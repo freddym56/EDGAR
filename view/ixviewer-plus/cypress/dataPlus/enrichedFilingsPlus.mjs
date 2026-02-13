@@ -3432,6 +3432,19 @@ export const filings = [
         "expectedSectionCountCorrection": ""
     },
 	{
+        "submissionType": "N-1A",
+        "accessionNum": "000119312525229869",
+        "docPath": "/Archives/edgar/data/1479026/000119312525229869/d50048d485bpos.htm",
+        "notes": "",
+        "factCount": "54",
+        "timeout": "15000",
+        "multiInstance": "",
+        "multiDoc": "",
+        "Instances": "",
+        "docName": "d50048d485bpos",
+        "expectedSectionCountCorrection": ""
+    },
+	{
         "submissionType": "DEF 14A",
         "accessionNum": "000119312523079100",
         "docPath": "/Archives/edgar/data/1045609/000119312523079100/d412709ddef14a.htm",
@@ -3689,6 +3702,36 @@ export const filings = [
 		"docName": "dp216618_exfilingfees.htm",
 	},
 	{
+		
+		"submissionType": "S-1",
+		"accessionNum": "filing-fee-decimal",
+		"docPath": "/Archives/edgar/data/no-cik/filing-fee-decimal/EXFILINGFEES.htm",
+		"notes": "Rounded big number fact",
+		"factCount": "47",
+		"timeout": "15000",
+		"multiInstance": false,
+		"multiDoc": false,
+		"filingFees": true,
+		"Instances": "",
+		"docName": "EXFILINGFEES.htm",
+		"expectedSectionCountCorrection": ""
+		
+	},
+	{
+		"submissionType": "10-Q",
+        "accessionNum": "000143774923034166",
+        "docPath": "/Archives/edgar/data/1415744/000143774923034166/nmex20231031_10q.htm",
+        "notes": "not round on large number",
+        "factCount": "226",
+        "timeout": "15000",
+        "multiInstance": false,
+        "multiDoc": false,
+		"filingFees": "",
+        "Instances": "",
+        "docName": "nmex20231031_10q.htm",
+        "expectedSectionCountCorrection": ""
+    },
+	{
 		"accessionNum": "000093041325000291",
 		"docPath": "/Archives/edgar/data/911507/000093041325000291/c110608_ncsr-ixbrl.htm",
 		"timeout": "150000",
@@ -3723,6 +3766,18 @@ export const filings = [
 		"docName": "aumn-20250930.htm.htm",
 		"factCount": 579,
 		"NCSR": false,
+	},
+	{
+		"accessionNum": "000120677425000099",
+		"docPath": "http://localhost:3000/ix.xhtml?doc=/Archives/edgar/data/1090009/000120677425000099/sfst4401651-10k.htm",
+		"timeout": "20000",
+        "multiInstance": false,
+        "multiDoc": false,
+		"filingFees": "",
+        "Instances": "",
+		"docName": "sfst4401651-10k.htm",
+		"factCount": 2860,
+		"NCSR": true,
 	},
 	{
 		"accessionNum": "000110465925020739",

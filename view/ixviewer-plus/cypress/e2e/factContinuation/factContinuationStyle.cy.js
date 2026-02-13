@@ -54,20 +54,64 @@ describe(`Fact Continuation`, () => {
 
         // fact 1
         cy.get('#fact-identifier-200', { timeout: Number(filing.timeout) }).click()
-        cy.get('#fact-identifier-200').should('be.visible').should('have.attr', 'selected-fact', 'true')
-        cy.get("[continued-main-fact-id='fact-identifier-200']").should('have.attr', 'selected-fact', 'true').should('have.attr', 'hover-fact', 'true')
+        cy.wait(500);
+        cy.get('#fact-identifier-200')
+        cy.get('[id="fact-nested-modal-close"]').click();
+        cy.get('#fact-identifier-200')
+            .should('have.attr', 'selected-fact', 'true')
+        cy.get("[continued-main-fact-id='fact-identifier-200']")
+            .should('have.attr', 'selected-fact', 'true')
 
         cy.get('#fact-identifier-199', { timeout: Number(filing.timeout) }).click()
-        cy.get('#fact-identifier-199').should('be.visible').should('have.attr', 'selected-fact', 'true').should('have.attr', 'hover-fact', 'true')
-        cy.get("[continued-main-fact-id='fact-identifier-200']").should('have.attr', 'selected-fact', 'false').should('have.attr', 'hover-fact', 'false')
-        cy.get("[continued-main-fact-id='fact-identifier-199']").should('have.attr', 'selected-fact', 'true').should('have.attr', 'hover-fact', 'true')
+        cy.wait(500);
+        cy.get('#fact-identifier-199').should('be.visible')
+            .should('have.attr', 'selected-fact', 'true')
+        cy.get("[continued-main-fact-id='fact-identifier-200']")
+            .should('have.attr', 'selected-fact', 'false')
+        cy.get("[continued-main-fact-id='fact-identifier-199']")
+            .should('have.attr', 'selected-fact', 'true')
 
-        // clicked on one of the continued facts and expect all continied fact and main continued fact to be selected
+        // clicked on continuation of fact 200 and expect all continied fact and main continued fact to be selected
         cy.get("[id='iinn_ScheduleOfFinancialLiabilities-c0_cont_3']", { timeout: Number(filing.timeout) }).click()
-        cy.get('#fact-identifier-200').should('be.visible').should('have.attr', 'selected-fact', 'true').should('have.attr', 'hover-fact', 'true')
-        cy.get("[continued-main-fact-id='fact-identifier-200']").should('have.attr', 'selected-fact', 'true').should('have.attr', 'hover-fact', 'true')
-        cy.get("[continued-main-fact-id='fact-identifier-199']").should('have.attr', 'selected-fact', 'false').should('have.attr', 'hover-fact', 'false')
- 
+        cy.wait(500);
+        cy.get('[id="fact-nested-modal-close"]').click();
+        cy.get('#fact-identifier-200')
+            .should('have.attr', 'selected-fact', 'true')
+        cy.get("[continued-main-fact-id='fact-identifier-200']")
+            .should('have.attr', 'selected-fact', 'true')
+        cy.get("[continued-main-fact-id='fact-identifier-199']")
+            .should('have.attr', 'selected-fact', 'false')
+    })
+
+    it('should highlight all parts of a continued fact, if any of the continued facts is hovered', () => {
+        let filing = readFilingDataAccNum('000101376223000425')
+        cy.loadFiling(filing)
+
+        // fact 1
+        cy.get('#fact-identifier-200', { timeout: Number(filing.timeout) }).trigger('mouseover');
+        cy.get('#fact-identifier-200')
+            .should('have.attr', 'hover-fact', 'true')
+        cy.get("[continued-main-fact-id='fact-identifier-200']")
+            .should('have.attr', 'hover-fact', 'true')
+
+        // fact 2
+        cy.get('#fact-identifier-199', { timeout: Number(filing.timeout) }).trigger('mouseover');
+        cy.get('#fact-identifier-199').should('be.visible')
+            .should('have.attr', 'hover-fact', 'true')
+        cy.get("[continued-main-fact-id='fact-identifier-200']")
+            .should('have.attr', 'hover-fact', 'false')
+        cy.get("[continued-main-fact-id='fact-identifier-199']")
+            .should('have.attr', 'hover-fact', 'true')
+
+        // clicked on continuation of fact 200 and expect all continied fact and main continued fact to be selected
+        cy.get("[id='iinn_ScheduleOfFinancialLiabilities-c0_cont_3']", { timeout: Number(filing.timeout) }).trigger('mouseover');
+        cy.get('#fact-identifier-200')
+            .should('have.attr', 'hover-fact', 'true')
+        cy.get("[continued-main-fact-id='fact-identifier-200']")
+            .should('have.attr', 'hover-fact', 'true')
+        cy.get("[continued-main-fact-id='fact-identifier-199']")
+            .should('have.attr', 'hover-fact', 'false')
+
     })  
 
     it('should select all parts of a continued fact, if any of the continued facts is selected on url', () => {

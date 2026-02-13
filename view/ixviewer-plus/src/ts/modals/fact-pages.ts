@@ -10,8 +10,8 @@ import { LabelEnum, SegmentClass, SingleFact } from "../interface/fact";
 
 const formatSegment = (segment: string) => {
 	if (segment) {
-		let domain:string = segment.split(':')[0]
-		const concept:string = segment.split(':')[1]
+		let domain: string = segment.split(':')[0]
+		const concept: string = segment.split(':')[1]
 		domain = `<span class="font-weight-bold">${domain.toLocaleUpperCase()}</span>`;
 
 		const dimensionLabels = [
@@ -19,12 +19,12 @@ const formatSegment = (segment: string) => {
 			"Member",
 			"Domain",
 		];
-	
+
 		let conceptFormatted = ''
 		if (concept) {
 			const conceptArr: string[] | null = concept.match(/[A-Z][a-z]*/g);
 			conceptArr?.map((word, index, arr) => {
-				if (index === arr.length -1) {
+				if (index === arr.length - 1) {
 					if (dimensionLabels.includes(word)) {
 						word = `[${word}]`;  // wrap dimension labels (last word) in square brackets
 					}
@@ -39,12 +39,49 @@ const formatSegment = (segment: string) => {
 		} else {
 			return null;
 		}
-	
+
 		const formattedSegment = [domain, conceptFormatted || concept].join(' ');
 		return formattedSegment;
 	}
 	return segment;
 }
+
+export const formatFactValue = (rawValue: string, decimalsVal: string, locale = "en-US"): string => {
+	const original = rawValue == null ? "" : String(rawValue).trim();
+
+	if (!original) return original;
+
+	
+	// Parse decimalsVal defensively
+	const dStr = (decimalsVal ?? "").trim();
+	const parsed = Number.parseInt(dStr, 10);
+
+
+	const hasValidDecimals = Number.isFinite(parsed) && parsed >= 0;
+	// Clamp and floor to the Intl spec range [0, 20]
+	const fractionDigits = hasValidDecimals
+		? Math.min(Math.floor(parsed), 20)
+		: 20; // safe default for the "else" branch
+
+
+	let formatter: Intl.NumberFormat;
+
+	if (hasValidDecimals) {
+		formatter = new Intl.NumberFormat(locale, {
+			minimumFractionDigits: fractionDigits,
+			maximumFractionDigits: fractionDigits,
+		});
+	} else {
+		// Only maximumFractionDigits when decimals are invalid; use a valid default (20)
+		formatter = new Intl.NumberFormat(locale, {
+			maximumFractionDigits: fractionDigits,
+		});
+	}
+
+
+	return formatter.format(original)
+};
+
 
 const getSegmentAttr = (segment: Array<SegmentClass[] | SegmentClass>, targetAttr: keyof SegmentClass) => {
 	if (segment) {
@@ -202,7 +239,7 @@ export const FactPages = {
 		const elementsToReturn = document.createElement("tbody");
 
 		possibleAspects.forEach((aspect) => {
-			if (aspect["name"] === 'Member' ||  aspect["name"] === 'Axis') return;
+			if (aspect["name"] === 'Member' || aspect["name"] === 'Axis') return;
 			const debugXmlParsing = false;
 
 			if (aspect["value"]) {
@@ -222,7 +259,7 @@ export const FactPages = {
 				tdContentsDiv.classList.add(aspect["name"] === 'Tag' ? "break-all" : "break-word");
 				tdContentsDiv.setAttribute('data-cy', `${aspect["name"]}-value`);
 
-				const useExperimentalFootnoteRenderer = false; 
+				const useExperimentalFootnoteRenderer = false;
 
 				// footnotes
 				if (useExperimentalFootnoteRenderer && aspect["name"] == "Footnote") {
@@ -262,15 +299,8 @@ export const FactPages = {
 
 				} else {
 					//convert fact string to number to add in formatting
-					if (aspect["name"] === "Fact") {
-						const factStringToNumber = Number(aspect["value"]);
-						if (aspect["isAmountsOnly"] && !Number.isNaN(factStringToNumber)) {
-							if (factInfo.decimalsVal && factInfo.decimalsVal >= 0) {
-								aspect["value"] = factStringToNumber.toLocaleString("en-US", { "maximumFractionDigits": 10, "minimumFractionDigits": factInfo.decimalsVal });
-							} else {
-								aspect["value"] = factStringToNumber.toLocaleString("en-US", { "maximumFractionDigits": 10 });
-							}
-						}
+					if (aspect["name"] === "Fact" && aspect["value"] && aspect["isAmountsOnly"]) {
+						aspect["value"] = formatFactValue(aspect["value"], factInfo?.decimalsVal);
 					}
 
 					tdContentsDiv.textContent = aspect["value"].toString();
@@ -318,14 +348,14 @@ export const FactPages = {
 				topRef.forEach((nestedRef: any) => {
 					for (const [key, val] of Object.entries(nestedRef)) {
 						const trElement = document.createElement("tr");
-	
+
 						const thElement = document.createElement("th");
-	
+
 						const aTag = document.createElement('a');
 						aTag.setAttribute('href', String(val));
 						aTag.setAttribute('target', '_blank');
 						aTag.setAttribute('rel', 'noopener noreferrer');
-	
+
 						if (val === 'URI') {
 							const small = document.createElement('small');
 							const smallContent = document.createTextNode(' (Will Leave SEC Website)');
@@ -337,17 +367,17 @@ export const FactPages = {
 							const thContent = document.createTextNode(key);
 							thElement.appendChild(thContent);
 						}
-	
+
 						const tdElement = document.createElement("td");
-	
+
 						const divElement = document.createElement("div");
-	
+
 						if (val === 'URI') {
 							const aTag = document.createElement('a');
 							aTag.setAttribute('href', val);
 							aTag.setAttribute('target', '_blank');
 							aTag.setAttribute('rel', 'noopener noreferrer');
-	
+
 							const aContent = document.createTextNode(val);
 							aTag.appendChild(aContent);
 							tdElement.appendChild(aTag);
@@ -369,7 +399,7 @@ export const FactPages = {
 					trEmptyElement.appendChild(tdEmptyElement);
 					elementsToReturn.appendChild(trEmptyElement);
 				}
-	
+
 			});
 		}
 		FactPages.fillCarousel(idToFill, elementsToReturn.firstElementChild ? elementsToReturn : FactPages.noDataCarousel());
@@ -380,10 +410,10 @@ export const FactPages = {
 		const calculations = [...factInfo.calculations];
 
 		calculations.unshift(
-		[{
-			label: LabelEnum.Balance,
-			value: factInfo.balance ? factInfo.balance : 'N/A',
-		}]);
+			[{
+				label: LabelEnum.Balance,
+				value: factInfo.balance ? factInfo.balance : 'N/A',
+			}]);
 
 		const elementsToReturn = document.createElement("tbody");
 
@@ -438,4 +468,6 @@ export const FactPages = {
 
 		document.getElementById(idToFill)?.appendChild(generatedHTML);
 	}
+
+
 };

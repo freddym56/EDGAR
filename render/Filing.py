@@ -15,7 +15,7 @@ from itertools import chain
 import arelle.ModelValue, arelle.XbrlConst
 from arelle.ModelDtsObject import ModelConcept
 from arelle.ModelObject import ModelObject
-from arelle.PythonUtil import OrderedSet
+from arelle.PythonUtil import OrderedSet, pyNamedObject
 from arelle.XmlUtil import collapseWhitespace
 from arelle.XmlValidateConst import VALID, VALID_NO_CONTENT
 from arelle.XbrlConst import parentChild
@@ -27,11 +27,12 @@ usGaapOrIfrsPattern = re.compile(".*/fasb[.]org/(us-gaap|srt)/20|.*/xbrl[.]ifrs[
 deiPattern = re.compile(".*/xbrl[.]sec[.]gov/dei/20", re.I)
 
 
-def mainFun(controller, modelXbrl, outputFolderName, transform=None, suplSuffix=None, rFilePrefix=None, altFolder=None, altTransform=None, altSuffix=None, zipDir=None):
+def mainFun(controller, report, outputFolderName, transform=None, suplSuffix=None, rFilePrefix=None, altFolder=None, altTransform=None, altSuffix=None, zipDir=None):
+    modelXbrl = report.modelXbrl
     if "EdgarRenderer/Filing.py#mainFun" in modelXbrl.arelleUnitTests:
-        raise arelle.PythonUtil.pyNamedObject(modelXbrl.arelleUnitTests["EdgarRenderer/Filing.py#mainFun"], "EdgarRenderer/Filing.py#mainFun")
+        raise pyNamedObject(modelXbrl.arelleUnitTests["EdgarRenderer/Filing.py#mainFun"], "EdgarRenderer/Filing.py#mainFun")
     _funStartedAt = time.time()
-    filing = Filing(controller, modelXbrl, outputFolderName, transform, suplSuffix, rFilePrefix, altFolder, altTransform, altSuffix, zipDir)
+    filing = Filing(controller, report, outputFolderName, transform, suplSuffix, rFilePrefix, altFolder, altTransform, altSuffix, zipDir)
     controller.logDebug("Filing initialized {:.3f} secs.".format(time.time() - _funStartedAt)); _funStartedAt = time.time()
     filing.populateAndLinkClasses()
     controller.logDebug("Filing populateAndLinkClasses {:.3f} secs.".format(time.time() - _funStartedAt)); _funStartedAt = time.time()
@@ -203,8 +204,10 @@ def contextDims(context) -> dict:
 
 class Filing(object):
 
-    def __init__(self, controller, modelXbrl, outputFolderName, transform, suplSuffix, rFilePrefix, altFolder, altTransform, altSuffix, zipDir):
-        self.modelXbrl = modelXbrl
+    def __init__(self, controller, report, outputFolderName, transform, suplSuffix, rFilePrefix, altFolder, altTransform, altSuffix, zipDir):
+        self.report = report
+        report.renderedFiles = [] # clear any prior rendered files when rerun for redaction
+        self.modelXbrl = modelXbrl = report.modelXbrl
         self.transform = transform
         self.suplSuffix = suplSuffix
         self.rFilePrefix = rFilePrefix

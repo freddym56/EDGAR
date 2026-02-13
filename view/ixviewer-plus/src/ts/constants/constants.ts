@@ -11,9 +11,8 @@ import { Section } from "../interface/meta";
 //Not really used (see comment below)
 type MetaDocument = any;
 
-export const Constants =
-{
-	version: "26.0.u1",
+export const Constants = {
+	version: "26.1",
 	featureSet: "plus",
 	appStart: 0,
 	loadPhaseComplete: 0,

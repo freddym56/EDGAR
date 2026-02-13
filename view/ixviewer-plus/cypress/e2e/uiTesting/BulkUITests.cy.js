@@ -74,7 +74,7 @@ describe("UI Basic checkup", () => {
                     // Checking for the existence of the buttons in the menu dropdown
                     // These tests will fail if we change the specific wording of these buttons
                     cy.get(selectors.menuInfoButton).should('contain.text', 'Information')
-                    cy.get(selectors.menuXBRLInstance).should('contain.text', 'Save XBRL Instance')
+                    cy.get(selectors.menuXBRLInstance).should('contain.text', 'Open XBRL Instance')
                     cy.get(selectors.menuXBRLZip).should('contain.text', 'Save XBRL Zip File')
                     cy.get(selectors.menuHTML).should('contain.text', 'Open as HTML')
                     cy.get(selectors.menuSettings).should('contain.text', 'Settings')

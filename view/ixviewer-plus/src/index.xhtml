@@ -12,7 +12,7 @@
     <title>Inline Viewer</title>
 </head>
 
-<body class="overflow-hidden">
+<body class="overflow-hidden ix-body">
     <noscript>
         This application relies heavily on JavaScript -- you
         will need to allow JavaScript to use this application.
@@ -58,7 +58,7 @@
                                 class="dropdown-item click text-body ix-focus-inset" tabindex="1">Information</a>
                             <a id="form-information-instance" data-test="form-information-instance"
                                 class="dropdown-item click text-body ix-focus-inset" target="_blank" rel="noopener noreferrer"
-                                tabindex="1">Save XBRL Instance</a>
+                                tabindex="1">Open XBRL Instance</a>
                             <a id="form-information-zip" data-test="form-information-zip"
                                 class="dropdown-item click text-body ix-focus-inset" rel="noopener noreferrer"
                                 tabindex="1">Save XBRL Zip File</a>
@@ -617,7 +617,7 @@
                 </div>
             </div>
 
-            <!-- help sidebar -->
+            <!-- Help sidebar -->
             <div class="col-auto px-0 sidebar-container sidebar-container-left help-sidebar hide">
                 <div id="help-menu" class="sidebar sidebar-scrollable left-sidebar collapse collapse-horizontal">
                     <div class="offcanvas-header space-between">
@@ -858,11 +858,11 @@
                                             location in the HTML</li>
                                     </ul>
                                     <p class="m-2">
-                                        <strong>Save XBRL Instance</strong>
+                                        <strong>Open XBRL Instance</strong>
                                     </p>
-                                    <p class="m-2">The Save XBRL Instance menu item allows
+                                    <p class="m-2">The Open XBRL Instance menu item allows
                                         an XBRL instance document (*.xml) that is extracted from the
-                                        Inline document to be saved locally for use by software
+                                        Inline document to be opened in a new tab.  User can then save locally for use by software
                                         supporting the XBRL format.</p>
                                     <p class="m-2">
                                         <strong>Save XBRL Zip</strong>
@@ -944,7 +944,7 @@
                 </div>
             </div>
 
-            <!-- middle pane: Main inline viewer pane for htm doc -->
+            <!-- Middle pane: Main inline viewer pane for htm doc -->
             <div class="col px-0 middle-pane-container overflow-hidden">
             
                 <div id="error-container" data-test="error-container" class="px-0">
@@ -1027,6 +1027,7 @@
                 
             </div>
 
+            <!-- Facts Sidebar -->
             <div class="col-auto px-0 sidebar-container sidebar-container-right hide">
                 <div id="facts-menu" class="sidebar collapse collapse-horizontal show">
                     <div class="offcanvas-header space-between">

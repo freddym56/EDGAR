@@ -15,12 +15,23 @@ export const FormInformation = {
     },
 
     xbrlInstance: () => {
-       const currentInstance = Constants.getInstances.find(element => element.current);
-       document.getElementById('form-information-instance')?.setAttribute('href', currentInstance?.xmlUrl || "#");
+        const currentInstance = Constants.getInstances.find(element => element.current);
+        const urlParams = HelpersUrl.returnURLParamsAsObject();
+        let xmlUrl = currentInstance?.xmlUrl || '';
+        if (HelpersUrl.isWorkstation() || HelpersUrl.isMockWorkstation()) {
+            if (urlParams.redline) {
+                // private
+                xmlUrl = xmlUrl.replace('_htm.xml', '_ht2.xml')
+            } else {
+                // public
+                xmlUrl = xmlUrl.replace('_htm.xml', '_ht1.xml')
+            }
+        }
+        document.getElementById('form-information-instance')?.setAttribute('href', xmlUrl || "#");
     },
 
     xbrlZip: () => {
-        //Handle Workstation case
+        // Handle Workstation case
         if (HelpersUrl.isWorkstation()) {
             const url = Constants.appWindow.location.href;
             const params = new URLSearchParams(Constants.appWindow.location.search);
@@ -70,7 +81,18 @@ export const FormInformation = {
 
     xbrlHtml: () => {
         const currentXHTML = Constants.getInstances.find(element => element.current)?.docs.find(element => element.current);
-        document.getElementById('form-information-html')?.setAttribute('href', currentXHTML?.url || "#");
+        const urlParams = HelpersUrl.returnURLParamsAsObject();
+        let htmlUrl = currentXHTML?.url || '';
+        if (HelpersUrl.isWorkstation() || HelpersUrl.isMockWorkstation()) {
+            if (urlParams.redline) {
+                // private
+                htmlUrl = htmlUrl.replace('.htm', '_ix2.htm');
+            } else {
+                // public
+                htmlUrl = htmlUrl.replace('.htm', '_ix1.htm');
+            }
+        }
+        document.getElementById('form-information-html')?.setAttribute('href', htmlUrl || "#");
     },
 
     version: () => {

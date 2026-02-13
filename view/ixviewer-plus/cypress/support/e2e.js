@@ -32,11 +32,11 @@ Cypress.on('uncaught:exception', (err, runnable) => {
     return false
 })
 
-Cypress.Commands.add('loadByAccessionNum', (accessionNum) => {
+Cypress.Commands.add('loadByAccessionNum', (accessionNum, urlParam = '') => {
     // This function invokes the 'getByAccessionNum' function over in filingsFunnel.js
     // Did it this way so we can keep this function usable by standalone scripts outside Cypress
     let filingObj = getByAccessionNum(accessionNum)
-    if (filingObj) cy.loadFiling(filingObj);
+    if (filingObj) cy.loadFiling(filingObj, urlParam);
 })
 
 Cypress.Commands.add('loadWithHash', (accessionNum, hash) => {
@@ -54,10 +54,10 @@ Cypress.Commands.add('loadByIndex', (index) => {
     else { console.error(`no filing matching accession number ${accessionNum}`) }
 })
 
-Cypress.Commands.add('loadFiling', (filing) => {
+Cypress.Commands.add('loadFiling', (filing, urlParam = '') => {
     // It may be helpful to use this instead of cy.visit when iterating over a collection of filing objects 
     // ... as we can then leverage filing specific timeouts.
-    return cy.visit(filing.docPath, { timeout : Number(filing.timeout) }).then(browser => {
+    return cy.visit(filing.docPath + urlParam, { timeout : Number(filing.timeout) }).then(browser => {
         // Standard mode of waiting until the filing has completely loaded
         //cy.get(selectors.factCountClock, { timeout: Number(filing.timeout) || 12000 }).should('not.exist');
         cy.get('div[id="loading-animation"]', { timeout: Number(filing.timeout) || 12000 }).should('not.be.visible');

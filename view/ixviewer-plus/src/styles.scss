@@ -81,10 +81,6 @@ hr {
   padding-top: .7rem;
   padding-bottom: .7rem;
 }
-#dynamic-xbrl-form hr {
-  margin-top: revert-layer;
-  margin-bottom: revert-layer;
-}
 
 #menuContents a:active {
   background-color: #bbe6ff;
@@ -427,21 +423,32 @@ textarea.form-control {
 // css reset 'fixes' to overwrite bootstrap stuff
 #dynamic-xbrl-form section {
   all: initial;
-  body {
-    all: initial;
-    padding: 0 5px;
-    table {
-      all: revert-layer;
-      width: revert-layer;
-    };
+  // all: revert-layer;
+  padding: 0 5px;
+  table {
     p {
-      margin: auto;
-    };
+      margin-top: 0;
+      margin-bottom: 0;
+    }
+  };
+  * {
+    font-weight: revert-layer;
   }
 }
 
 h1, h2, h3, h4, h5, h6 {
   all: revert-layer;
+}
+
+#dynamic-xbrl-form hr {
+  margin-top: revert-layer;
+  margin-bottom: revert-layer;
+  margin-left: revert-layer;
+  margin-right: revert-layer;
+}
+
+#dynamic-xbrl-form a {
+  color: revert-layer;
 }
 
 kbd {

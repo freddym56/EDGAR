@@ -13,7 +13,7 @@ describe('IXViewer Content Missing', () => {
         */
         Cypress.config('pageLoadTimeout', 10000)
         cy.loadByAccessionNum('bigFiling1')
-        cy.get(selectors.xbrlForm+" > section[id='xbrl-section-current'] > body").then(($body) => {
+        cy.get(selectors.xbrlForm+" > section[id='xbrl-section-current']").then(($body) => {
             /*
             IXViewer will make slight changes to the raw HTML document, so we have to give it some wiggle room
             In my testing, the variance introduced by IXViewer is 0.2%. Giving it a 1% allowance should be fine.

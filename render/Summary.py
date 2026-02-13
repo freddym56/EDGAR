@@ -611,8 +611,8 @@ class InstanceSummary(object):
         self.tagDict = OrderedDict()
         for concept in sorted(conceptInUseSet, key=lambda concept: getattr(concept.qname, 'localName', None)):
             self.tagDict[concept.attrib['id']] = {'xbrltype': getattr(concept.typeQname, 'localName', None)
-                                                  , 'nsuri': concept.qname.namespaceURI
-                                                  , 'localname': concept.qname.localName}
+                                                  , 'nsuri': getattr(concept.qname, 'namespaceURI', None)
+                                                  , 'localname': getattr(concept.qname, 'localName', None)}
             tag = self.tagDict[concept.attrib['id']]
             roleDict = None
             if concept.balance is not None: tag['crdr'] = concept.balance
@@ -696,10 +696,11 @@ class InstanceSummary(object):
                         elif ('contextRef' in e.attrib):
                             if (not e.parentQname == hiddenQname):
                                 context = e.context
-                                hash = context.dimsHash
-                                if (hash in rrSectionDimsHashDict):
-                                    if (len(rrSectionDimsHashDict[hash]) == 0):
-                                        rrSectionDimsHashDict[hash] = (e.objectIndex + 1, e)
+                                if context is not None:
+                                    hash = context.dimsHash
+                                    if (hash in rrSectionDimsHashDict):
+                                        if (len(rrSectionDimsHashDict[hash]) == 0):
+                                            rrSectionDimsHashDict[hash] = (e.objectIndex + 1, e)
             rrSections = sorted(rrSectionDimsHashDict.values())
             rrSections = [pair for pair in rrSections if len(pair) == 2]
             self.rrSectionFacts = []

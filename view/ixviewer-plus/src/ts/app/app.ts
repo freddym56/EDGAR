@@ -302,6 +302,9 @@ function progressiveLoadDoc(xhtml: string): void {
 function prepDocAndAddToDom(xhtml: string, current: boolean, i?: number): void {
     const parser = new DOMParser();
     const htmlDoc = parser.parseFromString(xhtml, "text/html");
+    // Note: while we refer to docs as xhtml, they are actually xml-like html, hence the "text/html" mime type here.
+    // That is also the content type when looking at the request in the browswer.  
+    // xml tag attributes are probably used on the backend for validation, but ignored in browswer parsing
 
     // Each .htm file (doc) gets its own section element which will be a child of the xbrl-form
     const docSection = document.createElement('section');
@@ -333,7 +336,14 @@ function prepDocAndAddToDom(xhtml: string, current: boolean, i?: number): void {
         splitBodyContents(body);
     }
 
-    docSection.append(body);
+    // We don't want to add the body tag of the doc, just it's contents.
+    // fragment will hold contents of body.  
+    const fragment = document.createDocumentFragment();
+    while (body.firstChild) {
+        fragment.appendChild(body.firstChild);
+    }
+
+    docSection.append(fragment);
     // incrementProgress();
     document.getElementById("dynamic-xbrl-form")?.append(docSection);
 
@@ -347,7 +357,7 @@ function prepDocAndAddToDom(xhtml: string, current: boolean, i?: number): void {
  * 1. limit the number of direct children of `body`
  * 2. utilize `content-visibility: auto` to load elements only when necessary
  */
-function splitBodyContents(body: HTMLElement): void {
+function splitBodyContents(body: HTMLElement | DocumentFragment): void {
     if (Constants.sumOfDocsSizes < Constants.docSizeFallbackLimit) {
         ErrorsMinor.message("IX Viewer has detected a very large file.  Performance may be degraded, and some features may not work as expected.");
         // else (docs greater than doc limit) message handled elsewhere

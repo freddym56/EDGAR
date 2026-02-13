@@ -110,7 +110,6 @@ class PresentationGroup(object):
                             for rel in reversed(localRelationshipSet)
                             if rel.toModelObject is not None),
                         linkrole=self.cube.linkroleUri)
-                raise Utils.RenderingException("xbrl.5.2.4.2", "Presentation group {} contains a directed cycle".format(self.cube.shortName))
             localRelationshipSet.append(relationship)
 
             try:

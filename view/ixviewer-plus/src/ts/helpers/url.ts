@@ -12,7 +12,7 @@ import { ixScrollTo } from "../helpers/utils";
 import { Facts } from "../facts/facts";
 
 export const HelpersUrl = {
-    fullURL: null as string | null,
+    fullURL: null as string | null | undefined,
     getFolderAbsUrl: null as string | null,
     getURL: null as string | null,
     getExternalFile: null as string | null,
@@ -104,9 +104,9 @@ export const HelpersUrl = {
     isWorkstation: (): boolean => {
         const url = Constants.appWindow.location.href;
         let isWorkstation = url.includes("DisplayDocument.do?");
-        isWorkstation ||= Constants.appWindow.location.host.indexOf("edgar.sec.gov") > 0; //originally used in form-information
+        isWorkstation ||= Constants.appWindow.location.host.indexOf("edgar.sec.gov") > 0; // originally used in form-information
 
-        //an old implementation:
+        // an old implementation:
         // const isWorkStation = Object.prototype.hasOwnProperty.call(urlParamsAsObject, 'accessionNumber') &&
         //   Object.prototype.hasOwnProperty.call(urlParamsAsObject, 'xbrl') &&
         //   Object.prototype.hasOwnProperty.call(urlParamsAsObject, 'interpretedFormat');
@@ -114,12 +114,24 @@ export const HelpersUrl = {
         return isWorkstation;
     },
 
-    returnURLParamsAsObject: (url: string): UrlParams => {
+    urlParamTrue: (param: string, url: string = Constants.appWindow.location.href): boolean => {
         const urlParams = new URLSearchParams(url);
+        const urlParamsAsObject = Object.fromEntries(urlParams);
+        return !!urlParamsAsObject[param];
+    },
+
+    isMockWorkstation: () => {
+        // designed to be used for cypress testing when passing '&ws=true' in url params.
+        return HelpersUrl.urlParamTrue('ws');
+    },
+
+    returnURLParamsAsObject: (url: string = Constants.appWindow.location.href): UrlParams => {
+        const urlObject = new URL(url, Constants.appWindow?.location?.origin);
+        const urlParams = urlObject.searchParams;
         const objToReturn = {} as UrlParams;
         const urlParamsAsObject = Object.fromEntries(urlParams);
         const isWorkStation = HelpersUrl.isWorkstation();
-        const isFEPT = urlParamsAsObject.doc.includes('view.html');
+        const isFEPT = urlParamsAsObject.doc ? urlParamsAsObject.doc.includes('view.html') : false;
 
         for (const urlParam of urlParams.entries()) {
             let [paramKey, paramVal] = urlParam;
@@ -196,7 +208,7 @@ export const HelpersUrl = {
             HelpersUrl.fullURL = HelpersUrl.fullURL?.replace(HelpersUrl.getHTMLFileName || "", internalUrl) || null;
             const hash = HelpersUrl.fullURL?.indexOf('#');
 			if (hash !== -1 && HelpersUrl) {
-				HelpersUrl.fullURL = HelpersUrl.fullURL.substring(0, hash);
+				HelpersUrl.fullURL = HelpersUrl.fullURL?.substring(0, hash);
 			}
             if (!onBack) {
                 HelpersUrl.updateURLWithoutReload();

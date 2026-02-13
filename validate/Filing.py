@@ -3750,7 +3750,9 @@ def validateFiling(val, modelXbrl, isEFM=False, isGFM=False):
     # DQC.US rules
     if dqcRules:
         try:
-            if xuleValidate(val): # true if there was a Xule validation
+            if "EFM.6.05.20.documentTypeValue" in modelXbrl.errors:
+                dqcRules = {} # block dqc due to invalid docType
+            elif xuleValidate(val): # true if there was a Xule validation
                 dqcRules = {} # block built-in rules
             else:
                 xuleConstants = loadXuleConstantsForPythonRules(val, dqcRules)
@@ -5113,7 +5115,7 @@ def validateFiling(val, modelXbrl, isEFM=False, isGFM=False):
                                 preNumericItems = set(c.name for c in preConcepts if c.isMonetary and c.periodType == "duration")
                                 calcItems = set()
                                 for rel in calcRelSet.modelRelationships:
-                                    if rel.fromModelObject.name in preNumericItems and rel.toModelObject.name in preNumericItems:
+                                    if getattr(rel.fromModelObject, "name", None) in preNumericItems and getattr(rel.toModelObject, "name", None) in preNumericItems:
                                         calcItems.add(rel.fromModelObject.name)
                                         calcItems.add(rel.toModelObject.name)
                                 presConceptNoCalculation = preNumericItems - (calcItems | BS_IS_exceptions | IS_SupplementalDisclosures | SHEexceptions)
@@ -5122,7 +5124,7 @@ def validateFiling(val, modelXbrl, isEFM=False, isGFM=False):
                                 preNumericItems = set(c.name for c in preConcepts if c.isMonetary and c.periodType == "instant")
                                 calcItems = set()
                                 for rel in calcRelSet.modelRelationships:
-                                    if rel.fromModelObject.name in preNumericItems and rel.toModelObject.name in preNumericItems:
+                                    if getattr(rel.fromModelObject, "name", None) in preNumericItems and getattr(rel.toModelObject, "name", None) in preNumericItems:
                                         calcItems.add(rel.fromModelObject.name)
                                         calcItems.add(rel.toModelObject.name)
                                 presConceptNoCalculation = preNumericItems - (calcItems | BS_IS_exceptions | IS_SupplementalDisclosures)
@@ -5131,7 +5133,7 @@ def validateFiling(val, modelXbrl, isEFM=False, isGFM=False):
                                 preNumericItems = set(c.name for c in preConcepts if c.isMonetary)
                                 calcItems = set()
                                 for rel in calcRelSet.modelRelationships:
-                                    if rel.fromModelObject.name in preNumericItems and rel.toModelObject.name in preNumericItems:
+                                    if getattr(rel.fromModelObject, "name", None) in preNumericItems and getattr(rel.toModelObject, "name", None) in preNumericItems:
                                         calcItems.add(rel.fromModelObject.name)
                                         calcItems.add(rel.toModelObject.name)
                                 presConceptNoCalculation = preNumericItems - (calcItems | BS_IS_exceptions | IS_SupplementalDisclosures | SHEexceptions)

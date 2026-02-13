@@ -11,6 +11,7 @@ import { Pagination } from "../pagination/sideBarPagination";
 import { Constants } from "../constants/constants";
 import { Facts } from "../facts/facts";
 import { Search } from "../search/search";
+import { formatFactValue } from  "../modals/fact-pages";
 
 export const FactsGeneral = {
 	getElementByNameContextref: (name: string, contextref: string) => {
@@ -106,14 +107,10 @@ export const FactsGeneral = {
 		factValElem.setAttribute('class', 'mb-0');
 		factValElem.setAttribute('data-cy', 'factVal');
 
-		let factValue = factInfo?.value;
-		if (factInfo?.value && factInfo.isAmountsOnly) {
-			let factNumVal = Number(factValue);
-			if (factInfo?.decimalsVal && factInfo.decimalsVal >= 0) {
-				factValue = factNumVal.toLocaleString("en-US", { "maximumFractionDigits": 10, "minimumFractionDigits": factInfo.decimalsVal })
-			} else {
-				factValue = factNumVal.toLocaleString("en-US", { "maximumFractionDigits": 10 })
-			}
+	
+		let factValue = factInfo?.value ?? '';
+		if (factValue && factInfo?.isAmountsOnly) {
+			factValue= formatFactValue(String(factValue), factInfo.decimalsVal ?? undefined)
 		} else {
 			factValue = factInfo?.value  || "nil";
 		}

@@ -1,5 +1,8 @@
 // stylelint-disable declaration-no-important, selector-no-qualifying-type, property-no-vendor-prefix
 
+/* 
+  IX Dev notes: see readme in ixviewer2, section "CSS Organization"
+*/
 
 // Reboot
 //
@@ -9,14 +12,26 @@
 // Normalize is licensed MIT. https://github.com/necolas/normalize.css
 
 
+
 // Document
 //
 // Change from `box-sizing: content-box` so that `width` is not affected by `padding` or `border`.
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
+#topNavs, #topNavs *, 
+#loading-animation, 
+.sidebar-container, 
+#error-container,
+#fact-table-container,
+#facts-breakdown-container,
+#form-information-modal,
+#settings-modal,
+#fact-modal,
+#fact-nested-modal {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
 }
 
 
@@ -127,9 +142,20 @@ h6 {
 // Similarly, the top margin on `<p>`s get reset. However, we also reset the
 // bottom margin to use `rem` units instead of `em`.
 
-p {
-  margin-top: 0;
-  margin-bottom: $paragraph-margin-bottom;
+#topNavs, 
+#loading-animation, 
+.sidebar-container, 
+#error-container,
+#fact-table-container,
+#facts-breakdown-container,
+#form-information-modal,
+#settings-modal,
+#fact-modal,
+#fact-nested-modal {
+  p {
+    margin-top: 0;
+    margin-bottom: $paragraph-margin-bottom;
+  }
 }
 
 
@@ -343,9 +369,20 @@ figure {
 //
 // Prevent double borders
 
-table {
-  caption-side: bottom;
-  border-collapse: collapse;
+#topNavs, #topNavs *, 
+#loading-animation, 
+.sidebar-container, 
+#error-container,
+#fact-table-container,
+#facts-breakdown-container,
+#form-information-modal,
+#settings-modal,
+#fact-modal,
+#fact-nested-modal {
+  table {
+    caption-side: bottom;
+    border-collapse: collapse;
+  }
 }
 
 caption {
@@ -609,4 +646,12 @@ progress {
 
 [hidden] {
   display: none !important;
+}
+
+#dynamic-xbrl-form {
+  all: revert;
+  display: block;
+}
+#dynamic-xbrl-form * {
+  box-sizing: content-box;
 }

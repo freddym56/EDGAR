@@ -114,7 +114,8 @@ latestTaxonomyDocs = { # note that these URLs are blocked by EFM validation mode
     "cef/*": {
         "deprecatedLabels": ["https://xbrl.sec.gov/cef/2023/cef-entire-2023.xsd",
                              "https://xbrl.sec.gov/cef/2024/cef-entire-2024.xsd",
-                             "https://xbrl.sec.gov/cef/2025/cef-entire-2025.xsd"],
+                             "https://xbrl.sec.gov/cef/2025/cef-entire-2025.xsd",
+                             "https://xbrl.sec.gov/cef/2026/cef-entire-2026.xsd"],
         "deprecatedLabelRolePattern": usDeprecatedLabelRolePattern,
         "deprecationDatePattern": usDeprecatedLabelPattern
         },
@@ -126,7 +127,8 @@ latestTaxonomyDocs = { # note that these URLs are blocked by EFM validation mode
                              "https://xbrl.sec.gov/country/2022/country-entire-2022.xsd",
                              "https://xbrl.sec.gov/country/2023/country-entire-2023.xsd",
                              "https://xbrl.sec.gov/country/2024/country-entire-2024.xsd",
-                             "https://xbrl.sec.gov/country/2025/country-entire-2025.xsd"],
+                             "https://xbrl.sec.gov/country/2025/country-entire-2025.xsd",
+                             "https://xbrl.sec.gov/country/2026/country-entire-2026.xsd"],
         "deprecatedLabelRolePattern": usDeprecatedLabelRolePattern,
         "deprecationDatePattern": usDeprecatedLabelPattern
         },
@@ -138,12 +140,14 @@ latestTaxonomyDocs = { # note that these URLs are blocked by EFM validation mode
                              "https://xbrl.sec.gov/currency/2022/currency-entire-2022.xsd",
                              "https://xbrl.sec.gov/currency/2023/currency-entire-2023.xsd",
                              "https://xbrl.sec.gov/currency/2024/currency-entire-2024.xsd",
-                             "https://xbrl.sec.gov/currency/2025/currency-entire-2025.xsd"],
+                             "https://xbrl.sec.gov/currency/2025/currency-entire-2025.xsd",
+                             "https://xbrl.sec.gov/currency/2026/currency-entire-2026.xsd"],
         "deprecatedLabelRolePattern": usDeprecatedLabelRolePattern,
         "deprecationDatePattern": usDeprecatedLabelPattern
         },
     "cyd/*": {
-        "deprecatedLabels": ["https://xbrl.sec.gov/cyd/2025/cyd-entire-2025.xsd"],
+        "deprecatedLabels": ["https://xbrl.sec.gov/cyd/2025/cyd-entire-2025.xsd",
+                             "https://xbrl.sec.gov/cyd/2026/cyd-entire-2026.xsd"],
         "deprecatedLabelRolePattern": usDeprecatedLabelRolePattern,
         "deprecationDatePattern": usDeprecatedLabelPattern
         },
@@ -155,14 +159,16 @@ latestTaxonomyDocs = { # note that these URLs are blocked by EFM validation mode
                              "https://xbrl.sec.gov/dei/2022/dei-2022_lab.xsd",
                              "https://xbrl.sec.gov/dei/2023/dei-2023_lab.xsd",
                              "https://xbrl.sec.gov/dei/2024/dei-2024_lab.xsd",
-                             "https://xbrl.sec.gov/dei/2025/dei-2025_lab.xsd"],
+                             "https://xbrl.sec.gov/dei/2025/dei-2025_lab.xsd",
+                             "https://xbrl.sec.gov/dei/2026/dei-2026_lab.xsd"],
         "deprecatedLabelRolePattern": usDeprecatedLabelRolePattern,
         "deprecationDatePattern": usDeprecatedLabelPattern
         },
     "ecd/*": {
         "deprecatedLabels": [ "https://xbrl.sec.gov/ecd/2023/ecd-entire-2023.xsd",
                               "https://xbrl.sec.gov/ecd/2024/ecd-entire-2024.xsd",
-                              "https://xbrl.sec.gov/ecd/2025/ecd-entire-2025.xsd"],
+                              "https://xbrl.sec.gov/ecd/2025/ecd-entire-2025.xsd",
+                              "https://xbrl.sec.gov/ecd/2026/ecd-entire-2026.xsd"],
         "deprecatedLabelRolePattern": usDeprecatedLabelRolePattern,
         "deprecationDatePattern": usDeprecatedLabelPattern
         },
@@ -174,20 +180,23 @@ latestTaxonomyDocs = { # note that these URLs are blocked by EFM validation mode
                              "https://xbrl.sec.gov/exch/2022/exch-entire-2022.xsd",
                              "https://xbrl.sec.gov/exch/2023/exch-entire-2023.xsd",
                              "https://xbrl.sec.gov/exch/2024/exch-entire-2024.xsd",
-                             "https://xbrl.sec.gov/exch/2025/exch-entire-2025.xsd"],
+                             "https://xbrl.sec.gov/exch/2025/exch-entire-2025.xsd",
+                             "https://xbrl.sec.gov/exch/2026/exch-entire-2026.xsd"],
         "deprecatedLabelRolePattern": usDeprecatedLabelRolePattern,
         "deprecationDatePattern": usDeprecatedLabelPattern
         },
     "ffd/*": {
         "deprecatedLabels": [ "https://xbrl.sec.gov/ffd/2024/ffd-entire-2024.xsd",
-                              "https://xbrl.sec.gov/ffd/2025/ffd-entire-2025.xsd"],
+                              "https://xbrl.sec.gov/ffd/2025/ffd-entire-2025.xsd",
+                              "https://xbrl.sec.gov/ffd/2026/ffd-entire-2026.xsd"],
         "deprecatedLabelRolePattern": usDeprecatedLabelRolePattern,
         "deprecationDatePattern": usDeprecatedLabelPattern
         },
     "fnd/*": {
         "deprecatedLabels": [ "https://xbrl.sec.gov/fnd/2023/fnd-entire-2023.xsd",
                               "https://xbrl.sec.gov/fnd/2024/fnd-entire-2024.xsd",
-                              "https://xbrl.sec.gov/fnd/2025/fnd-entire-2025.xsd"],
+                              "https://xbrl.sec.gov/fnd/2025/fnd-entire-2025.xsd",
+                              "https://xbrl.sec.gov/fnd/2026/fnd-entire-2026.xsd"],
         "deprecatedLabelRolePattern": usDeprecatedLabelRolePattern,
         "deprecationDatePattern": usDeprecatedLabelPattern
         },
@@ -202,14 +211,16 @@ latestTaxonomyDocs = { # note that these URLs are blocked by EFM validation mode
                              "https://xbrl.sec.gov/naics/2022/naics-entire-2022.xsd",
                              "https://xbrl.sec.gov/naics/2023/naics-entire-2023.xsd",
                              "https://xbrl.sec.gov/naics/2024/naics-entire-2024.xsd",
-                             "https://xbrl.sec.gov/naics/2025/naics-entire-2025.xsd"],
+                             "https://xbrl.sec.gov/naics/2025/naics-entire-2025.xsd",
+                             "https://xbrl.sec.gov/naics/2026/naics-entire-2026.xsd"],
         "deprecatedLabelRolePattern": usDeprecatedLabelRolePattern,
         "deprecationDatePattern": usDeprecatedLabelPattern
         },
     "oef/*": {
         "deprecatedLabels": [ "https://xbrl.sec.gov/oef/2023/oef-entire-2023.xsd",
                              "https://xbrl.sec.gov/oef/2024/oef-entire-2024.xsd",
-                             "https://xbrl.sec.gov/oef/2025/oef-entire-2025.xsd"],
+                             "https://xbrl.sec.gov/oef/2025/oef-entire-2025.xsd",
+                             "https://xbrl.sec.gov/oef/2026/oef-entire-2026.xsd"],
         "deprecatedLabelRolePattern": usDeprecatedLabelRolePattern,
         "deprecationDatePattern": usDeprecatedLabelPattern
         },
@@ -225,39 +236,45 @@ latestTaxonomyDocs = { # note that these URLs are blocked by EFM validation mode
     "rxp/*": {
         "deprecatedLabels": [ "https://xbrl.sec.gov/rxp/2023/rxp-entire-2023.xsd",
                              "https://xbrl.sec.gov/rxp/2024/rxp-entire-2024.xsd",
-                             "https://xbrl.sec.gov/rxp/2025/rxp-entire-2025.xsd"],
+                             "https://xbrl.sec.gov/rxp/2025/rxp-entire-2025.xsd",
+                             "https://xbrl.sec.gov/rxp/2026/rxp-entire-2026.xsd"],
         "deprecatedLabelRolePattern": usDeprecatedLabelRolePattern,
         "deprecationDatePattern": usDeprecatedLabelPattern
         },
     "sbs/*": {
         "deprecatedLabels": [ "https://xbrl.sec.gov/sbs/2023/sbs-entire-2023.xsd",
-                             "https://xbrl.sec.gov/sbs/2024/sbs-entire-2024.xsd"],
+                             "https://xbrl.sec.gov/sbs/2024/sbs-entire-2024.xsd",
+                             "https://xbrl.sec.gov/sbs/2026/sbs-entire-2026.xsd"],
         "deprecatedLabelRolePattern": usDeprecatedLabelRolePattern,
         "deprecationDatePattern": usDeprecatedLabelPattern
         },
     "sic/*": {
         "deprecatedLabels": ["https://xbrl.sec.gov/sic/2023/sic-entire-2023.xsd",
                              "https://xbrl.sec.gov/sic/2024/sic-entire-2024.xsd",
-                             "https://xbrl.sec.gov/sic/2025/sic-entire-2025.xsd"],
+                             "https://xbrl.sec.gov/sic/2025/sic-entire-2025.xsd",
+                             "https://xbrl.sec.gov/sic/2026/sic-entire-2026.xsd"],
         "deprecatedLabelRolePattern": usDeprecatedLabelRolePattern,
         "deprecationDatePattern": usDeprecatedLabelPattern
         },
     "snj/*": {
         "deprecatedLabels": ["https://xbrl.sec.gov/snj/2023/snj-entire-2023.xsd",
                              "https://xbrl.sec.gov/snj/2024/snj-entire-2024.xsd",
-                             "https://xbrl.sec.gov/snj/2025/snj-entire-2025.xsd"],
+                             "https://xbrl.sec.gov/snj/2025/snj-entire-2025.xsd",
+                             "https://xbrl.sec.gov/snj/2026/snj-entire-2026.xsd"],
         "deprecatedLabelRolePattern": usDeprecatedLabelRolePattern,
         "deprecationDatePattern": usDeprecatedLabelPattern
         },
     "spac/*": {
         "deprecatedLabels": ["https://xbrl.sec.gov/spac/2025/spac-entire-2025.xsd",
-                             "https://xbrl.sec.gov/spac/2025q3/spac-entire-2025q3.xsd"],
+                             "https://xbrl.sec.gov/spac/2025q3/spac-entire-2025q3.xsd",
+                             "https://xbrl.sec.gov/spac/2026/spac-entire-2026.xsd"],
         "deprecatedLabelRolePattern": usDeprecatedLabelRolePattern,
         "deprecationDatePattern": usDeprecatedLabelPattern
         },
     "sro/*": {
         "deprecatedLabels": ["https://xbrl.sec.gov/sro/2024/sro-entire-2024.xsd",
-                             "https://xbrl.sec.gov/sro/2025/sro-entire-2025.xsd"],
+                             "https://xbrl.sec.gov/sro/2025/sro-entire-2025.xsd",
+                             "https://xbrl.sec.gov/sro/2026/sro-entire-2026.xsd"],
         "deprecatedLabelRolePattern": usDeprecatedLabelRolePattern,
         "deprecationDatePattern": usDeprecatedLabelPattern
         },
@@ -269,14 +286,16 @@ latestTaxonomyDocs = { # note that these URLs are blocked by EFM validation mode
                              "https://xbrl.fasb.org/srt/2022/elts/srt-lab-2022.xml",
                              "https://xbrl.fasb.org/srt/2023/elts/srt-lab-2023.xml",
                              "https://xbrl.fasb.org/srt/2024/elts/srt-lab-2024.xml",
-                             "https://xbrl.fasb.org/srt/2025/elts/srt-lab-2025.xml"],
+                             "https://xbrl.fasb.org/srt/2025/elts/srt-lab-2025.xml",
+                             "https://xbrl.fasb.org/srt/2026/elts/srt-lab-2026.xml"],
         "deprecatedLabelRolePattern": usDeprecatedLabelRolePattern,
         "deprecationDatePattern": usDeprecatedLabelPattern
         },
     "stpr/*": {
         "deprecatedLabels": ["https://xbrl.sec.gov/stpr/2023/stpr-entire-2023.xsd",
                              "https://xbrl.sec.gov/stpr/2024/stpr-entire-2024.xsd",
-                             "https://xbrl.sec.gov/stpr/2025/stpr-entire-2025.xsd"],
+                             "https://xbrl.sec.gov/stpr/2025/stpr-entire-2025.xsd",
+                             "https://xbrl.sec.gov/stpr/2026/stpr-entire-2026.xsd"],
         "deprecatedLabelRolePattern": usDeprecatedLabelRolePattern,
         "deprecationDatePattern": usDeprecatedLabelPattern
         },
@@ -288,13 +307,15 @@ latestTaxonomyDocs = { # note that these URLs are blocked by EFM validation mode
                              "https://xbrl.fasb.org/us-gaap/2022/elts/us-gaap-lab-2022.xml",
                              "https://xbrl.fasb.org/us-gaap/2023/elts/us-gaap-lab-2023.xml",
                              "https://xbrl.fasb.org/us-gaap/2024/elts/us-gaap-lab-2024.xml",
-                             "https://xbrl.fasb.org/us-gaap/2025/elts/us-gaap-lab-2025.xml"],
+                             "https://xbrl.fasb.org/us-gaap/2025/elts/us-gaap-lab-2025.xml",
+                             "https://xbrl.fasb.org/us-gaap/2026/elts/us-gaap-lab-2026.xml"],
         "deprecatedLabelRolePattern": usDeprecatedLabelRolePattern,
         "deprecationDatePattern": usDeprecatedLabelPattern,
         "dqcRuleArcrole": "http://fasb.org/dqcRules/arcrole/concept-rule",
         },
     "us-gaap-ebp/*": {
-        "deprecatedLabels": ["https://xbrl.fasb.org/us-gaap/2025/ebp/elts/us-gaap-ebp-lab-2025.xml"],
+        "deprecatedLabels": ["https://xbrl.fasb.org/us-gaap/2025/ebp/elts/us-gaap-ebp-lab-2025.xml",
+                             "https://xbrl.fasb.org/us-gaap/2026/ebp/elts/us-gaap-ebp-lab-2026.xml"],
         "deprecatedLabelRolePattern": usDeprecatedLabelRolePattern,
         "deprecationDatePattern": usDeprecatedLabelPattern,
         },
@@ -302,7 +323,8 @@ latestTaxonomyDocs = { # note that these URLs are blocked by EFM validation mode
         "deprecatedLabels": ["https://xbrl.sec.gov/vip/2022/vip-entire-2022.xsd",
                              "https://xbrl.sec.gov/vip/2023/vip-entire-2023.xsd",
                              "https://xbrl.sec.gov/vip/2024/vip-entire-2024.xsd",
-                             "https://xbrl.sec.gov/vip/2025/vip-entire-2025.xsd"],
+                             "https://xbrl.sec.gov/vip/2025/vip-entire-2025.xsd",
+                             "https://xbrl.sec.gov/vip/2026/vip-entire-2026.xsd"],
         "deprecatedLabelRolePattern": usDeprecatedLabelRolePattern,
         "deprecationDatePattern": usDeprecatedLabelPattern
         },
@@ -314,7 +336,8 @@ latestTaxonomyDocs = { # note that these URLs are blocked by EFM validation mode
                              "http://xbrl.ifrs.org/taxonomy/2021-03-24/deprecated/depr-lab_full_ifrs-en_2021-03-24.xml",
                              "http://xbrl.ifrs.org/taxonomy/2022-03-24/deprecated/depr-lab_full_ifrs-en_2022-03-24.xml",
                              "https://xbrl.ifrs.org/taxonomy/2023-03-23/deprecated/depr-lab_full_ifrs-en_2023-03-23.xml",
-                             "https://xbrl.ifrs.org/taxonomy/2024-03-27/deprecated/depr-lab_full_ifrs-en_2024-03-27.xml"],
+                             "https://xbrl.ifrs.org/taxonomy/2024-03-27/deprecated/depr-lab_full_ifrs-en_2024-03-27.xml",
+                             "https://xbrl.ifrs.org/taxonomy/2025-03-27/deprecated/depr-lab_full_ifrs-en_2025-03-27.xml"],
         "deprecatedLabelRolePattern": ifrsDeprecatedLabelRole,
         "deprecationDatePattern": ifrsDeprecatedLabelPattern
         }
@@ -340,7 +363,9 @@ latestEntireUgt = {
     "us-gaap/2024": ["https://xbrl.fasb.org/us-gaap/2024/entire/us-gaap-entryPoint-std-2024.xsd",
                      "https://xbrl.fasb.org/us-gaap/2024/dqcrules/dqcrules-entire-2024.xsd"],
     "us-gaap/2025": ["https://xbrl.fasb.org/us-gaap/2025/entire/us-gaap-entryPoint-std-2025.xsd",
-                     "https://xbrl.fasb.org/us-gaap/2025/dqcrules/dqcrules-entire-2025.xsd"]
+                     "https://xbrl.fasb.org/us-gaap/2025/dqcrules/dqcrules-entire-2025.xsd"],
+    "us-gaap/2026": ["https://xbrl.fasb.org/us-gaap/2026/entire/us-gaap-entryPoint-std-2026.xsd",
+                     "https://xbrl.fasb.org/us-gaap/2026/dqcrules/dqcrules-entire-2026.xsd"]
     }
 
 linkbaseValidations = {

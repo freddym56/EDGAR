@@ -280,8 +280,9 @@ export class FetchAndMerge {
     private fetchDocs(): Promise<Array<{ xhtml: string } | ErrorResponse>> {
         const promises = this.activeInstance?.docs?.map((doc: { url: string }) => {
             return new Promise<{ xhtml: string } | ErrorResponse>((resolve) => {
-                //TODO: use `HelpersUrl.isWorkstation` instead
+
                 const isWorkstation = doc.url.includes("DisplayDocument.do?");
+
                 let ixvUrl = doc.url;
                 if (isWorkstation) {
                     if (Object.prototype.hasOwnProperty.call(this.params, 'redline') && this.params.redline) {
@@ -292,7 +293,7 @@ export class FetchAndMerge {
                 }
 
                 const params: RequestInit = {
-                    headers: { "Content-Type": "application/xhtml+xml" },
+                    headers: { "Content-Type": "text/html" },
                     mode: 'no-cors',
                     credentials: 'include',
                 };
@@ -424,8 +425,10 @@ export class FetchAndMerge {
         if (isWorkstation) {
             // If methods from HelpersUrl are used here some very strange bugs occur, such as window and localStorage undefined.
             if (Object.prototype.hasOwnProperty.call(this.params, 'redline') && this.params.redline) {
+                // private
                 xmlUrl = xmlUrl.replace('_htm.xml', '_ht2.xml')
             } else {
+                // public
                 xmlUrl = xmlUrl.replace('_htm.xml', '_ht1.xml')
             }
         }
@@ -528,7 +531,7 @@ export class FetchAndMerge {
                 decimals: this.setDecimalsInfo(attributes.decimals || ""),
                 decimalsVal: attributes.decimals,
                 sign: null, // sign exists as attr in inlineDoc, not instance
-                footnote: this.setFootnoteInfo(ix, instanceFootnoteData),
+                footnote: this.setFootnoteInfoOnFact(ix, instanceFootnoteData),
                 isEnabled: true,
                 isHighlight: false,
                 isSelected: false,
@@ -1067,6 +1070,7 @@ export class FetchAndMerge {
      * @returns {any} concatenated text from all footnote nodes, joined by a ' '
      */
     private accumulateFootnoteText(ftObj: LinkFootnote | Record<string, unknown>, result = "") {
+        // https://jira.edgar.sec.gov/browse/EDGARDEV-29476
         const truncateFootnoteTo = 100;
 
         if (result?.length > truncateFootnoteTo) {
@@ -1074,8 +1078,7 @@ export class FetchAndMerge {
             return result += ' ...';
         }
 
-        Object.entries(ftObj).forEach(([key, value]) =>
-        {
+        Object.entries(ftObj).forEach(([key, value]) => {
             if (key == "_text") {
                 result += String(value);
             }
@@ -1103,7 +1106,12 @@ export class FetchAndMerge {
      * todo: handle images, tables, ...other html elements (currently just concatenating text content)
      * the above todos are WIP and are handled when useFetchedFootnoteXmlStrings is set to true.
      */
-    private setFootnoteInfo(id: string, instanceFootnotes: {
+
+    /*
+        Note on Footnotes
+        - footnote text is in the instance file (_htm.xml)
+    */
+    private setFootnoteInfoOnFact(factId: string, instanceFootnotes: {
         "link:loc": LinkLOC[],
         "link:footnote": LinkFootnote[],
         "link:footnoteArc": LinkFootnoteArc[],
@@ -1111,81 +1119,76 @@ export class FetchAndMerge {
     }) {
         if (instanceFootnotes && instanceFootnotes['link:footnoteArc']) {
             /*
-                link:footnoteArc tags are link tags with xlink:from some fact id xlink:to some xlink:footnote id that contains actual footnote content.
+            link:footnoteArc tags are link tags consisting of:
+                xlink:from (some fact id) 
+                xlink:to (some xlink:footnote id that contains actual footnote content.)
             */
-            const factFootnoteArcTags = Array.isArray(instanceFootnotes['link:footnoteArc'])
-                ? instanceFootnotes['link:footnoteArc'].filter((element) => element._attributes['xlink:from'] === id ) 
-                : [instanceFootnotes['link:footnoteArc']].find((element) => element._attributes['xlink:from'] === id )
-            if (factFootnoteArcTags?.length) {
-                if (instanceFootnotes['link:footnote']) {
-                    if (Array.isArray(instanceFootnotes['link:footnote'])) {
-                        const footnoteTags = factFootnoteArcTags?.map(arcTag => arcTag._attributes['xlink:to'])
-                            .map(footnoteId => instanceFootnotes['link:footnote'].find((footnoteElem) => footnoteElem._attributes.id === footnoteId));
+            let factFootnoteArcTags = Array.isArray(instanceFootnotes['link:footnoteArc'])
+                ? instanceFootnotes['link:footnoteArc'].filter((element) => element._attributes['xlink:from'] === factId ) 
+                : [instanceFootnotes['link:footnoteArc']].find((element) => element._attributes['xlink:from'] === factId );
+            if (!Array.isArray(factFootnoteArcTags) && typeof factFootnoteArcTags === 'object') {
+                factFootnoteArcTags = [factFootnoteArcTags];
+            }
 
-                        const useFetchedFootnoteXmlStrings = false;
-                        const useParsedFootnote = !useFetchedFootnoteXmlStrings;
+            if (factFootnoteArcTags?.length && instanceFootnotes['link:footnote']) {
+                if (Array.isArray(instanceFootnotes['link:footnote'])) {
+                    const factFootnoteTags = factFootnoteArcTags?.map(arcTag => arcTag._attributes['xlink:to'])
+                        .map(footnoteId => instanceFootnotes['link:footnote'].find((footnoteElem) => footnoteElem._attributes.id === footnoteId));
 
-                        if (useParsedFootnote) {
-                            if (Array.isArray(footnoteTags)) {
-                                const footnotesTexts = footnoteTags.map(footnote => {
-                                    return this.accumulateFootnoteText(footnote || {} as Record<string, unknown>);
-                                });
-                                return footnotesTexts.join('<br>');
-                            } else {
-                                return this.accumulateFootnoteText(footnoteTags || {} as Record<string, unknown>);
-                            }
-                        }
-
-                        // Rest of this if block is WIP for rendering all div types in footnote cell
-
-                        // GO FIND PART OF footnotes.xmlString that corresponds to actual footnote
-                        // return that substring ... so you can render it in fact-pages.ts
-                        // we only need '<link:footnote ... > string for each footnote to render
-                        // find all <link:footnote ... > xml strings and put in array
-                        // then find the one that matches the xlink:to value with its id
-
-                        const startTagRegex = /<link:footnote /gi; 
-                        let startTagResults: RegExpExecArray | null = null;
-                        const footnoteStartIndices:number[] = [];
-                        while (!!(startTagResults = startTagRegex.exec(instanceFootnotes.asXmlString))) {
-                            footnoteStartIndices.push(startTagResults.index);
-                        }
-
-                        const endTagRegex = /<\/link:footnote>/gi; 
-                        let endTagResults: RegExpExecArray | null = null;
-                        const footnoteEndIndices:number[] = [];
-                        while (!!(endTagResults = endTagRegex.exec(instanceFootnotes.asXmlString))) {
-                            footnoteEndIndices.push(endTagResults.index + ('</link:footnote>').length);
-                        }
-
-                        const footnotesAsXmlStrings: string[] = [];
-
-                        footnoteStartIndices.forEach((start, indexInArrayOfStarts) => {
-                            const pluckedFootnote = instanceFootnotes.asXmlString.substring(start, footnoteEndIndices[indexInArrayOfStarts]);
-                            footnotesAsXmlStrings.push(pluckedFootnote);
-                        })
-
-                        const relevantFootnoteAsXmlString = footnotesAsXmlStrings.find(fn => {
-                            return fn.indexOf(factFootnoteArcTags._attributes['xlink:to']) != -1;
-                        })
-
-                        return relevantFootnoteAsXmlString;
+                    if (Array.isArray(factFootnoteTags)) {
+                        const footnotesTexts = factFootnoteTags.map(footnote => {
+                            return this.accumulateFootnoteText(footnote || {} as Record<string, unknown>);
+                        });
+                        return footnotesTexts.join('<br>');
                     } else {
-                        // single footnote on instance
-                        // TODO we need way more cases
-                        //uhh, no we don't, because the first 2 cases cover EVERYTHING
-                        if (!Array.isArray(instanceFootnotes['link:footnote']._text)) {
-                            return instanceFootnotes['link:footnote']._text;
-                        } else if (Array.isArray(instanceFootnotes['link:footnote']._text)) {
-                            return instanceFootnotes['link:footnote']._text.join('');
-                        } else if (instanceFootnotes['link:footnote']['xhtml:span']) {
-                            return instanceFootnotes['link:footnote']['xhtml:span']._text;
-                        }
+                        return this.accumulateFootnoteText(factFootnoteTags || {} as Record<string, unknown>);
                     }
+                } else {
+                    return this.accumulateFootnoteText(instanceFootnotes['link:footnote'] || {} as Record<string, unknown>);
                 }
             }
         }
         return null;
+    }
+
+    private wipFootnoteParser = () => {
+        // removed from setFootnoteInfo() for clarity
+        // this block is WIP for rendering all div types in footnote cell
+
+        // GO FIND PART OF footnotes.xmlString that corresponds to actual footnote
+        // return that substring ... so you can render it in fact-pages.ts
+        // we only need '<link:footnote ... > string for each footnote to render
+        // find all <link:footnote ... > xml strings and put in array
+        // then find the one that matches the xlink:to value with its id
+
+        /*
+            const startTagRegex = /<link:footnote /gi;
+            let startTagResults: RegExpExecArray | null = null;
+            const footnoteStartIndices:number[] = [];
+            while (!!(startTagResults = startTagRegex.exec(instanceFootnotes.asXmlString))) {
+                footnoteStartIndices.push(startTagResults.index);
+            }
+
+            const endTagRegex = /<\/link:footnote>/gi; 
+            let endTagResults: RegExpExecArray | null = null;
+            const footnoteEndIndices:number[] = [];
+            while (!!(endTagResults = endTagRegex.exec(instanceFootnotes.asXmlString))) {
+                footnoteEndIndices.push(endTagResults.index + ('</link:footnote>').length);
+            }
+
+            const footnotesAsXmlStrings: string[] = [];
+
+            footnoteStartIndices.forEach((start, indexInArrayOfStarts) => {
+                const pluckedFootnote = instanceFootnotes.asXmlString.substring(start, footnoteEndIndices[indexInArrayOfStarts]);
+                footnotesAsXmlStrings.push(pluckedFootnote);
+            })
+
+            const relevantFootnoteAsXmlString = footnotesAsXmlStrings.find(fn => {
+                return fn.indexOf(factFootnoteArcTags._attributes['xlink:to']) != -1;
+            })
+
+            return relevantFootnoteAsXmlString;
+        */
     }
 
     private getCalculationWeight(weight: number) {
