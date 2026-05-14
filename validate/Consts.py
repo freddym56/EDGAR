@@ -56,7 +56,8 @@ docTypesAttachmentDocumentType = {
     }
 docTypesSubType = {
     "2.01 SD": "SD",
-    "EX-99.4R HISTORIC": "N-4"
+    "EX-99.4R HISTORIC": "N-4",
+    "COMPL RPT": "SBSE-CCO-RPT"
     # default is submissionType parameter is the same as dei:DocumentType
     }
 
@@ -69,11 +70,11 @@ attachmentDocumentTypeValidationRulesFiles = ( # match attachment doc type patte
     )
 supplementalAttachmentDocumentTypesPattern = re.compile(r"EX-FILING FEES.*|EX-99\.[C-S]\.SBSEF.*|EX-98.*|EX-99.4R HISTORIC|EX-26")
 exhibitTypesStrippingOnErrorPattern = re.compile(r"EX-26.*|EX-99\.[C-S]\.SBSEF.*|EX-98.*")
-exhibitTypesPrivateNotDisseminated = re.compile(r"EX-99\.[DEFHIJKNOPQRS]\.SBSEF")
+exhibitTypesPrivateNotDisseminated = re.compile(r"EX-99\.[DEFHIJKNOPQRS]\.SBSEF|COMPL RPT")
 primaryAttachmentDocumentTypesPattern = re.compile(r"(?!EX-)")
 # for the below, group the attachmentDocumentType so that we can extract the correct value.
 # Example EX-98.1 can become EX-98 based on the group
-attachmentDocumentTypeReqSubDocTypePattern = re.compile(r"(EX-98).*")
+attachmentDocumentTypeReqSubDocTypePattern = re.compile(r"(EX-98|EX-99\.4R HISTORIC).*")
 nsPatternNotAllowedinxBRLXML = re.compile(r".*sec.gov/spac/.*")
 subTypesWarningforxBRLXml = [
     "S-1", "S-1/A", "S-1MEF", "S-4", "S-4/A", "S-4MEF", "S-4EF", "S-4POS", "F-1", "F-1/A", "F-1MEF", "F-4", "F-4/A", "F-4MEF", 

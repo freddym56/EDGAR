@@ -508,7 +508,7 @@ class Report(object):
                         exampleFact = fact
                     if symbol is None:
                         symbol = Utils.getSymbolStr(fact) or unitID
-                    if fact.decimals.casefold() == 'inf' or maxSoFar > -3:
+                    if fact.decimals.casefold() == 'inf' or maxSoFar > -3 or not Utils.is_number(fact.decimals):
                         maxSoFar = 0
                         break  # to be scaled, every fact must have a decimals value of -3 or less.  inf inhibits scaling.
                     else:

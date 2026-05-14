@@ -110,7 +110,7 @@ def validateFiling(val, modelXbrl, isEFM=False, isGFM=False):
     styleIxHiddenPattern = re.compile(r"(.*[^\w]|^)-sec-ix-hidden\s*:\s*([\w.-]+).*")
     styleIxRedactPattern = re.compile(r"(.*;)?\s*-sec-ix-redact\s*:\s*true(?:\s*;)?\s*([\w.-].*)?$")
     efmRoleDefinitionPattern = re.compile(r"([0-9]+) - (Statement|Disclosure|Schedule|Document) - (.+)")
-    messageKeySectionPattern = re.compile(r"(.*[{]efmSection[}]|[a-z]{2}-[0-9]{4})(.*)")
+    messageKeySectionPattern = re.compile(r"(.*[{]efmSection[}]|[a-z]{2}-[0-9]{4}|dq-)(.*)")
     secDomainPattern = re.compile(r"(fasb\.org|xbrl\.sec\.gov)")
 
     val._isStandardUri = {}
@@ -649,9 +649,17 @@ def validateFiling(val, modelXbrl, isEFM=False, isGFM=False):
         val.entityRegistrantName = deiItems.get("EntityRegistrantName") # used for name check in 6.8.6
 
         # 6.05..23,24 check (after dei facts read)
-        if not (isEFM and deiDocumentType == "L SDR"): # allow entityIdentifierValue == "0000000000" or any other CIK value
+        if not (isEFM and deiDocumentType in ("L SDR", "K SDR")): # allow entityIdentifierValue == "0000000000" or any other CIK value
             if disclosureSystem.deiFilerIdentifierElement in deiItems:
                 value = deiItems.get(disclosureSystem.deiFilerIdentifierElement)
+                if value == "0000000000":
+                    # XBRL Guide 3.1.3 Central Index Key
+                    # A dei:EntityCentralIndexKey fact with value a full ten-digit CIK other than 0000000000 from among the co-registrants in the submission header.
+                    val.modelXbrl.error("EFM.6.05.02",
+                        _("The %(elementName)s, %(value)s, must be a full 10-digit CIK other than 0000000000."),
+                        edgarCode="cp-0502-Non-Matching-Cik",
+                        modelObject=deiFilerIdentifierFact, elementName=disclosureSystem.deiFilerIdentifierElement,
+                        value=value)
                 if entityIdentifierValue != value:
                     val.modelXbrl.error(("EFM.6.05.23", "GFM.3.02.02"),
                         _("The EntityCentralIndexKey, %(value)s, does not match the context identifier CIK %(entityIdentifier)s.  "
@@ -1125,15 +1133,20 @@ def validateFiling(val, modelXbrl, isEFM=False, isGFM=False):
                 # replacement for efmSection. Based on sev msgSection
                 if sev.get("msgSection"):
                     msgPrefix, _sep, msgSectionNumber = sev["msgSection"].partition(":")
-                    logArgs[f"{msgPrefix.lower()}Section"] = msgPrefix
                     logArgs["arelleCode"] = msgPrefix
+                    section = f"{msgPrefix.lower()}Section"
+                    logArgs[section] = ""
                     for i, e in enumerate(msgSectionNumber.split(".")):
                         if i > 0 :
                             if e.isnumeric(): # e.g. [6,5,2] -> "6.05.02"
                                 e = e.zfill(2)
                         logArgs["arelleCode"] += "." + e
+                        logArgs[section] += e
 
                 logArgs["edgarCode"] = messageKey # edgar code is the un-expanded key for message with {...}'s
+                if "-{efmSection}" in logArgs["edgarCode"] and not logArgs.get("efmSection") and logArgs.get("exgSection"):
+                    logArgs["edgarCode"] = logArgs["edgarCode"].replace("-{efmSection}", "")
+
                 try:
                     m = messageKeySectionPattern.match(messageKey or "")
                     if m:
@@ -2094,7 +2107,13 @@ def validateFiling(val, modelXbrl, isEFM=False, isGFM=False):
                 elif validation  == "not-in-future":
                     for name in names:
                         for f in sevFacts(sev, name):
-                            if deiDocumentType and f.context.endDatetime > documentTypeFact.context.endDatetime:
+                            if (
+                                deiDocumentType
+                                # invalid context may not have endDatetime
+                                and f.context.endDatetime
+                                and documentTypeFact.context.endDatetime
+                                and f.context.endDatetime > documentTypeFact.context.endDatetime
+                            ):
                                 sevMessage(sev, subType=submissionType, modelObject=f, efmSection=efmSection, tag=name, context="context " + f.contextID)
 
                 elif validation in ("ru", "ou"):
@@ -2145,10 +2164,12 @@ def validateFiling(val, modelXbrl, isEFM=False, isGFM=False):
                         if fr is None and f is not None:
                             sevMessage(sev, subType=submissionType, modelObject=sevFacts(sev), tag=name, otherTag=referenceTag, value=fr.xValue, contextID=fr.contextID)
                 elif validation == "required-context-duration":
-                    monthsDuration = (val.requiredContext.endDatetime - val.requiredContext.startDatetime).days / 30.4375 # 30.4375 specified by DERA to use in the transforms for days to months
-                    if not value - 1 < monthsDuration < value + 1: # fractional months likely due to days per month
-                        sevMessage(sev, subType=submissionType, modelObject=val.requiredContext, tag="Required Context Period Duration",
-                                   value=f"{monthsDuration:.1f} months", expectedValue=f"{value} months", contextID=val.requiredContext.id)
+                    # ensure a valid context is provided with endDatetime and startDatetime
+                    if val.requiredContext.endDatetime and val.requiredContext.startDatetime:
+                        monthsDuration = (val.requiredContext.endDatetime - val.requiredContext.startDatetime).days / 30.4375 # 30.4375 specified by DERA to use in the transforms for days to months
+                        if not value - 1 < monthsDuration < value + 1: # fractional months likely due to days per month
+                            sevMessage(sev, subType=submissionType, modelObject=val.requiredContext, tag="Required Context Period Duration",
+                                    value=f"{monthsDuration:.1f} months", expectedValue=f"{value} months", contextID=val.requiredContext.id)
                 # fee tagging
                 elif validation in ("fe", "fw","fo"):
                     instDurNames = defaultdict(list)
@@ -2554,7 +2575,7 @@ def validateFiling(val, modelXbrl, isEFM=False, isGFM=False):
                         perEnd = fr.xValue + ONE_DAY
                         for name in names:
                             f = sevFact(sev, name)
-                            if f is not None:
+                            if f is not None and f.context.endDatetime and f.context.startDatetime:
                                 monthsDuration = (f.context.endDatetime - f.context.startDatetime).days / 30.4375 # 30.4375 specified by DERA to use in the transforms for days to months
                                 if f.context.endDatetime != perEnd or not 11 < monthsDuration < 13:
                                     sevMessage(sev, subType=submissionType, modelObject=sevFacts(sev), tag=name, otherTag=referenceTag, contextID=f.contextID)
@@ -2567,7 +2588,7 @@ def validateFiling(val, modelXbrl, isEFM=False, isGFM=False):
                             factsInMonth = [0 for i in range(12)] # count per month
                             ns = fr.qname.namespaceURI
                             for f in modelXbrl.facts:
-                                if f.qname.namespaceURI == ns:
+                                if f.qname.namespaceURI == ns and f.context.endDatetime and f.context.startDatetime:
                                     isMonthDuration = 0.8 < (f.context.endDatetime - f.context.startDatetime).days / 30.4375 < 1.2
                                     monthNbr = 12 - (perEnd - f.context.startDatetime).days / 30.4375
                                     monthInt = int(monthNbr + .2)

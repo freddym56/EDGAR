@@ -298,6 +298,7 @@ class Filing(object):
         self.builtinEquityRowAxes = [('us-gaap', self.usgaapNamespace, 'CreationDateAxis'),  # us-gaap deprecated 2019 absent after 2021.
                                      ('ifrs-full', self.ifrsNamespace, 'CreationDateAxis'),
                                      ('us-gaap', self.usgaapNamespace, 'StatementScenarioAxis'),
+                                     ('us-gaap', self.usgaapNamespace, 'RestatementAxis'),
                                      ('us-gaap', self.usgaapNamespace, 'AdjustmentsForNewAccountingPronouncementsAxis'),
                                      ('us-gaap', self.usgaapNamespace, 'AdjustmentsForChangeInAccountingPrincipleAxis'),
                                      ('us-gaap', self.usgaapNamespace, 'ErrorCorrectionsAndPriorPeriodAdjustmentsRestatementByRestatementPeriodAndAmountAxis'),
@@ -427,7 +428,7 @@ class Filing(object):
                             return ("", "", 0)
                         if fact.isNumeric:
                             if fact.isNil: discriminator = float("INF")  # Null values always last
-                            elif fact.decimals is None: discriminator = 0  # Can happen with invalid xbrl
+                            elif fact.decimals is None or not Utils.is_number(fact.decimals): discriminator = 0  # Can happen with invalid xbrl
                             else: discriminator = 0 - float(fact.decimals)  # Larger decimal values come first
                         else:  # non-numeric
                             if fact.isNil: discriminator = '\uffff'  # Null values always last (highest 2-byte unicode character)
@@ -656,7 +657,7 @@ class Filing(object):
                             _("Context %(contextID)s explicit dimension %(dimension)s member %(value)s is not a global member item"),
                             modelObject=(arelleDimension, fact), contextID=fact.context.id,
                             dimension=arelleDimension.dimensionQname, value=arelleDimension.memberQname)
-                elif arelleDimension.isTyped and arelleDimension.typedMember.xValid < VALID:
+                elif arelleDimension.isTyped and arelleDimension.typedMember is not None and arelleDimension.typedMember.xValid < VALID:
                     self.modelXbrl.debug("debug",
                         _("Context %(contextID)s typed dimension %(dimension)s member %(value)s is not an xml schema validated value"),
                         modelObject=(arelleDimension, fact), contextID=fact.context.id,

@@ -6064,7 +6064,8 @@
         },
         {
             "sub-types": [
-                "@offset-p"
+                "@offset-p",
+                "424I"
             ],
             "xbrl-names": [
                 "ffd:OffsetPrrFileNb"
