@@ -16,7 +16,7 @@ matplotlib_use("Agg")
 import os, datetime, decimal, io, time
 import regex as re
 from collections import defaultdict
-from lxml.etree import Element, SubElement, XSLT, tostring as treeToString, fromstring
+from lxml.etree import Element, SubElement, XSLT, tostring as treeToString, fromstring, xmlfile as lxml_xmlfile
 import arelle.XbrlConst
 from . import Utils
 Filing = None
@@ -53,6 +53,8 @@ class Report(object):
         self.rootETree = Element('InstanceReport', nsmap={'xsi': 'http://www.w3.org/2001/XMLSchema-instance'})
         self.columnsETree = SubElement(self.rootETree, 'Columns')  # children added later
         self.rowsETree = SubElement(self.rootETree, 'Rows')  # children added later
+        self._rowBytesList = []   # rows serialized incrementally; rowsETree stays empty
+        self._visibleRowCount = 0
 
         self.shortName = self.cube.shortName  # each Report can edit its own shortName
 
@@ -623,6 +625,16 @@ class Report(object):
         else:
             SubElement(etreeNode, 'FootnoteIndexer')  # the stylesheet needs this, even if empty?
 
+    @staticmethod
+    def writeFootnoteIndexerXmlfile(xf, footnoteNumberSet):
+        if footnoteNumberSet:
+            nums = ','.join('[{}]'.format(n) for n in sorted(footnoteNumberSet))
+            with xf.element('FootnoteIndexer'):
+                xf.write(nums)
+        else:
+            with xf.element('FootnoteIndexer'):
+                pass
+
     def removeVerticalInteriorSymbols(self):
         for i, col in enumerate(self.colList):
             if len(col.unitTypeToFactSetDefaultDict) > 0 and not col.isHidden:
@@ -950,7 +962,11 @@ class Report(object):
     def emitRFileRows(self):
         for index, row in enumerate(self.rowList):
             if not row.isHidden:
-                row.emitRow(index)
+                buf = io.BytesIO()
+                with lxml_xmlfile(buf) as xf:
+                    row.emitRowXmlfile(xf, index)
+                self._rowBytesList.append(buf.getvalue())
+                self._visibleRowCount += 1
 
     def emitRFileHeaderAndFooter(self):
         SubElement(self.rootETree, 'Version').text = self.filing.controller.VERSION
@@ -991,7 +1007,7 @@ class Report(object):
         SubElement(self.rootETree, 'ReportType').text = 'Sheet'
         SubElement(self.rootETree, 'RoleURI').text = self.cube.linkroleUri
         SubElement(self.rootETree, 'NumberOfCols').text = str(int(self.rootETree.xpath('count(/InstanceReport/Columns/Column)')))
-        SubElement(self.rootETree, 'NumberOfRows').text = str(int(self.rootETree.xpath('count(/InstanceReport/Rows/Row)')))
+        SubElement(self.rootETree, 'NumberOfRows').text = str(self._visibleRowCount)
 
     def emitContextRef(self, mcuETree, factAxisMemberList, context):
         contextRefETree = SubElement(mcuETree, 'contextRef')
@@ -1107,6 +1123,11 @@ class Report(object):
         baseName = (self.filing.rFilePrefix or '') + baseNameBeforeExtension + '.xml' + (self.filing.suplSuffix or '')
         reportSummary.xmlFileName = baseName
         xmlText = treeToString(tree, xml_declaration=True, encoding='utf-8', pretty_print=True)
+        if self._rowBytesList:
+            rows_content = b'<Rows>\n' + b'\n'.join(self._rowBytesList) + b'\n</Rows>'
+            # lxml serializes an empty element as <Rows/> with pretty_print; replace it with row content.
+            # Avoid re-parsing bytes into libxml2 nodes here — that would recreate the full C-heap peak.
+            xmlText = xmlText.replace(b'<Rows/>', rows_content, 1)
         if self.filing.reportZip:
             self.filing.reportZip.writestr(self.filing.zipDir + baseName, xmlText)
             self.controller.renderedFiles.add(baseName)
@@ -1118,6 +1139,10 @@ class Report(object):
         baseName = (self.filing.rFilePrefix or '') + baseNameBeforeExtension + '.htm' + (self.filing.suplSuffix or '')
         reportSummary.htmlFileName = baseName
         _startedAt = time.time()
+        # Rows were detached during emitRFileRows; restore them so XSLT can see them.
+        if self._rowBytesList:
+            for row_bytes in self._rowBytesList:
+                self.rowsETree.append(fromstring(row_bytes))
         cell_count = sum(1 for x in tree.iter('Cell'))
         if cell_count > 50000:
             self.controller.logWarn(f"There are {cell_count} cells; skipping transformation.",
@@ -1526,6 +1551,179 @@ class Row(object):
             return 'na'
         return t
 
+    def emitRowXmlfile(self, xf, index):
+        """Stream this row directly to an lxml xmlfile context without building a libxml2 tree."""
+        report = self.report
+        filing = self.filing
+
+        def elem(tag, text=None, **attrib):
+            with xf.element(tag, **attrib):
+                if text is not None:
+                    s = str(text)
+                    if s:
+                        xf.write(s)
+
+        with xf.element('Row', FlagID='0'):
+            # --- header ---
+            elem('Id', index + 1)
+            elem('IsAbstractGroupTitle', str(self.IsAbstractGroupTitle).casefold())
+            elem('LabelSeparator', ' ')
+            elem('Level', self.level)
+
+            elementPrefix = ''
+            if self.elementQnameStr is not None and report.embedding.rowPrimaryPosition != -1:
+                elem('ElementName', self.elementQnameStr)
+                elementPrefix = self.elementQnameStr[:(self.elementQnameStr.find('_') + 1)]
+                elem('ElementPrefix', elementPrefix)
+            elif self.factList and report.embedding.rowPrimaryPosition != -1:
+                elementQname = str(self.factList[0].qname).replace(':', '_')
+                elem('ElementName', elementQname)
+                elementPrefix = elementQname[:(elementQname.find('_') + 1)]
+                elem('ElementPrefix', elementPrefix)
+            else:
+                elem('ElementName')
+                elem('ElementPrefix')
+
+            elem('IsBaseElement', str('us-gaap' in elementPrefix.casefold()).casefold())
+
+            concept = None
+            balance = 'na'
+            periodType = 'duration'
+            theRealQname = self.originalElementQname
+            if theRealQname is not None:
+                concept = filing.modelXbrl.qnameConcepts[theRealQname]
+                if concept is not None:
+                    periodType = concept.periodType
+                    if concept.balance is not None:
+                        balance = concept.balance
+
+            elem('BalanceType', balance)
+            elem('PeriodType', periodType)
+            elem('IsReportTitle', 'false')
+            elem('IsSegmentTitle', str(self.isSegmentTitle).casefold())
+            elem('IsCalendarTitle', str(self.IsCalendarTitle).casefold())
+            elem('IsEquityPrevioslyReportedAsRow', 'false')
+            elem('IsEquityAdjustmentRow', 'false')
+            elem('IsBeginningBalance', str(Utils.isPeriodStartLabel(self.preferredLabel)).casefold())
+            elem('IsEndingBalance', str(Utils.isPeriodEndLabel(self.preferredLabel)).casefold())
+            elem('IsReverseSign', str(Utils.isNegatedLabel(self.preferredLabel)).casefold())
+            if self.preferredLabel is not None:
+                elem('PreferredLabelRole', self.preferredLabel)
+            report.writeFootnoteIndexerXmlfile(xf, self.footnoteNumberSet)
+
+            # --- cells ---
+            with xf.element('Cells'):
+                unlabeledSegmentTitle = self.isSegmentTitle and report.cube.isUnlabeled
+                for i, col in enumerate(report.colList):
+                    if col.isHidden:
+                        continue
+                    cell = self.cellList[i]
+                    if cell is None or cell.fact is None or cell.fact.isNil:
+                        try:
+                            contextID = cell.fact.contextID
+                            isNil = True
+                            unitId = cell.fact.unitID
+                        except AttributeError:
+                            isNil = False
+                            contextID = ''
+                            unitId = None
+
+                        cell_attribs = {'FlagID': '0', 'ContextID': contextID or ''}
+                        if unitId:
+                            cell_attribs['UnitID'] = unitId
+                        with xf.element('Cell', **cell_attribs):
+                            elem('Id', i + 1)
+                            elem('IsNumeric', 'false')
+                            elem('IsRatio', str(isNil).casefold())
+                            elem('DisplayZeroAsNone', str(isNil).casefold())
+                            elem('NumericAmount', '0')
+                            elem('RoundedNumericAmount', '0')
+                            if isNil:
+                                elem('NonNumbericText', ' ')
+                                report.writeFootnoteIndexerXmlfile(xf, cell.footnoteNumberSet)
+                            elif unlabeledSegmentTitle and i == 0:
+                                nnt = cell.NonNumericText if cell is not None else ''
+                                elem('NonNumbericText', nnt or None)
+                                elem('FootnoteIndexer')
+                            else:
+                                elem('NonNumbericText')
+                                elem('FootnoteIndexer')
+                            if cell is not None and cell.fact is not None:
+                                elem('CurrencyCode', cell.currencyCode)
+                                elem('CurrencySymbol', cell.currencySymbol)
+                            else:
+                                elem('CurrencyCode')
+                                elem('CurrencySymbol')
+                            elem('IsIndependantCurrency', 'false')
+                            elem('ShowCurrencySymbol', 'false')
+                            elem('DisplayDateInUSFormat', 'false')
+                    else:
+                        cell.emitCellXmlfile(xf)
+
+            # --- footer ---
+            typeQname = ''
+            simpleDataType = 'na'
+            doclabel = 'No definition available.'
+            referencesText = 'No definition available.'
+            if theRealQname is not None and concept is not None:
+                typeQname = str(concept.typeQname)
+                simpleDataType = self.simpleDataType(concept)
+                thedoclabel = concept.label(
+                    preferredLabel=arelle.XbrlConst.documentationLabel,
+                    fallbackToQname=False,
+                    lang=report.controller.labelLangs,
+                    linkrole=arelle.XbrlConst.defaultLinkRole)
+                if thedoclabel is not None:
+                    doclabel = thedoclabel
+                references = []
+                relationshipList = concept.modelXbrl.relationshipSet(arelle.XbrlConst.conceptReference).fromModelObject(concept)
+                relationshipList.sort(key=lambda x: x.sourceline)
+                for refrel in relationshipList:
+                    ref = refrel.toModelObject
+                    if ref is not None:
+                        try:
+                            references.append((ref.attrib[xlinkRole], ref))
+                        except KeyError:
+                            pass
+                if references:
+                    referencesText = ''
+                    for i_ref, (role, ref) in enumerate(references):
+                        if referencesText:
+                            referencesText += '\n'
+                        referencesText += 'Reference ' + str(i_ref + 1) + ': ' + role + '\n'
+                        for e in ref.iter():
+                            if e.text is not None:
+                                text = e.text.strip()
+                                if text:
+                                    referencesText += ' -' + e.localName + ' ' + text + '\n'
+
+            elem('ElementDataType', typeQname)
+            elem('SimpleDataType', simpleDataType)
+            elem('ElementDefenition', doclabel)
+            elem('ElementReferences', referencesText)
+            elem('IsTotalLabel', str(Utils.isTotalLabel(self.preferredLabel)).casefold())
+            elem('UnitID', '0')
+            elem('Label', filing.rowSeparatorStr.join(self.headingList))
+
+            if self.factAxisMemberGroup is not None:
+                fam_group = self.factAxisMemberGroup
+                otherAxisOnRows = any(
+                    fam.pseudoAxisName not in {'period', 'unit', 'primary'}
+                    for fam in fam_group.factAxisMemberRowList)
+                elem('hasSegments', str(otherAxisOnRows).casefold())
+                elem('hasScenarios', 'false')
+
+                # MCU subtree is small (~5-20 nodes); build with SubElement and stream via xf.write().
+                mcu = Element('MCU')
+                if self.context is not None:
+                    if report.embedding.rowPeriodPosition != -1:
+                        report.emitContextRef(mcu, fam_group.factAxisMemberRowList, self.context)
+                    elif otherAxisOnRows:
+                        report.emitContextRef(mcu, fam_group.factAxisMemberRowList, None)
+                if report.embedding.rowPrimaryPosition != -1 and fam_group.fact.unit is not None:
+                    report.emitUPS(mcu, fam_group.fact.unit)
+                xf.write(mcu)
+
 
 class Column(object):
 
@@ -1716,6 +1914,77 @@ class Cell(object):
         #########################################
         displayDateInUSFormatBool = re.compile('[0-9]{4}-[0-9]{2}-[0-9]{2}').match(self.NonNumericText) is not None
         SubElement(cellETree, 'DisplayDateInUSFormat').text = str(displayDateInUSFormatBool).casefold()
+
+    def emitCellXmlfile(self, xf):
+        """Stream a non-empty, non-nil cell to an lxml xmlfile context without building a libxml2 tree.
+
+        Falls back to emitCell + xf.write() for text-block cells that may trigger embedded report
+        rendering, since that path needs a live lxml element to append children to.
+        """
+        fact = self.fact
+        report = self.row.report
+        filing = self.filing
+
+        if fact.concept.isTextBlock and not filing.disallowEmbeddings and not report.cube.isElements:
+            tmp = Element('_')
+            self.emitCell(tmp)
+            xf.write(tmp[0])
+            return
+
+        def elem(tag, text=None):
+            with xf.element(tag):
+                if text is not None:
+                    s = str(text)
+                    if s:
+                        xf.write(s)
+
+        ContextID = fact.contextID
+        UnitID = fact.unitID or ''
+        cell_attribs = {'FlagID': '0', 'ContextID': ContextID, 'UnitID': UnitID}
+
+        with xf.element('Cell', **cell_attribs):
+            elem('Id', self.index)
+
+            IsNumeric = fact.isNumeric
+            IsRatio = False
+            NumericAmount = ''
+            valueStr = Utils.strFactValue(fact, preferredLabel=self.preferredLabel, filing=filing, report=report)
+            if IsNumeric:
+                IsRatio = Utils.isRate(fact, filing)
+                NumericAmount = valueStr
+            elif fact.concept.isTextBlock:
+                self.NonNumericText = valueStr
+            else:
+                self.NonNumericText = valueStr.replace('<', '&lt;')
+
+            elem('IsNumeric', str(IsNumeric).casefold())
+            elem('IsRatio', str(IsRatio).casefold())
+            dataTypeSet = {'NonNegativePure4Type', 'NonPositivePure4Type', 'pureItemType',
+                           'NonNegativeMonetaryType', 'NonPositiveMonetaryType'}
+            elem('DisplayZeroAsNone', str(
+                filing.isRRorOEF and fact.concept.typeQname.localName in dataTypeSet
+            ).casefold())
+
+            numericAmount, roundedNumericAmount = self.handleScalingAndPrecision(IsNumeric, NumericAmount)
+            elem('NumericAmount', numericAmount)
+            elem('RoundedNumericAmount', roundedNumericAmount)
+
+            nnt = self.NonNumericText
+            elem('NonNumbericText', nnt or None)
+
+            report.writeFootnoteIndexerXmlfile(xf, self.footnoteNumberSet)
+
+            if self.currencyCode is not None:
+                elem('CurrencyCode', self.currencyCode)
+                elem('CurrencySymbol', self.currencySymbol)
+            else:
+                elem('CurrencyCode')
+                elem('CurrencySymbol')
+
+            elem('ShowCurrencySymbol', str(self.showCurrencySymbol).casefold())
+
+            displayDate = re.compile('[0-9]{4}-[0-9]{2}-[0-9]{2}').match(nnt) is not None
+            elem('DisplayDateInUSFormat', str(displayDate).casefold())
 
     def handleEmbeddedReport(self, report, cellETree):
         # we check for cube.isElements because we don't want to actually render this embedding in that case.  also, if the fact is
