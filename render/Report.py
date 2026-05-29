@@ -1147,24 +1147,28 @@ class Report(object):
         baseName = (self.filing.rFilePrefix or '') + baseNameBeforeExtension + '.htm' + (self.filing.suplSuffix or '')
         reportSummary.htmlFileName = baseName
         _startedAt = time.time()
-        # Cols and rows were streamed to byte lists; restore them into the tree for XSLT.
+        # Assemble complete XML from the skeleton + pre-serialized cols/rows, then parse
+        # into a temporary tree for XSLT. Freed explicitly before returning so C-heap nodes
+        # are returned to libxml2's pool before the next report starts, not at Report GC time.
+        xml_bytes = treeToString(tree, xml_declaration=True, encoding='utf-8')
         if self._colBytesList:
-            for col_bytes in self._colBytesList:
-                self.columnsETree.append(fromstring(col_bytes))
+            xml_bytes = xml_bytes.replace(b'<Columns/>', b'<Columns>\n' + b'\n'.join(self._colBytesList) + b'\n</Columns>', 1)
         if self._rowBytesList:
-            for row_bytes in self._rowBytesList:
-                self.rowsETree.append(fromstring(row_bytes))
-        cell_count = sum(1 for x in tree.iter('Cell'))
+            xml_bytes = xml_bytes.replace(b'<Rows/>', b'<Rows>\n' + b'\n'.join(self._rowBytesList) + b'\n</Rows>', 1)
+        xslt_tree = fromstring(xml_bytes).getroottree()
+        del xml_bytes
+
+        cell_count = sum(1 for _ in xslt_tree.iter('Cell'))
+        keywordArgs = {"asPage": XSLT.strparam("true")}
+        if getattr(self.embedding, "disclaimer", None) and getattr(self.embedding, "disclaimerStyle", None):
+            keywordArgs["disclaimer"] = XSLT.strparam(self.embedding.disclaimer)
+            keywordArgs["disclaimerStyle"] = XSLT.strparam(self.embedding.disclaimerStyle)
         if cell_count > 50000:
             self.controller.logWarn(f"There are {cell_count} cells; skipping transformation.",
                                     messageCode="EXG.rendering.tooManyCells")
             result = fromstring("<HTML><HEAD><TITLE>NOPE</TITLE></HEAD><BODY>Not available</BODY></HTML>")
         else:
-            keywordArgs = { "asPage": XSLT.strparam("true") }
-            if getattr(self.embedding, "disclaimer", None) and getattr(self.embedding, "disclaimerStyle", None):
-                keywordArgs["disclaimer"] = XSLT.strparam(self.embedding.disclaimer)
-                keywordArgs["disclaimerStyle"] = XSLT.strparam(self.embedding.disclaimerStyle)
-            result = self.filing.transform(tree, **keywordArgs)
+            result = self.filing.transform(xslt_tree, **keywordArgs)
         htmlText = treeToString(result, method='html', with_tail=False, pretty_print=True, encoding='us-ascii')
         if self.filing.reportZip:
             self.filing.reportZip.writestr(self.filing.zipDir + baseName, htmlText)
@@ -1174,14 +1178,14 @@ class Report(object):
             self.controller.renderedFiles.add(baseName)
             self.filing.report.renderedFiles.append(baseName)
         if self.filing.altTransform is not None and cell_count <= 50000:
-            # secondary output for workstation
             baseName = baseNameBeforeExtension + '.htm' + (self.filing.altSuffix or '')
             reportSummary.htmlFileName = baseName
-            result = self.filing.altTransform(tree, **keywordArgs)
+            result = self.filing.altTransform(xslt_tree, **keywordArgs)
             htmlText = treeToString(result, method='html', with_tail=False, pretty_print=True, encoding='us-ascii')
             self.controller.writeFile(os.path.join(self.filing.altFolder, baseName), htmlText)
             self.controller.renderedFiles.add(baseName)
             self.filing.report.renderedFiles.append(baseName)
+        del xslt_tree
         self.controller.logDebug("R{} htm XSLT {:.3f} secs.".format(self.cube.fileNumber, time.time() - _startedAt))
 
     def generateBarChart(self):
