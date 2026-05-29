@@ -1073,12 +1073,15 @@ class EdgarRenderer(Cntlr.Cntlr):
                 reportXslt = None
                 if self.reportXslt:
                     _xsltStartedAt = time.time()
-                    reportXslt = etree.XSLT(etree.parse(self.reportXslt))
-                    if self.reportXsltDissem:
-                        reportXsltDissem = etree.XSLT(etree.parse(self.reportXsltDissem))
-                    else:
-                        reportXsltDissem = None
-                    self.logDebug("Excel XSLT transform {:.3f} secs.".format(time.time() - _xsltStartedAt))
+                    try:
+                        from .Report import SaxonTransform
+                        reportXslt = SaxonTransform(self.reportXslt)
+                        reportXsltDissem = SaxonTransform(self.reportXsltDissem) if self.reportXsltDissem else None
+                        self.logDebug("Saxon XSLT compile {:.3f} secs.".format(time.time() - _xsltStartedAt))
+                    except Exception:
+                        reportXslt = etree.XSLT(etree.parse(self.reportXslt))
+                        reportXsltDissem = etree.XSLT(etree.parse(self.reportXsltDissem)) if self.reportXsltDissem else None
+                        self.logDebug("lxml XSLT compile {:.3f} secs.".format(time.time() - _xsltStartedAt))
                 # R files can be produced after knowing if any instance had private data
                 self.nextFileNum = 1  # important for naming file numbers for multi-instance filings
                 self.nextUncategorizedFileNum = 9999
