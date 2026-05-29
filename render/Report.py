@@ -51,8 +51,10 @@ class Report(object):
         self.RoundingOption = None
 
         self.rootETree = Element('InstanceReport', nsmap={'xsi': 'http://www.w3.org/2001/XMLSchema-instance'})
-        self.columnsETree = SubElement(self.rootETree, 'Columns')  # children added later
-        self.rowsETree = SubElement(self.rootETree, 'Rows')  # children added later
+        self.columnsETree = SubElement(self.rootETree, 'Columns')  # stays empty; cols go to _colBytesList
+        self.rowsETree = SubElement(self.rootETree, 'Rows')        # stays empty; rows go to _rowBytesList
+        self._colBytesList = []   # columns serialized incrementally; columnsETree stays empty
+        self._visibleColCount = 0
         self._rowBytesList = []   # rows serialized incrementally; rowsETree stays empty
         self._visibleRowCount = 0
 
@@ -957,7 +959,11 @@ class Report(object):
     def emitRFileCols(self):
         for index, col in enumerate(self.colList):
             if not col.isHidden:
-                col.emitColumn(index)
+                buf = io.BytesIO()
+                with lxml_xmlfile(buf) as xf:
+                    col.emitColumnXmlfile(xf, index)
+                self._colBytesList.append(buf.getvalue())
+                self._visibleColCount += 1
 
     def emitRFileRows(self):
         for index, row in enumerate(self.rowList):
@@ -1006,7 +1012,7 @@ class Report(object):
         SubElement(self.rootETree, 'IsMultiCurrency').text = 'false'
         SubElement(self.rootETree, 'ReportType').text = 'Sheet'
         SubElement(self.rootETree, 'RoleURI').text = self.cube.linkroleUri
-        SubElement(self.rootETree, 'NumberOfCols').text = str(int(self.rootETree.xpath('count(/InstanceReport/Columns/Column)')))
+        SubElement(self.rootETree, 'NumberOfCols').text = str(self._visibleColCount)
         SubElement(self.rootETree, 'NumberOfRows').text = str(self._visibleRowCount)
 
     def emitContextRef(self, mcuETree, factAxisMemberList, context):
@@ -1123,10 +1129,12 @@ class Report(object):
         baseName = (self.filing.rFilePrefix or '') + baseNameBeforeExtension + '.xml' + (self.filing.suplSuffix or '')
         reportSummary.xmlFileName = baseName
         xmlText = treeToString(tree, xml_declaration=True, encoding='utf-8', pretty_print=True)
+        if self._colBytesList:
+            cols_content = b'<Columns>\n' + b'\n'.join(self._colBytesList) + b'\n</Columns>'
+            xmlText = xmlText.replace(b'<Columns/>', cols_content, 1)
         if self._rowBytesList:
             rows_content = b'<Rows>\n' + b'\n'.join(self._rowBytesList) + b'\n</Rows>'
-            # lxml serializes an empty element as <Rows/> with pretty_print; replace it with row content.
-            # Avoid re-parsing bytes into libxml2 nodes here — that would recreate the full C-heap peak.
+            # Inject pre-serialized bytes directly — avoids re-parsing into libxml2 nodes.
             xmlText = xmlText.replace(b'<Rows/>', rows_content, 1)
         if self.filing.reportZip:
             self.filing.reportZip.writestr(self.filing.zipDir + baseName, xmlText)
@@ -1139,7 +1147,10 @@ class Report(object):
         baseName = (self.filing.rFilePrefix or '') + baseNameBeforeExtension + '.htm' + (self.filing.suplSuffix or '')
         reportSummary.htmlFileName = baseName
         _startedAt = time.time()
-        # Rows were detached during emitRFileRows; restore them so XSLT can see them.
+        # Cols and rows were streamed to byte lists; restore them into the tree for XSLT.
+        if self._colBytesList:
+            for col_bytes in self._colBytesList:
+                self.columnsETree.append(fromstring(col_bytes))
         if self._rowBytesList:
             for row_bytes in self._rowBytesList:
                 self.rowsETree.append(fromstring(row_bytes))
@@ -1809,6 +1820,53 @@ class Column(object):
                     SubElement(columnETree, 'CurrencySymbol').text = cell.currencySymbol
                     break
 
+    def emitColumnXmlfile(self, xf, index):
+        """Stream this column directly to an lxml xmlfile context without building a libxml2 tree."""
+        report = self.report
+        firstColOfAnUnlabeledCube = report.cube.isUnlabeled and index == 0
+        colVector = report.generateCellVector('col', index)[1]
+
+        def elem(tag, text=None, **attrib):
+            with xf.element(tag, **attrib):
+                if text is not None:
+                    s = str(text)
+                    if s:
+                        xf.write(s)
+
+        with xf.element('Column', FlagID='0'):
+            elem('Id', index + 1)
+            elem('IsAbstractGroupTitle', 'false')
+            elem('LabelSeparator', ' ')
+            report.writeFootnoteIndexerXmlfile(xf, self.footnoteNumberSet)
+
+            with xf.element('Labels'):
+                for i, header in enumerate(self.headingList):
+                    with xf.element('Label', Id=str(i), Label=str(header)):
+                        pass
+
+            otherAxisOnCols = any(
+                fam.pseudoAxisName not in {'period', 'unit', 'primary'}
+                for fam in self.factAxisMemberGroup.factAxisMemberColList)
+            elem('hasSegments', str(otherAxisOnCols).casefold())
+            elem('hasScenarios', 'false')
+
+            # MCU subtree — small, built with SubElement and streamed via xf.write().
+            mcu = Element('MCU')
+            if self.context is not None and not firstColOfAnUnlabeledCube:
+                if report.embedding.columnPeriodPosition != -1:
+                    report.emitContextRef(mcu, self.factAxisMemberGroup.factAxisMemberColList, self.context)
+                elif otherAxisOnCols:
+                    report.emitContextRef(mcu, self.factAxisMemberGroup.factAxisMemberColList, None)
+            if report.embedding.columnPrimaryPosition != -1 and self.factAxisMemberGroup.fact.unit is not None:
+                report.emitUPS(mcu, self.factAxisMemberGroup.fact.unit)
+            xf.write(mcu)
+
+            if report.embedding.columnUnitPosition != -1:
+                for cell in colVector:
+                    if cell is not None and cell.showCurrencySymbol:
+                        elem('CurrencySymbol', cell.currencySymbol)
+                        break
+
 
 class Cell(object):
 
@@ -2095,7 +2153,14 @@ class Cell(object):
         SubElement(EmbeddedReport, 'EmbedInstruction')
         SubElement(EmbeddedReport, 'IsTransposed').text = str(self.row.report.cube.isTransposed).casefold()
         SubElement(EmbeddedReport, 'Role')
-        EmbeddedReport.append(embedding.report.rootETree)
+        # Cols and rows were streamed to byte lists during emitRFile; restore them into the
+        # embedded report's tree so the full InstanceReport XML is present when appended here.
+        embedded_report = embedding.report
+        for col_bytes in embedded_report._colBytesList:
+            embedded_report.columnsETree.append(fromstring(col_bytes))
+        for row_bytes in embedded_report._rowBytesList:
+            embedded_report.rowsETree.append(fromstring(row_bytes))
+        EmbeddedReport.append(embedded_report.rootETree)
 
 # this is broken.
 #===============================================================================
