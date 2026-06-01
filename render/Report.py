@@ -16,46 +16,11 @@ matplotlib_use("Agg")
 import os, datetime, decimal, io, time
 import regex as re
 from collections import defaultdict
-from lxml.etree import Element, SubElement, XSLT, tostring as treeToString, fromstring, xmlfile as lxml_xmlfile
+from lxml.etree import Element, SubElement, tostring as treeToString, fromstring, xmlfile as lxml_xmlfile
 import arelle.XbrlConst
 from . import Utils
 Filing = None
 from arelle.XbrlConst import qnIXbrl11Hidden
-
-try:
-    import saxonche as _saxonche
-    _SAXON_AVAILABLE = True
-except ImportError:
-    _saxonche = None
-    _SAXON_AVAILABLE = False
-
-
-class SaxonTransform:
-    """XSLT transform via Saxon-C (saxonche) instead of lxml.
-
-    Saxon uses GraalVM/native memory rather than libxml2's monotonic C-heap pool,
-    so memory is released after each transform instead of accumulating to peak.
-    Accepts raw xml_bytes and returns HTML bytes; no lxml tree is ever built.
-    Falls back gracefully when saxonche is not installed.
-    """
-
-    def __init__(self, xslt_file_path):
-        proc = _saxonche.PySaxonProcessor(license=False)
-        xslt_proc = proc.new_xslt30_processor()
-        self._proc = proc
-        self._exe = xslt_proc.compile_stylesheet(stylesheet_file=xslt_file_path)
-
-    def __call__(self, xml_bytes, **params):
-        xml_str = xml_bytes.decode('utf-8') if isinstance(xml_bytes, bytes) else xml_bytes
-        node = self._proc.parse_xml(xml_text=xml_str)
-        self._exe.set_global_context_item(xdm_item=node)
-        self._exe.set_initial_match_selection(xdm_value=node)
-        for k, v in params.items():
-            self._exe.set_parameter(k, self._proc.make_string_value(str(v)))
-        result = self._exe.apply_templates_returning_string()
-        self._exe.clear_parameters()
-        return result.encode('utf-8') if result else b''
-
 
 xlinkRole = '{' + arelle.XbrlConst.xlink + '}role'  # constant belongs in XbrlConsts`headingList
 
@@ -1189,66 +1154,41 @@ class Report(object):
             xml_bytes = xml_bytes.replace(b'<Rows/>', b'<Rows>\n' + b'\n'.join(self._rowBytesList) + b'\n</Rows>', 1)
         cell_count = xml_bytes.count(b'<Cell ')
 
-        if isinstance(self.filing.transform, SaxonTransform):
-            # Saxon path: transform bytes directly — no libxml2 tree, no C-heap spike.
-            params = {"asPage": "true"}
-            if getattr(self.embedding, "disclaimer", None) and getattr(self.embedding, "disclaimerStyle", None):
-                params["disclaimer"] = self.embedding.disclaimer
-                params["disclaimerStyle"] = self.embedding.disclaimerStyle
-            if cell_count > 50000:
-                self.controller.logWarn(f"There are {cell_count} cells; skipping transformation.",
-                                        messageCode="EXG.rendering.tooManyCells")
-                htmlText = b"<HTML><HEAD><TITLE>NOPE</TITLE></HEAD><BODY>Not available</BODY></HTML>"
-            else:
-                htmlText = self.filing.transform(xml_bytes, **params)
-            if self.filing.reportZip:
-                self.filing.reportZip.writestr(self.filing.zipDir + baseName, htmlText)
-                self.controller.renderedFiles.add(baseName)
-            elif self.filing.fileNameBase is not None:
-                self.controller.writeFile(os.path.join(self.filing.fileNameBase, baseName), htmlText)
-                self.controller.renderedFiles.add(baseName)
-                self.filing.report.renderedFiles.append(baseName)
-            if self.filing.altTransform is not None and cell_count <= 50000 and isinstance(self.filing.altTransform, SaxonTransform):
-                baseName = baseNameBeforeExtension + '.htm' + (self.filing.altSuffix or '')
-                reportSummary.htmlFileName = baseName
-                htmlText = self.filing.altTransform(xml_bytes, **params)
-                self.controller.writeFile(os.path.join(self.filing.altFolder, baseName), htmlText)
-                self.controller.renderedFiles.add(baseName)
-                self.filing.report.renderedFiles.append(baseName)
+        if cell_count > 50000:
+            self.controller.logWarn(f"There are {cell_count} cells; skipping transformation.",
+                                    messageCode="EXG.rendering.tooManyCells")
+            htmlText = b"<HTML><HEAD><TITLE>NOPE</TITLE></HEAD><BODY>Not available</BODY></HTML>"
         else:
-            # lxml fallback: assemble XML bytes into a temporary tree for XSLT 1.0.
-            # Freed explicitly before returning so C-heap nodes return to libxml2's pool
-            # before the next report starts rather than at Report GC time.
-            xslt_tree = fromstring(xml_bytes).getroottree()
-            del xml_bytes
-            keywordArgs = {"asPage": XSLT.strparam("true")}
-            if getattr(self.embedding, "disclaimer", None) and getattr(self.embedding, "disclaimerStyle", None):
-                keywordArgs["disclaimer"] = XSLT.strparam(self.embedding.disclaimer)
-                keywordArgs["disclaimerStyle"] = XSLT.strparam(self.embedding.disclaimerStyle)
-            if cell_count > 50000:
-                self.controller.logWarn(f"There are {cell_count} cells; skipping transformation.",
-                                        messageCode="EXG.rendering.tooManyCells")
-                result = fromstring("<HTML><HEAD><TITLE>NOPE</TITLE></HEAD><BODY>Not available</BODY></HTML>")
-            else:
-                result = self.filing.transform(xslt_tree, **keywordArgs)
-            htmlText = treeToString(result, method='html', with_tail=False, pretty_print=True, encoding='us-ascii')
-            if self.filing.reportZip:
-                self.filing.reportZip.writestr(self.filing.zipDir + baseName, htmlText)
-                self.controller.renderedFiles.add(baseName)
-            elif self.filing.fileNameBase is not None:
-                self.controller.writeFile(os.path.join(self.filing.fileNameBase, baseName), htmlText)
-                self.controller.renderedFiles.add(baseName)
-                self.filing.report.renderedFiles.append(baseName)
-            if self.filing.altTransform is not None and cell_count <= 50000:
-                baseName = baseNameBeforeExtension + '.htm' + (self.filing.altSuffix or '')
-                reportSummary.htmlFileName = baseName
-                result = self.filing.altTransform(xslt_tree, **keywordArgs)
-                htmlText = treeToString(result, method='html', with_tail=False, pretty_print=True, encoding='us-ascii')
-                self.controller.writeFile(os.path.join(self.filing.altFolder, baseName), htmlText)
-                self.controller.renderedFiles.add(baseName)
-                self.filing.report.renderedFiles.append(baseName)
-            del xslt_tree
-        self.controller.logDebug("R{} htm XSLT {:.3f} secs.".format(self.cube.fileNumber, time.time() - _startedAt))
+            from . import HtmlRenderer
+            disclaimer = getattr(self.embedding, 'disclaimer', None)
+            disclaimer_style = getattr(self.embedding, 'disclaimerStyle', None)
+            root_elem = fromstring(xml_bytes)
+            htmlText = HtmlRenderer.render(
+                root_elem,
+                as_page=True,
+                disclaimer=disclaimer or None,
+                disclaimer_style=disclaimer_style or None,
+            )
+            del root_elem
+
+        del xml_bytes
+
+        if self.filing.reportZip:
+            self.filing.reportZip.writestr(self.filing.zipDir + baseName, htmlText)
+            self.controller.renderedFiles.add(baseName)
+        elif self.filing.fileNameBase is not None:
+            self.controller.writeFile(os.path.join(self.filing.fileNameBase, baseName), htmlText)
+            self.controller.renderedFiles.add(baseName)
+            self.filing.report.renderedFiles.append(baseName)
+
+        if self.filing.altTransform is not None and cell_count <= 50000 and self.filing.altFolder is not None:
+            altBaseName = baseNameBeforeExtension + '.htm' + (self.filing.altSuffix or '')
+            reportSummary.htmlFileName = altBaseName
+            self.controller.writeFile(os.path.join(self.filing.altFolder, altBaseName), htmlText)
+            self.controller.renderedFiles.add(altBaseName)
+            self.filing.report.renderedFiles.append(altBaseName)
+
+        self.controller.logDebug("R{} htm render {:.3f} secs.".format(self.cube.fileNumber, time.time() - _startedAt))
 
     def generateBarChart(self):
         # change rendering guide bar chart documentation
