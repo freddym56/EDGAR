@@ -169,6 +169,14 @@ span.open-indicator {
 .section-link {
   margin-bottom: 10px;
 }
+div.section-link {
+  // not a link
+  cursor: default;
+  opacity: .7;
+}
+div.section-link:hover {
+  text-decoration: none;
+}
 .section-link:hover {
   // background-color: #eee;
   text-decoration: underline;

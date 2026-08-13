@@ -31,8 +31,8 @@ describe(`Sections Links to different instance`, () => {
 
 describe(`Sections Links multi doc (metalinks 2.1)`, () => {
     it(`${multiDocFiling.accessionNum} ${multiDocFiling.formType || multiDocFiling.submissionType}`, () => {
-        cy.loadFiling(multiDocFiling)
-        cy.get(selectors.sectionsHeader, { timeout: Number(multiDocFiling.timeout) }).click()
+        cy.loadFiling(multiDocFiling);
+        cy.get(selectors.sectionsHeader, { timeout: Number(multiDocFiling.timeout) }).click();
 
         // click section link in ex99-1 doc
         cy.get('[id="section-header-Notes to Financial Statements"]').click();
@@ -118,8 +118,9 @@ describe("wh filing Section Links link to the correct fact/section", () => {
                     cy.get(link).click();
     
                     //Some Cover sections have no Fact ID and link to the top of the page
+                    // if (factSelector && factSelector != "undefined") {
                     if (factSelector != null) {
-                        cy.get(`${factSelector}`).should("satisfy", Cypress.dom.isVisible);
+                        cy.get(factSelector).should("satisfy", Cypress.dom.isVisible);
                     }
     
                     //Should not get an error
@@ -156,5 +157,38 @@ describe("Section links should update fact hash", () => {
         cy.get(selectors.sectionsHeader).click();
         cy.get('a[order="1"]').click();
         cy.hash().should('eq', '#fact-identifier-3')
+    })
+});
+
+describe("Section links should be navigatable (metalinks 2.0)", () => {
+    it('Have attributes for selecting facts', () => {
+        cy.visit('/Archives/edgar/data/2969/000000296918000044/apd-10xkx30sep2018.htm');
+        cy.get(selectors.sectionsHeader).click();
+        cy.get(selectors.sectionsLinks).each((link, linkIndex) => {
+            cy.get(link).should('have.attr', "inline-fact-selector");
+            cy.get(link).should('have.attr', "fact-file");
+        })
+    })
+});
+
+describe.only("Sections links 2", () => {
+    /*
+    In this case filing summary has "??" in the short name, but the ml rep doesn't.  It's tricky to match the ml report, but we should, and should display it
+    function is findMatchingMetaReport() in merge-data-utils
+    */
+    it('should show hard to match reports', () => {
+        cy.loadByAccessionNum('000000695119000046')
+        cy.get(selectors.sectionsHeader).click();
+        cy.get('#cat-body-Notes-Details-sectionDoc-10-K > a:nth-child(15)')
+            .should('contain.text', 'Derivative Instruments and Hedging Activities (Derivatives??in??Cash??Flow Hedging Relationships) (Details)')
+    })
+});
+
+describe.only("Sections has DEI report", () => {
+    it('should show hard to match reports', () => {
+        cy.loadByAccessionNum('000001260120000228')
+        cy.get(selectors.sectionsHeader).click();
+        cy.get('#cat-body-Reports-sectionDoc-485BPOS > a:nth-child(1)')
+            .should('contain.text', 'Document and Entity Information');
     })
 });

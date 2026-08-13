@@ -45,21 +45,10 @@ from .Util import usgaapYear
 
 """ Xule validator specific variables."""
 _short_name = 'DQC'
-_name = 'DQCRT XULE Rules Validator'
-_version = 'Check version using Tools->DQC->Version on the GUI or --dqc-version on the command line'
-_version_prefix = '3.0.'
-_description = 'DQCRT rules validator.'
-_license = 'Apache-2'
-_author = 'XBRL US Inc.'
-_copyright = '(c) 2017-2023'
 _xule_resources_dir = os.path.join(os.path.dirname(__file__), "resources", "xule")
-_xule_resources_dir_for_json = json.dumps(_xule_resources_dir + os.sep)[1:-1]
-_plugin_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 _rule_set_map_name = os.path.join(_xule_resources_dir, "edgarRulesetMap.json")
-_latest_map_name = 'https://github.com/Arelle/EDGAR/tree/master/validate/resources/xule/edgarRulesetMapOnline.json'
-_incompatible_plugin = None # trhe if DQC.py or other incompatible plugin is detected
 xule_error_code_pattern = re.compile(r"DQC\.|xule\.")
-DQC_plugin_url_pattern = re.compile(r"validate[/\\]DQC(\.py)?")
+incompatible_plugin_url_pattern = re.compile(r".*validate[/\\]DQC(\.py)?$")
 
 DQCRT_RUN_ONLY_PATTERN = (r"DQC\.US\.(" # separate rules 0000-0009, 0010-0099, 0100-01XX
     "000[145689]|"
@@ -133,11 +122,6 @@ def xuleValidate(val):
     # print(f"*** trace usgYr {usgYr} usgMinYr {usgMinYr} param \"{val.params.get('dqcRuleFilter','')}\"")
     if xuleValidateFinally is not None:
         if usgYr >= usgMinYr:
-            if _incompatible_plugin:
-                val.modelXbrl.warning("arelle.incompatibleRulePlugin",
-                                      _("Incompatible plugin %(plugin)s detected, xule rules not run."),
-                                      modelObject=val.modelXbrl, plugin=_incompatible_plugin)
-                return True # xule requested but incompatible configuration
             # must run without disclosure system blockage of URLs
             validateDisclosureSystem = val.modelXbrl.modelManager.validateDisclosureSystem
             val.modelXbrl.modelManager.validateDisclosureSystem = False
@@ -309,21 +293,36 @@ def cntrlrCmdLineUtilityRun(cntlr, options, **kwargs):
     if registerMethod is not None:
         registerMethod(_short_name, _rule_set_map_name)
 
+def disableIncompatiblePlugin(cntlr, plugin_info):
+    incompatible_plugin_msg = (
+        "The {plugin_name} plugin has been disabled because the EDGAR plugin is also enabled, "
+        "wherein DQC rules are managed by the EDGAR workflow to provide integrated validation rule results."
+    )
+    incompatible_plugin_code = "arelle.edgarManagedDQCRules"
+    moduleUrl = plugin_info.get('moduleURL', '')
+    plugin_name = plugin_info.get('name')
+    if incompatible_plugin_url_pattern.match(moduleUrl):
+        incompatible_plugin_module = PluginManager.pluginConfig["modules"].get(plugin_name)
+        if incompatible_plugin_module.get("status") != "disabled":
+            incompatible_plugin_module["status"] = "disabled"
+            PluginManager.pluginConfigChanged = True
+            PluginManager.pluginMethodsForClasses.clear()
+            cntlr.addToLog(_(incompatible_plugin_msg.format(plugin_name=plugin_name)),
+                            messageCode=incompatible_plugin_code) 
+
 def getXulePlugin(cntlr):
     """Find the Xule plugin
 
     This will locate the Xule plugin module.
     """
-    global _xule_plugin_info, _incompatible_plugin, xulePluginDoesNotExist
-    if _xule_plugin_info is None and not xulePluginDoesNotExist:
+    global _xule_plugin_info, xulePluginDoesNotExist
+    if not xulePluginDoesNotExist:
         for plugin_info in PluginManager.modulePluginInfos.values():
             moduleUrl = plugin_info.get('moduleURL')
-            if moduleUrl.endswith('xule'):
+            if _xule_plugin_info is None and moduleUrl.endswith('xule'):
                 _xule_plugin_info = plugin_info
-            elif DQC_plugin_url_pattern.match(moduleUrl):
-                _incompatible_plugin = moduleUrl
-                cntlr.addToLog(_("EDGAR is not compatible with the DQC.py plugin, please remove the DQC.py plugin.  The EDGAR plugin directly manages running of to run DQC rules."),
-                               messageCode="arelle.incompatibleRulePlugin")
+            elif incompatible_plugin_url_pattern.match(moduleUrl):
+                disableIncompatiblePlugin(cntlr, plugin_info)
 
     if _xule_plugin_info is None and not xulePluginDoesNotExist:
         cntlr.addToLog(_("Xule plugin is not loaded. Xule plugin is required to run DQC rules. This plugin should be automatically loaded."),
@@ -344,33 +343,33 @@ def getXuleMethod(cntlr, class_name):
     return None
 
 def menuTools(cntlr, menu):
-    """Add validator menu the Tools menu in the Arelle GUI
-
-    This is invoked by the Arelle controller
-    """
-    menu_method = getXuleMethod(cntlr, 'Xule.AddMenuTools')
-    version_method = getXuleMethod(cntlr, 'Xule.ValidatorVersion')
-    if menu_method is not None:
-        menu_method(cntlr, menu, _short_name, _version_prefix, __file__, _rule_set_map_name, _latest_map_name)
+    # EDGAR manages xule validation directly; no DQC/XULE menu needed
+    # the removal of the menu items here is a backup in case another plugin's
+    # menuTools call adds these menu items.
+    for label in ("DQC", "Xule"):
+        try:
+            menu.delete(label)
+        except Exception:
+            pass
 
 def validateMenuTools(cntlr, validateMenu, *args, **kwargs):
-    """Add validator checkbutton to the Arelle Validate menu (under Tools).
+    """Register the xule validator and suppress xule's own GUI menu.
 
-    This is invoked by the Arelle controller.
+    This is invoked by the Arelle controller before CntlrWinMain.Menu.Tools.
+    Replacing the xule plugin's tool hook here so the menu item is not added.
     """
-    # set validation true for validateDQCRT so it always validates for Filing.py when that validates
-    ''' block this function
-        it causes xule to register validator with validate variable which causes it to run on validate.finally
 
-    cntlr.config["validateDQCRT"] = True
-    menu_method = getXuleMethod(cntlr, 'Xule.AddValidationMenuTools')
-    menu_method(cntlr, validateMenu, _short_name, _rule_set_map_name)
-    '''
-    # Register the xule validator
+    # Register the xule validator so xule's Validate.Finally loop will run EDGAR rules
     registerMethod = getXuleMethod(cntlr, 'Xule.RegisterValidator')
     if registerMethod is not None:
         registerMethod(_short_name, _rule_set_map_name)
-        cntlr.config['xule_activated'] = False # block xule initialization from Tools menu path
+
+    # block xule initialization from Tools menu path
+    for plugin_info in PluginManager.modulePluginInfos.values():
+        moduleUrl = plugin_info.get('moduleURL')
+        if moduleUrl.endswith('xule'):
+            plugin_info['CntlrWinMain.Menu.Tools'] = noop
+    cntlr.config['xule_activated'] = False
 
 ''' original plugininfo from DQC.py
     incorporated as validate/EFM/__init__.py

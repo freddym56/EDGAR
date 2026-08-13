@@ -21,7 +21,7 @@ export const Facts = {
 	updateFactCounts: () => {
 		let factCount = FactMap.getFactCount();
 		Constants.factCount = factCount;
-		
+
 		// FactsTable.update();
 		const instanceFactCountElems = Array.from(document.querySelectorAll(".fact-total-count"));
 
@@ -77,7 +77,7 @@ export const Facts = {
 			let id = Constants.appWindow.location.hash;
 
 			const element = document.querySelector(id);
-			
+
 			if (element instanceof HTMLElement) {
 				Facts.clickEvent(event, element);
 				// element.scrollIntoView(false); // keeping as comment to remember alternative function
@@ -88,6 +88,14 @@ export const Facts = {
 
 	setInlineFactListeners(element: HTMLElement) {
 		element.addEventListener("click", (event: MouseEvent) => {
+			const parent = event.currentTarget.parentElement
+
+			if (parent?.children.length === 1 && parent.tagName.startsWith('ix:')) {
+				if (parent.textContent.trim() === event.currentTarget.textContent.trim()) {
+					return
+				}
+			}
+
 			event.stopPropagation();
 			event.preventDefault();
 			Search.closeSuggestions();
@@ -99,7 +107,16 @@ export const Facts = {
 		});
 
 		element.addEventListener("keyup", (event: KeyboardEvent) => {
+			const parent = event.currentTarget.parentElement
+			
+			if (parent?.children.length === 1 && parent.tagName.startsWith('ix:')) {
+				if (parent.textContent.trim() === event.currentTarget.textContent.trim()) {
+					return
+				}
+			}
+			
 			if (!actionKeyHandler(event)) return;
+			
 			if (element instanceof HTMLElement) {
 				const id = element.hasAttribute('continued-main-fact-id') ? element.getAttribute('continued-main-fact-id') : element.getAttribute('id');
 				Facts.updateURLHash(id as string);
@@ -186,12 +203,12 @@ export const Facts = {
 										Facts.setInlineFactListeners(continuedFactElem);
 										continuedFactElem.setAttribute("continued-main-fact-id", mainID);
 										continuedFactElem.setAttribute("continued-fact", "true");
-										continuedFactElem.setAttribute("enabled-fact", `${fact.isEnabled}`);	
-										continuedFactElem.setAttribute("selected-fact", `${fact.isSelected}`);	
+										continuedFactElem.setAttribute("enabled-fact", `${fact.isEnabled}`);
+										continuedFactElem.setAttribute("selected-fact", `${fact.isSelected}`);
 										setDisplayAttribute(fact, continuedFactElem);
 										// continuedFactElem)?.setAttribute("text-block-fact", "true");
-														
-										continuedFactElem.setAttribute("highlight-fact", `${fact.isHighlight}`);						
+
+										continuedFactElem.setAttribute("highlight-fact", `${fact.isHighlight}`);
 										target.setAttribute('highlight-fact', `${fact.isHighlight}`);
 										fact.continuedIDs.push(continuedAtId);
 										if (continuedFactElem.hasAttribute("continuedat")) {
@@ -207,7 +224,7 @@ export const Facts = {
 				unobserveAfter ? observer.unobserve(target) : null;
 			});
 		}, {
-			root: document.getElementById('dynamic-xbrl-form'), 
+			root: document.getElementById('dynamic-xbrl-form'),
 			rootMargin: '200px',
 		});
 
@@ -218,7 +235,7 @@ export const Facts = {
 			observer.observe(inlineFact);
 		});
 
-		if (LOGPERFORMANCE || Constants.logPerfParam ) {
+		if (LOGPERFORMANCE || Constants.logPerfParam) {
 			const endPerformance = performance.now();
 			addToJsPerfTable('facts.inViewPort()', startPerformance, endPerformance);
 		}
@@ -364,7 +381,7 @@ export const Facts = {
 		});
 	},
 
-	resetAllPopups: ():Promise<void> => {
+	resetAllPopups: (): Promise<void> => {
 		return new Promise((resolve) => {
 			const foundPopupClassesArray = Array.from(document.querySelectorAll(".popover"));
 			foundPopupClassesArray.forEach((current) => {

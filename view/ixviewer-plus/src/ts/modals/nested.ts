@@ -157,7 +157,14 @@ export const ModalsNested = {
 		event.preventDefault();
 		event.stopPropagation();
 
-		document.getElementById('fact-nested-modal')?.classList.remove('d-none');
+		Modals.hide('fact-modal')
+
+		const modal = document.getElementById('fact-nested-modal')
+		if (modal) {
+			Modals.hide('fact-modal')
+			modal.classList.remove('d-none');
+			Modals.bringToFront(modal)
+		}
 
 		document.getElementById('fact-nested-modal-drag')?.focus();
 		// we empty the ID Array
@@ -273,14 +280,14 @@ export const ModalsNested = {
 			Modals.expandToggle(event, 'fact-nested-modal', 'fact-nested-modal-expand', 'fact-nested-modal-compress');
 		});
 
-		document.getElementById('fact-nested-modal-close')?.addEventListener('click', (event: MouseEvent) => {
-			Modals.close(event);
-		});
-		document.getElementById('fact-nested-modal-close')?.addEventListener('keyup', (event: KeyboardEvent) => {
-			if (!actionKeyHandler(event)) return;
-			Modals.close(event);
-		});
-
+		const closeBtn = document.getElementById('fact-nested-modal-close');
+		if(closeBtn) {
+			closeBtn.onclick = () => Modals.hide('fact-nested-modal');
+			closeBtn.onkeyup = (event: KeyboardEvent) => {
+				if (!actionKeyHandler(event)) return;
+				Modals.hide('fact-nested-modal');
+			}
+		}
 		window.addEventListener("keyup", ModalsNested.keyboardEvents);
 	},
 

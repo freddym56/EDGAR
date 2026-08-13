@@ -204,4 +204,41 @@ describe(`Fact sidebar | fact attributes`, () => {
                 expect(/Next+/.test(text)).to.eq(true);
         });
     });
+
+    it('pagination should not allow key event to move pass page number low/upper limit', () => {
+        let filing = readFilingDataAccNum('000121390023047204')
+        cy.loadFiling(filing)
+
+        cy.get('#fact-identifier-0', { timeout: Number(filing.timeout) }).first().click() ; // should bring up sidebar
+        cy.get(selectors.showFactInSidebar).click();
+
+        cy.get(selectors.sidebarPaginationPrev).should('have.class', 'disabled');
+        cy.get(selectors.sidebarFact(0)).should('be.visible')
+        cy.get("#prevFactPage").focus();
+        cy.press('Enter');
+        cy.get(selectors.sidebarFact(0)).should('be.visible')
+
+        cy.get("#lastFactPage").focus();
+        cy.press('Enter');
+
+        cy.get(selectors.sidebarPaginationNext).should('have.class', 'disabled');
+        cy.get(selectors.sidebarFact(40)).should('be.visible')
+        cy.get("#nextFactPage").focus();
+        cy.press('Enter');
+        cy.get(selectors.sidebarFact(40)).should('be.visible')
+    });
+
+
+    it('clicking sidebar fact list should close More Filters drowndop', () => {
+        let filing = readFilingDataAccNum('000121390023047204')
+        cy.loadFiling(filing)
+
+        cy.get('#fact-identifier-0', { timeout: Number(filing.timeout) }).first().click() ; // should bring up sidebar
+        cy.get(selectors.showFactInSidebar).click();
+
+        cy.get(selectors.moreFiltersHeader).click()
+        cy.get(selectors.periodFilterTagsDrawer).should('be.visible')
+        cy.get(selectors.sidebarFact(0)).click()
+        cy.get(selectors.periodFilterTagsDrawer).should('not.be.visible')
+    });
 });

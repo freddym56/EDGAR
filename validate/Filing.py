@@ -186,10 +186,13 @@ def validateFiling(val, modelXbrl, isEFM=False, isGFM=False):
                         if not attachmentDocumentType: # infer attachmentDocumentType parameter from dei:DocumentType
                             attachmentDocumentType = docTypesAttachmentDocumentType.get(f.xValue, f.xValue)
                         if not hasSubmissionType: # infer submissionType parameter from dei:DocumentType
-                            submissionType = docTypesSubType.get(f.xValue, f.xValue)
+                            # The primary document will be processed first and the efmSubmissionType
+                            # would have been set based on the primary document.
+                            # otherwise we fallback to docTypesSubType or the dei:DocumentType value
+                            submissionType = getattr(modelXbrl.modelManager.modelXbrl,'efmSubmissionType', docTypesSubType.get(f.xValue, f.xValue))
                         break
         matchResult = attachmentDocumentTypeReqSubDocTypePattern.match(attachmentDocumentType)
-        if matchResult:
+        if matchResult and "§" not in submissionType: # ensure we haven't already added it. eg. before revalidating
             hasSubmissionType = False
             submissionType = f"{submissionType}§{matchResult.group(matchResult.lastindex)}"
         _setParams = []
@@ -1144,6 +1147,9 @@ def validateFiling(val, modelXbrl, isEFM=False, isGFM=False):
                         logArgs[section] += e
 
                 logArgs["edgarCode"] = messageKey # edgar code is the un-expanded key for message with {...}'s
+                if "-{efmSection}" in logArgs["edgarCode"] and not logArgs.get("efmSection") and logArgs.get("exgSection"):
+                    logArgs["edgarCode"] = logArgs["edgarCode"].replace("-{efmSection}", "")
+
                 try:
                     m = messageKeySectionPattern.match(messageKey or "")
                     if m:
@@ -1870,6 +1876,25 @@ def validateFiling(val, modelXbrl, isEFM=False, isGFM=False):
                             break # we can stop processing other facts
                     if eloItem in val.params["itemsList"] and not factsFound:
                         sevMessage(sev, subType=submissionType, modelObject=modelXbrl, item=eloItem, namespace=namespace)
+
+                elif validation == "form1-ex-i-validations":
+                    # Check if any fact uses us-gaap or ifrs_full
+                    hasFinTxmy = any(
+                        abbreviatedNamespace(f.qname.namespaceURI, NOYEAR) in ("us-gaap", "ifrs_full", "ifrs")
+                        for f in modelXbrl.facts
+                    )
+
+                    # EX.I — requires at least one us-gaap or ifrs_full fact
+                    if attachmentDocumentType == "EX.I.FORM1" and not hasFinTxmy:
+                        sevMessage(
+                            sev,
+                            subType=submissionType,
+                            docType=deiDocumentType,
+                            modelObject=None,
+                            efmSection=efmSection,
+                            expectedValue="!do-not-quote!Expected at least one us-gaap or ifrs fact for EX.I.FORM1"
+                        )
+                        
                 # type-specific validations
                 elif len(names) == 0:
                     pass # no name entries if all dei names of this validation weren't in the loaded dei taxonomy (i.e., pre 2019)
@@ -2084,11 +2109,16 @@ def validateFiling(val, modelXbrl, isEFM=False, isGFM=False):
                                     f.xValid = INVALID
                             if f is None and name in eloValueFactNames:
                                 missingReqInlineTag = True
+                elif validation == "doc-type-equals-attachment-type":
+                    #Form1 related
+                    if attachmentDocumentType is not None and not attachmentDocumentType.startswith(str(deiDocumentType)):
+                        sevMessage(sev, subType=submissionType, docType = deiDocumentType,  modelObject=f, efmSection=efmSection, expectedValue=attachmentDocumentType)                
                 elif validation == "max-decimals":
                     maxDecimals = sev.get("max-decimals", 0)
                     for name in names:
                         for f in sevFacts(sev, name, requiredContext=not axisKey, whereKey="where", sevCovered=subTypes != {"n/a"}):
                             try:
+                                
                                 decimalPrecision = abs(Decimal(f.xValue).as_tuple().exponent)
                             except Exception:
                                 modelXbrl.debug(

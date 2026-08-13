@@ -22,7 +22,12 @@ export const selectors = {
     menuHelp: 'a[id="form-information-help"]',
     menuVersion: 'span[id="form-information-version"]',
 
+    formInformationClose: 'i[id="form-information-modal-close"]',
+    formInformationDrag: 'i[id="form-information-modal-drag"]',
+
     infoModal: 'tbody[id="form-information-modal-carousel-page-1"]',
+    formInfoModal : 'div#form-information-modal',
+    settingsModal : 'div#settings-modal',
 
     taggedSections: '#tagged-sections',
     sectionsHeader: 'button[id="sections-dropdown-link"]',
@@ -46,6 +51,7 @@ export const selectors = {
     settings: 'a[data-test="menu-dropdown-settings"]',
     hoverForQuickInfoSelect: 'select[id="hover-option-select"]',
     settingsClose: 'i[id="settings-modal-close"]',
+    settingsDrag: 'i[id="settings-modal-drag"]',
 
     helpLink: 'a[id="form-information-help"]',
     gettingStarted: 'button[data-bs-target="#help-getting-started"]',

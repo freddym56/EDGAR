@@ -4,13 +4,11 @@
  */
 
 import { ConstantsFunctions } from "../constants/functions";
-import { FactMap } from "../facts/map";
 import { FactsGeneral } from "../facts/general";
 import { UserFiltersState } from "../user-filters/state";
 import { actionKeyHandler } from "../helpers/utils";
 import { callSearch } from "../flex-search/search-worker-interface";
-import { searchUiUpdate } from "../flex-search/flex-search-ui";
-import { showSearchingHourglass } from "../flex-search/flex-search-ui";
+import { searchUiUpdate, showSearchingHourglass } from "../flex-search/flex-search-ui";
 // import { buildArrowKeyListenerForElems } from "../helpers/utils"; // WIP
 
 export const Search = {
@@ -20,13 +18,38 @@ export const Search = {
     (document.getElementById('global-search') as HTMLInputElement).value = '';
     UserFiltersState.setUserSearch({});
     // FlexSearch.searchFacts({});
-    callSearch({}, true).then(searchResults => {
+    callSearch({}).then(searchResults => {
+      if (searchResults === undefined) return
       searchUiUpdate(searchResults);
     })
   },
 
   closeSuggestions: () => {
     ConstantsFunctions.emptyHTMLByID('suggestions');
+  },
+
+  getSearchQuery: () => {
+    const valueToSearchFor = (document.getElementById('global-search') as HTMLInputElement).value;
+
+    const options = document.querySelectorAll('[name="search-options"]');
+    let optionsArray = Array.prototype.slice.call(options);
+    optionsArray = optionsArray.map((current) => {
+      if (current['checked']) {
+        return Number.parseInt(current['value']);
+      }
+    }).filter(Boolean);
+
+    const { clauses } = Search.normalizeValueToSearchFor(valueToSearchFor)
+    // Searching "cat and dog or mouse and sheep" -> clauses = [["cat", "dog"],["mouse","sheep"]]
+    // ["cat", "dog"]     => clause 1
+    // ["mouse","sheep"]  => clause 2
+    const query = {
+      clauses,
+      'options': optionsArray
+    };
+
+    return query
+
   },
 
   submit: () => {
@@ -40,53 +63,27 @@ export const Search = {
     ConstantsFunctions.emptyHTMLByID('suggestions');
     // let valueToSearchFor = (document.getElementById('global-search') as HTMLInputElement).value;
     // here we sanitize the users input to account for Regex patterns
-    let valueToSearchFor = (document.getElementById('global-search') as HTMLInputElement).value;
-    valueToSearchFor = valueToSearchFor.replace(/[\\{}()[\]^$+*?.]/g, '\\$&');
 
-    const options = document.querySelectorAll('[name="search-options"]');
-    let optionsArray = Array.prototype.slice.call(options);
-    optionsArray = optionsArray.map((current) => {
-      if (current['checked']) {
-        return parseInt(current['value']);
-      }
-    }).filter((element) => {
-      return element;
-    });
-
-    valueToSearchFor = Search.createValueToSearchFor(valueToSearchFor);
-
-    const query = {
-      value: [valueToSearchFor],
-      'options': optionsArray
-    };
+    const query = Search.getSearchQuery();
     UserFiltersState.setUserSearch(query);
 
     callSearch(query).then(searchResults => {
+      if (searchResults === undefined) return
       searchUiUpdate(searchResults);
     })
   },
 
-  createValueToSearchFor: (input: string) => {
-    // AND template = (?=.*VARIABLE1)(?=.*VARIABLE2)
-    // OR template = (VARIABLE1)|(VARIABLE2)
+  normalizeValueToSearchFor: (input: string) => {
+    const normalized = input.replaceAll(/\band\b/gi, ' & ').replaceAll(/\bor\b/gi, ' | ').toLowerCase();
 
-    // TODO this will require a second/third look
-    const inputArray = input.replace(/ and /gi, ' & ').replace(/ or /gi, ' | ').split(' ');
-    if (inputArray.length > 1) {
-      let regex = '^';
-      inputArray.forEach((current: string) => {
-        if (current === '|') {
-          regex += '|';
-        } else if (current === '&') {
-          // business as usual
-        } else {
-          regex += '(?=.*' + current + ')';
-        }
-      });
-      return regex;
-    }
-    return input;
+    const clauses = normalized
+      .split('|')
+      .map(clause => clause.split('&').map(t => t.trim()).filter(Boolean))
+      .filter(clause => clause.length > 0)
+
+    return { clauses }
   },
+
 
   suggestions: () => {
     const smallSetSize = 3;
@@ -95,29 +92,11 @@ export const Search = {
     const search = document.getElementById('global-search');
     ConstantsFunctions.emptyHTMLByID('suggestions');
     if (valueToSearchFor.length > 1 && document.activeElement === search) {
-      // here we sanitize the users input to account for Regex patterns
-      valueToSearchFor = valueToSearchFor.replace(/[\\{}()[\]^$+*?.]/g, '\\$&');
-
-      const options = document.querySelectorAll('[name="search-options"]');
-      let optionsArray = Array.prototype.slice.call(options);
-      optionsArray = optionsArray.map((current) => {
-        if (current['checked']) {
-          return parseInt(current['value']);
-        }
-      }).filter((element) => {
-        return element;
-      });
-
-      valueToSearchFor = Search.createValueToSearchFor(valueToSearchFor);
-
-      const query = {
-        value: [valueToSearchFor],
-        'options': optionsArray
-      };
+      const query = Search.getSearchQuery();
 
       const suggestionsUl = document.getElementById('suggestions') as HTMLElement;
 
-      const populateSuggestionsUi = (results) => {
+      const populateSuggestionsUi = (results: string[]) => {
         results?.slice(0, lrgSetSize).forEach((current: string, index) => {
           const hidden = index >= smallSetSize;
           const factListMember = FactsGeneral.renderFactElem(current, hidden);
@@ -125,21 +104,15 @@ export const Search = {
         });
       }
 
-      const addMoreFactsButton = (results) => {
+      const addMoreFactsButton = (results: string[]) => {
         // More Facts Button
-        if (results && results!.length > smallSetSize) {
+        if (results && results.length > smallSetSize) {
           const moreFactsLi = document.createElement('li');
-          moreFactsLi.classList.add('hover-dim');
-          moreFactsLi.classList.add('list-group-item');
-          moreFactsLi.classList.add('not-numbered');
-          moreFactsLi.classList.add('d-flex');
-          moreFactsLi.classList.add('justify-content-between');
-          moreFactsLi.classList.add('align-items-start');
+          moreFactsLi.classList.add('hover-dim', 'list-group-item', 'not-numbered', 'd-flex', 'justify-content-between', 'align-items-start');
 
           const moreFactsDiv = document.createElement('div');
           moreFactsDiv.setAttribute('id', 'moreFactsBtn');
-          moreFactsDiv.classList.add('ms-2');
-          moreFactsDiv.classList.add('me-auto');
+          moreFactsDiv.classList.add('ms-2', 'me-auto');
 
           const title = document.createTextNode(`More Facts`);
           moreFactsDiv.append(title);
@@ -159,9 +132,10 @@ export const Search = {
         }
       }
 
-      callSearch(query, true).then(searchResults => {
-        populateSuggestionsUi(searchResults);
-        addMoreFactsButton(searchResults);
+      callSearch(query).then(searchResults => {
+        const searchResultsArray: string[] = Array.from(searchResults)
+        populateSuggestionsUi(searchResultsArray);
+        addMoreFactsButton(searchResultsArray);
       })
 
       document.getElementById('global-search-form')?.append(suggestionsUl);
@@ -183,32 +157,6 @@ export const Search = {
       // const searchSuggestionElems = Array.from(document.querySelectorAll('[id="suggestions"] > a'));
       // const suggestionElems = [search, ...searchSuggestionElems, moreFactsBtn]
       // buildArrowKeyListenerForElems(suggestionElems)
-    }
-  },
-
-  suggestionsTemplate: (factID: string) => {
-    const fact = FactMap.getByID(factID);
-    if (fact) {
-      const li = document.createElement('li');
-      li.classList.add('list-group-item');
-      li.classList.add('d-flex');
-      li.classList.add('justify-content-between');
-      li.classList.add('align-items-start');
-
-      const div = document.createElement('div');
-      div.classList.add('ms-2');
-      div.classList.add('me-auto');
-
-      const div1 = document.createElement('div');
-      div1.classList.add('fw-bold');
-      const title = document.createTextNode(ConstantsFunctions.getFactLabel(fact.labels));
-      const period = document.createTextNode(fact.period);
-      div1.append(title);
-      div.append(div1);
-      div.append(period);
-      li.append(div);
-
-      return li;
     }
   },
 

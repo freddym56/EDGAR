@@ -75,6 +75,7 @@
 		"comment2": "sub-types not subject to FAST act",
 		"SBSEF": ["SBSEF-FIN-QTR", "SBSEF-FIN-REQ", "SBSEF-CCO-RPT"],
 		"SBSEF-EXHIBITS": ["EX-99.C.SBSEF", "EX-99.D.SBSEF", "EX-99.E.SBSEF", "EX-99.F.SBSEF", "EX-99.H.SBSEF", "EX-99.I.SBSEF", "EX-99.J.SBSEF", "EX-99.K.SBSEF", "EX-99.L.SBSEF", "EX-99.P.SBSEF", "EX-99.Q.SBSEF", "EX-99.R.SBSEF", "EX-99.S.SBSEF"],
+        "1": ["1", "1AA", "1/A", "1/A-A"],
     	"6-K": ["6-K", "6-K/A"],
 		"10-12B": ["10-12B", "10-12B/A"],
 		"10-12G": ["10-12G", "10-12G/A"],
@@ -256,6 +257,7 @@
     {"sub-types": ["SBSEF-FIN-QTR/A"], "xbrl-names": "DocumentType", "efm": "6.5.20", "validation": "xv", "value": ["SBSEF-FIN-QTR"], "source": "inline", "dei/cover": "dei"},
     {"sub-types": ["SBSEF-FIN-REQ/A"], "xbrl-names": "DocumentType", "efm": "6.5.20", "validation": "xv", "value": ["SBSEF-FIN-REQ"], "source": "inline", "dei/cover": "dei"},
     {"sub-types": ["SBSEF-CCO-RPT/A"], "xbrl-names": "DocumentType", "efm": "6.5.20", "validation": "xv", "value": ["SBSEF-CCO-RPT"], "source": "inline", "dei/cover": "dei"},
+    {"sub-types": ["@1"], "xbrl-names": "DocumentType", "msgSection": "EXG:3.1.5", "validation": "xv", "value": ["EX.I.FORM1"], "source": "inline", "dei/cover": "dei"},
     {"sub-types": ["N-1A"], "xbrl-names": "DocumentType", "efm": "6.5.20", "validation": "xv", "value": ["N-1A"], "source": "both", "dei/cover": "dei"},
     {"sub-types": ["N-1A/A"], "xbrl-names": "DocumentType", "efm": "6.5.20", "validation": "xv", "value": ["N-1A", "N-1A/A"], "source": "both", "dei/cover": "dei"},
     {"sub-types": ["N-2"], "xbrl-names": "DocumentType", "efm": "6.5.20", "validation": "xv", "value": ["N-2"], "source": "both", "dei/cover": "dei"},
@@ -355,6 +357,28 @@
 	"comment": "catch any submission type not explicitly above with any sub-type type not covered by the above, excluding Other"
     },
     {
+        "sub-types": ["@1"],
+        "xbrl-names": "DocumentType",
+        "msgSection": "EXG:3.1.5",
+        "validation": "doc-type-equals-attachment-type",
+        "source": "both",
+        "dei/cover": "dei",
+        "severity": "error",
+        "message": "dq-doc-type-equals-attachment-type",
+        "comment": "Form1 - deiDocumentType equals attachmentDocumentType"
+    },
+ 	{
+        "sub-types": ["@1"],
+        "xbrl-names":[],
+        "msgSection": "EXG:1.3",
+        "validation": "form1-ex-i-validations",
+        "source": "both",
+        "dei/cover": "dei",
+        "severity": "error",
+        "message": "dq-form1-ex-i-validations",
+        "comment": "Form1 - I  validations"
+    },
+    {
         "sub-types": ["@all"],
         "xbrl-names": "AmendmentFlag",
         "efm": "6.5.20",
@@ -371,7 +395,7 @@
         "references": "AmendmentFlag",
         "reference-value": true,
         "source": "both",
-        "dei/cover": "dei",
+        "dei/cover": "cover",
         "comment": "if and only if non-empty, AmendmentFlag must be true"
     },
     {
@@ -2423,7 +2447,7 @@
     {
         "sub-types": ["@6-K", "@8-K", "@20-F", "@20FR", "@SC 14A", "@SC 14C", "@SC SPAC", "@SFP SPAC"],
         "xbrl-names": "spac:*",
-        "msgSection": "EXG:3.4",
+        "msgSection": "EXG:3.5",
         "validation": "(supported-taxonomy)",
         "source": "both",
         "dei/cover": "dei",
@@ -2435,7 +2459,7 @@
     {
         "sub-types": ["@SPAC EX98 REQ", "@SPAC EX98 OPT"],
         "xbrl-names": "spac:*",
-        "msgSection": "EXG:3.4",
+        "msgSection": "EXG:3.5",
         "validation": "(supported-taxonomy-docType)",
         "source": "both",
         "dei/cover": "dei",
@@ -2447,7 +2471,7 @@
     {
         "sub-types": ["@SPAC EX98 REQ"],
         "xbrl-names": "spac:*",
-        "msgSection": "EXG:3.4",
+        "msgSection": "EXG:3.5",
         "validation": "doc-type-facts-dependency",
         "source": "both",
         "dei/cover": "dei",
@@ -2458,7 +2482,7 @@
     {
         "sub-types": ["@SPAC EX98 REQ", "@SPAC EX98 OPT"],
         "xbrl-names": [],
-        "msgSection": "EXG:3.4",
+        "msgSection": "EXG:3.5",
         "validation": "taxonomy-url-required-in-dts",
         "value": "https://xbrl.sec.gov/spac/*/spac-proj-*.xsd",
         "source": "both",
@@ -2468,7 +2492,7 @@
     {
         "sub-types": ["@SFP SPAC", "@SC 14A", "@SC 14C", "SC TO-I", "SC TO-I/A"],
         "xbrl-names": [],
-        "msgSection": "EXG:3.4",
+        "msgSection": "EXG:3.5",
         "validation": "taxonomy-ns-in-dts-fact-required",
         "value": ".*sec.gov/spac/.*",
         "source": "both"
@@ -2652,6 +2676,18 @@
     {
         "sub-types": ["@SD"],
         "xbrl-names": [
+        	"EntityReportingCurrencyISOCode",
+            "rxp:TotalPayments"
+        ],
+        "efm": "6.5.58",
+        "validation": "o",
+        "source": "both",
+        "dei/cover": "dei",
+        "comment": "ensure absent warning is trigerred on non @SD forms"
+    },
+    {
+        "sub-types": ["@SD"],
+        "xbrl-names": [
         	"rxp:AlternativeReportingRegime"
         ],
         "efm": "6.5.58.10",
@@ -2782,6 +2818,16 @@
         "(supported-taxonomy-docType)": {
             "message": "dq-{efmSection}-{taxonomy}-{docType}-Facts-Unexpected",
             "severity": "warning"
+        },
+        "doc-type-equals-attachment-type": {
+            "message": "dq-doc-type-equals-attachment-type",
+            "severity": "warning",
+            "validation": "Form1 attachmentDocumentType equals deiDocumentType"
+        },
+        "form1-ex-i-validations": {
+            "message": "dq-form1-ex-i-validations",
+            "severity": "error",
+            "validation": "Form1 EX.I.FORM1 validations"
         },
         "doc-type-facts-dependency": {
             "message": "dq-{docType}-{taxonomy}-Facts-Dependency",
@@ -3176,7 +3222,9 @@
 		"dq-sro-1yr-period": "In submission type {subType}, {tag} {severityVerb} have a one-year period ending on {otherTag} in context {contextID}.",
 		"dq-sro-monthly-facts": "In submission type {subType}, there {severityVerb} at least one fact per month of reporting year, missing months {missingMonths}.",
         "dq-{docType}-{taxonomy}-Facts-Dependency": "In submission type {subType}, for document type {docType}, there {severityVerb} be at least one {taxonomy} taxonomy element. {taxonomy} taxonomy element not found.",
-        "dq-Taxonomy-ns-Facts-Dependency": "In submission type {subType}, when taxonomy namespace {taxonomyNSURi} is present, there {severityVerb} be at least one {taxonomy} fact."
+        "dq-Taxonomy-ns-Facts-Dependency": "In submission type {subType}, when taxonomy namespace {taxonomyNSURi} is present, there {severityVerb} be at least one {taxonomy} fact.",
+        "dq-doc-type-equals-attachment-type": "In submission type {subType}, for the exhibit type {expectedValue} the value of dei:DocumentType {docType} {severityVerb} be equal to the exhibit type.",
+        "dq-form1-ex-i-validations": "In submission type {subType}: {expectedValue}"
     },
 	"extraction-cover-tags": [
 		"TradingSymbol",

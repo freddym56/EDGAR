@@ -124,4 +124,35 @@ describe(`Fact Hash`, () => {
             })
         })
     })
+
+    it("Selectd single nested open to parent Fact hash", () => {
+         let filing = {
+            docPath: '/Archives/edgar/data/1669811/000119312526054586/dfin-20251231.htm',
+            timeout: 12000
+        }
+        cy.loadFiling(filing)
+
+        cy.get("#fact-identifier-490").click()
+        cy.hash().should('eq', '#fact-identifier-489')
+    })
+
+    it("Selectd nested a[href] element should open to href hash", () => {
+        let filing = {
+            docPath: '/Archives/edgar/data/no-cik/hyperlinks-text-block/ssti-20200930.htm',
+            timeout: 12000
+        }
+        cy.loadFiling(filing)
+
+        cy.get("#fact-identifier-413").click()
+        cy.hash().should('eq', '#fact-identifier-413')
+        cy.get(selectors.factModal).should('be.visible');
+
+        cy.get(selectors.factModalClose).click()
+
+        cy.get("#fact-identifier-413 a[href=\"#note_5_balance_sheet_accounts\"]").click()
+        cy.hash().should('eq', '#note_5_balance_sheet_accounts')
+
+        cy.get("#note_5_balance_sheet_accounts").should('be.visible')
+        cy.get(selectors.factModal).should('not.be.visible');
+    })
 })

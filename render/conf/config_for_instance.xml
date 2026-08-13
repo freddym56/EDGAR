@@ -10,7 +10,7 @@
   <!-- reportXslt: transform r.xml into r.htm, may only be empty if reportFormat is just Xml -->
   <reportXslt>InstanceReport.xslt</reportXslt>
   <!-- reportXslt: transform FilingSummary.xml into FilingSummary.htm, or empty if no FilingSummary.htm desired. -->
-  <summaryXslt>Summarize.xslt</summaryXslt>
+  <summaryXslt>RFileViewer</summaryXslt>
   <!-- excelXslt: transform r.xml into Excel 2007 xlsx output, or empty if no Excel output desired -->
   <excelXslt />
   <!--  Optional to transform rendering logs for browser reference (when browsers may no longer have XSLT Processors) -->

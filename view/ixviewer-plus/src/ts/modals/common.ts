@@ -47,8 +47,12 @@ export const ModalsCommon = {
 			return;
 		}
 
-		document.getElementById("fact-nested-modal")?.classList.add("d-none");
-		document.getElementById("fact-modal")?.classList.remove("d-none");
+		const modal = document.getElementById('fact-modal')
+		if (modal) {
+			Modals.hide('fact-nested-modal')
+			modal.classList.remove('d-none');
+			Modals.bringToFront(modal)
+		}
 		// document.getElementById("fact-modal-drag")?.focus();
 
 		ModalsCommon.carouselData(element);
@@ -99,13 +103,14 @@ export const ModalsCommon = {
 			Modals.expandToggle(event, 'fact-modal', 'fact-modal-expand', 'fact-modal-compress');
 		});
 
-		document.getElementById('fact-modal-close')?.addEventListener('click', (event: MouseEvent) => {
-			Modals.close(event);
-		});
-		document.getElementById('fact-modal-close')?.addEventListener('keyup', (event: KeyboardEvent) => {
-			if (!actionKeyHandler(event)) return;
-			Modals.close(event);
-		});
+		const closeBtn = document.getElementById('fact-modal-close');
+		if(closeBtn) {
+			closeBtn.onclick = () => Modals.hide('fact-modal');
+			closeBtn.onkeyup = (event: KeyboardEvent) => {
+				if (!actionKeyHandler(event)) return;
+				Modals.hide('fact-modal');
+			}
+		}
 
 		window.addEventListener("keyup", ModalsCommon.keyboardEvents);
 	},

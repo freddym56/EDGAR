@@ -3,6 +3,7 @@ import { selectors } from "../../utils/selectors";
 describe(`Nested Fact Modal`, () => {
     it('Should show only fact modal or nested-fact modal, not both', () => {
         cy.loadByAccessionNum('000101376223000425');
+        // http://localhost:3000/ix.xhtml?doc=./Archives/edgar/data/no-cik/0001013762-23-000425/ea185980-6k_inspiratech.htm
 
         // normal fact
         cy.get('#fact-identifier-7').first().click();

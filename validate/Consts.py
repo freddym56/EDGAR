@@ -23,7 +23,7 @@ srtAxisIfrsMembers = { # members of IFRS axes which have SRT corresponding membe
 
 # doc type requirements are for EFM 6.5.20 and are in some cases a superset of what the submission allows.
 docTypesRR = {"497", "485APOS", "485BPOS", "485BXT", "N-1A", "N-1A/A"}
-docTypesAllowingRedact = {"17AD-27"} | {f"EX-99.{c}.SBSEF" for c in "CDEFHIJKLPQRS"} | {f"SBSEF-{x}" for x in ("CCO-RPT","FIN-REQ","FIN-QTR")}
+docTypesAllowingRedact = {"17AD-27"} | {f"EX-99.{c}.SBSEF" for c in "CDEFHIJKLPQRS"} | {f"SBSEF-{x}" for x in ("CCO-RPT","FIN-REQ","FIN-QTR")} | {"EX.I.FORM1"}
 
 submissionTypesAllowingSeriesClasses = docTypesRR | {
     'N-Q', 'N-Q/A'}
@@ -56,7 +56,8 @@ docTypesAttachmentDocumentType = {
     }
 docTypesSubType = {
     "2.01 SD": "SD",
-    "EX-99.4R HISTORIC": "N-4"
+    "EX-99.4R HISTORIC": "N-4",
+    "EX-98": "S-1"  # defaulting to S-1 for EX-98 but it can be used with other submission types.
     # default is submissionType parameter is the same as dei:DocumentType
     }
 

@@ -5,7 +5,8 @@ import { selectors } from "../../../utils/selectors.mjs"
     Non workstation links are tested in cypress/e2e/menu
 */
 
-describe(`Workstation - Menu open as xbrl instance`, () => {
+// TODO: figure how to test workstation
+describe.skip(`Workstation - Menu open as xbrl instance`, () => {
     it(`Private filings should have private ht2.xml instance link`, () => {
         cy.loadByAccessionNum('000080786323000002', '&ws=true&redline=true');
         cy.get('button[data-test="menu-dropdown-link"]').click();

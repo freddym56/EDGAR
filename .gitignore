@@ -3,3 +3,6 @@
 /.settings
 /.pydevproject
 /.vscode
+/view/rfileviewer/node_modules
+/view/rfileviewer/package-lock.json
+

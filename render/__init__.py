@@ -143,7 +143,7 @@ Language of labels:
     GUI may use tools->language labels setting to override system language for labels
 
 """
-VERSION = '3.26.1'
+VERSION = '3.26.3'
 
 from collections import defaultdict
 from arelle import PythonUtil
@@ -500,7 +500,10 @@ class EdgarRenderer(Cntlr.Cntlr):
             value = next((x
                           for x in [init, self.configDict[file], self.defaultValueDict[file]]
                           if x is not None), None)
-            if value is not None and type(value) == str and len(value) > 0:
+            if value in ("RFileViewer", "RFileViewerSECWS"):
+                setattr(self, file, value)
+                return value # special case to use python-implemented transformation
+            elif value is not None and type(value) == str and len(value) > 0:
                 if not isdir(self.resourcesFolder):
                     # It is possible to specify a bad resources folder, but then not actually need it;
                     # that is why the test for its presence is here and not earlier.
@@ -1001,17 +1004,26 @@ class EdgarRenderer(Cntlr.Cntlr):
         return _text
 
     def transformFilingSummary(self, filing, rootETree, xsltFile, reportsFolder, htmFileName, includeLogs, title=None, zipDir=""):
-        summary_transform = etree.XSLT(etree.parse(xsltFile))
-        trargs = {"asPage": etree.XSLT.strparam('true'),
-                  "accessionNumber": "'{}'".format(getattr(filing, "accessionNumber", "")),
-                  "resourcesFolder": "'{}'".format(self.resourcesFolder.replace("\\", "/")),
-                  "processXsltInBrowser": etree.XSLT.strparam(str(self.processXsltInBrowser).lower()),
-                  "includeLogs": etree.XSLT.strparam(str(includeLogs).lower()),
-                  "includeExcel": etree.XSLT.strparam("true" if (self.excelXslt) else "false")}
-        if title:
-            trargs["title"] = etree.XSLT.strparam(title)
-        result = summary_transform(rootETree, **trargs)
-        IoManager.writeHtmlDoc(filing, result, self.reportZip, reportsFolder, htmFileName, zipDir);
+        accessionNumber = getattr(filing, "accessionNumber", "") # likely to be missing on GUI transformations without formula parameter for accessionNumber
+        if xsltFile in ("RFileViewer", "RFileViewerSECWS"):
+            # use node.js-implemented viewer
+            from .RFileViewer import transformToHtml
+            # note: logDebugToConsole appears on terminal under VS Code
+            result = transformToHtml(rootETree, accessionNumber, title, logDebugToConsole=False, secws=(xsltFile=="RFileViewerSECWS"))
+            IoManager.writeTextDoc(filing, result, self.reportZip, reportsFolder, htmFileName, zipDir, encoding="utf-8");
+        else:
+            # use xslt-implemented viewer
+            summary_transform = etree.XSLT(etree.parse(xsltFile))
+            trargs = {"asPage": etree.XSLT.strparam('true'),
+                      "accessionNumber": "'{}'".format(accessionNumber),
+                      "resourcesFolder": "'{}'".format(self.resourcesFolder.replace("\\", "/")),
+                      "processXsltInBrowser": etree.XSLT.strparam(str(self.processXsltInBrowser).lower()),
+                      "includeLogs": etree.XSLT.strparam(str(includeLogs).lower()),
+                      "includeExcel": etree.XSLT.strparam("true" if (self.excelXslt) else "false")}
+            if title:
+                trargs["title"] = etree.XSLT.strparam(title)
+            result = summary_transform(rootETree, **trargs)
+            IoManager.writeHtmlDoc(filing, result, self.reportZip, reportsFolder, htmFileName, zipDir);
 
     def filingEnd(self, cntlr, options, filesource, filing, sourceZipStream=None, *args, **kwargs):
         # note that filesource is None if there were no instances
@@ -1819,7 +1831,7 @@ def edgarRendererGuiViewMenuExtender(cntlr, viewMenu, *args, **kwargs):
         cntlr.saveConfig()
 
     def setValidateBeforeRendering(self, *args):
-        cntlr.config["edgarRendererValidateBeforeRendering"] = cntlr.showTablesMenu.get()
+        cntlr.config["edgarRendererValidateBeforeRendering"] = cntlr.validateBeforeRendering.get()
         cntlr.saveConfig()
 
     def setShowiXBRLViewer(self, *args):
@@ -1827,21 +1839,21 @@ def edgarRendererGuiViewMenuExtender(cntlr, viewMenu, *args, **kwargs):
         cntlr.saveConfig()
 
     cntlr.showFilingData = BooleanVar(value=cntlr.config.get("edgarRendererShowFilingData", True))
-    cntlr.showFilingData.trace("w", setShowFilingData)
+    cntlr.showFilingData.trace_add("write", setShowFilingData)
     erViewMenu.add_checkbutton(label=_("Show Filing Data"), underline=0, variable=cntlr.showFilingData, onvalue=True, offvalue=False)
     cntlr.redlineMode = BooleanVar(value=cntlr.config.get("edgarRendererRedlineMode", True))
-    cntlr.redlineMode.trace("w", setRedlineMode)
+    cntlr.redlineMode.trace_add("write", setRedlineMode)
     erViewMenu.add_checkbutton(label=_("Show Redlining and Redactions"), underline=0, variable=cntlr.redlineMode, onvalue=True, offvalue=False,
                                         state="normal" if cntlr.showFilingData.get() else "disabled")
     cntlr.showTablesMenu = BooleanVar(value=cntlr.config.get("edgarRendererShowTablesMenu", True))
-    cntlr.showTablesMenu.trace("w", setShowTablesMenu)
+    cntlr.showTablesMenu.trace_add("write", setShowTablesMenu)
     erViewMenu.add_checkbutton(label=_("Show Tables Menu"), underline=0, variable=cntlr.showTablesMenu, onvalue=True, offvalue=False)
     cntlr.validateBeforeRendering = BooleanVar(value=cntlr.config.get("edgarRendererValidateBeforeRendering", True))
-    cntlr.validateBeforeRendering.trace("w", setShowTablesMenu)
+    cntlr.validateBeforeRendering.trace_add("write", setValidateBeforeRendering)
     erViewMenu.add_checkbutton(label=_("Validate Before Rendering"), underline=0, variable=cntlr.validateBeforeRendering, onvalue=True, offvalue=False)
     if iXBRLViewerInterface.hasIXBRLViewerPlugin(cntlr):
         cntlr.showiXBRLViewer = BooleanVar(value=cntlr.config.get("edgarRendererShowiXBRLViewer", True))
-        cntlr.showiXBRLViewer.trace("w", setShowiXBRLViewer)
+        cntlr.showiXBRLViewer.trace_add("write", setShowiXBRLViewer)
         erViewMenu.add_checkbutton(label=_("Show iXBRL Viewer"), underline=0, variable=cntlr.showiXBRLViewer, onvalue=True, offvalue=False)
     else:
         cntlr.showiXBRLViewer = BooleanVar(value=False)
@@ -1864,9 +1876,14 @@ def edgarRendererGuiRun(cntlr, modelXbrl, *args, **kwargs):
             _reportXslt = parameters["reportXslt"][1]
             _summaryXslt = parameters["summaryXslt"][1]
             _ixRedline = "ixRedline" in parameters and parameters["ixRedline"][1] == "true"
+        elif "summaryXslt" in parameters and parameters["summaryXslt"][1] in ("RFileViewer", "RFileViewerSECWS"):
+            _reportXslt = ('InstanceReport.xslt', 'InstanceReportTable.xslt')[_combinedReports]
+            _summaryXslt = parameters["summaryXslt"][1]
+            _ixRedline = cntlr.redlineMode.get()
         else:
             _reportXslt = ('InstanceReport.xslt', 'InstanceReportTable.xslt')[_combinedReports]
-            _summaryXslt = ('Summarize.xslt', '')[_combinedReports]  # no FilingSummary.htm for Rall.htm production
+            # _summaryXslt = ('Summarize.xslt', '')[_combinedReports]  # no FilingSummary.htm for Rall.htm production
+            _summaryXslt = ('RFileViewer', '')[_combinedReports]  # no FilingSummary.htm for Rall.htm production
             _ixRedline = cntlr.redlineMode.get()
         if not hasattr(cntlr, "editedIxDocs"):
             cntlr.editedIxDocs = {}
@@ -1950,11 +1967,11 @@ def edgarRendererGuiRun(cntlr, modelXbrl, *args, **kwargs):
                     hasInlineReport = True
                 entrypointFiles.append({"file":instanceModelDocument.uri})
 
-        def guiWriteFile(filepath, data):
+        def guiWriteFile(filepath, data, encoding=None):
             outdir = os.path.dirname(filepath)
             if not os.path.exists(outdir):  # may be a subdirectory of out dir
                 os.makedirs(outdir)
-            with io.open(filepath, "wb" if isinstance(data, bytes) else "wt") as fh:
+            with io.open(filepath, "wb" if isinstance(data, bytes) else "wt", encoding=encoding) as fh:
                 fh.write(data)
 
         def guiReadFile(filepath, binary):

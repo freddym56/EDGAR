@@ -12,6 +12,7 @@ import { Constants } from "../constants/constants";
 import { Facts } from "../facts/facts";
 import { Search } from "../search/search";
 import { formatFactValue } from  "../modals/fact-pages";
+import { SegmentArray } from "../interface/fact"
 
 export const FactsGeneral = {
 	getElementByNameContextref: (name: string, contextref: string) => {
@@ -142,14 +143,14 @@ export const FactsGeneral = {
 		return factElem;
 	},
 
-	getFactBadge: (factInfo: any) => {
-		const dimensions = factInfo.segment?.some((element: any) => element.dimension);
+	getFactBadge: (factInfo: any) => { 
+		const hasDimensions = FactsGeneral.segmentHasProp(factInfo.segment, 'dimension');
 
 		const spanElement = document.createElement('span');
 		const nestedSpanElement = document.createElement('span');
 
-		const title = `${factInfo.isAdditional ? ' Additional' : ''}${factInfo.isCustom ? ' Custom' : ''}${dimensions ? ' Dimension' : ''}`.trim();
-		const label = `${factInfo.isAdditional ? ' A' : ''}${factInfo.isCustom ? ' C' : ''}${dimensions ? ' D' : ''}`.trim();
+		const title = `${factInfo.isAdditional ? ' Additional' : ''}${factInfo.isCustom ? ' Custom' : ''}${hasDimensions ? ' Dimension' : ''}`.trim();
+		const label = `${factInfo.isAdditional ? ' A' : ''}${factInfo.isCustom ? ' C' : ''}${hasDimensions ? ' D' : ''}`.trim();
 		nestedSpanElement.setAttribute('title', title.split(' ').join(' & '));
 		nestedSpanElement.setAttribute('class', 'mx-1 my-0 badge text-bg-dark');
 
@@ -164,5 +165,14 @@ export const FactsGeneral = {
 	{
 		return [...unsortedArray].sort((a, b) => +a.isAdditional - +b.isAdditional)
 			.map(({ id }) => id);
+	},
+
+	// possibly refactor to more gerenal helper - depending if nested array's object property check are used else where 
+	segmentHasProp: (segment: SegmentArray, prop: string): boolean => {
+		if(Array.isArray(segment)) return segment.some(s => FactsGeneral.segmentHasProp(s as SegmentArray, prop));
+		if(segment && typeof segment === 'object') {
+			return prop in segment;
+		} 
+		return false
 	}
 };

@@ -102,10 +102,10 @@ export const ConstantsFunctions = {
 			Modals.close(new Event(''));
 
 			Constants.getInstances.forEach((instanceFile) => {
-				instanceFile.current = instanceFile.instance === instanceIndex ? true : false;
+				instanceFile.current = instanceFile.instanceIndex === instanceIndex ? true : false;
 				instanceFile.docs.forEach((doc, index) => {
 					if (targetInstanceFile) {
-						if (instanceFile.instance === instanceIndex && targetInstanceFile === doc.slug) {
+						if (instanceFile.instanceIndex === instanceIndex && targetInstanceFile === doc.slug) {
 							doc.current = true;
 						} else {
 							doc.current = false;
@@ -115,7 +115,7 @@ export const ConstantsFunctions = {
 					}
 				});
 			});
-
+			
 			const needToLoadInstance = Constants.getInstances[instanceIndex].docs.some(element => !element.loaded);
 			if (needToLoadInstance) {
 				// not loaded, go get the requested instance

@@ -95,6 +95,7 @@ export const Pagination = {
 	},
 
 	previousPage: (calledFromPrevFact = false) => {
+		if(Constants.sideBarPaginationState.pageNumber === 1) return
 		Constants.sideBarPaginationState.pageNumber = Constants.sideBarPaginationState.pageNumber - 1;
 		Pagination.renderPage(Constants.sideBarPaginationState.pageNumber);
 		if (calledFromPrevFact) {
@@ -105,6 +106,7 @@ export const Pagination = {
 	},
 
 	nextPage: (calledFromNextFact = false) => {
+		if(Constants.sideBarPaginationState.pageNumber === Constants.sideBarPaginationState.totalPages) return
 		Constants.sideBarPaginationState.pageNumber = Constants.sideBarPaginationState.pageNumber + 1;
 		Pagination.renderPage(Constants.sideBarPaginationState.pageNumber);
 		if (calledFromNextFact) {
@@ -227,6 +229,9 @@ export const Pagination = {
 		nextPageAElement.addEventListener('click', () => { Pagination.nextPage(); });
 		nextPageAElement.addEventListener('keyup', (event: KeyboardEvent) => {
 			if (!actionKeyHandler(event)) return;
+			if(Pagination.getCurrentPage  === Pagination.getTotalPages) return
+
+	
 			Pagination.nextPage();
 		});
 

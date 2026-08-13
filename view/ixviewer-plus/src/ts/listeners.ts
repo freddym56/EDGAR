@@ -2,6 +2,7 @@
  * Data and content created by government employees within the scope of their employment
  * are not subject to domestic copyright protection. 17 U.S.C. 105.
  */
+import * as bootstrap from "bootstrap";
 
 import { FactsChart } from "./facts/chart";
 import { FactsMenu } from "./facts/menu";
@@ -49,7 +50,7 @@ export class Listeners {
                     return inst.docs.find(doc => doc.slug === targetDoc);
                 })
                 if (instanceToChangeTo) {
-                    ConstantsFunctions.changeInstance(instanceToChangeTo.instance, targetDoc, true);
+                    ConstantsFunctions.changeInstance(instanceToChangeTo.instanceIndex, targetDoc, true);
                 }
             }
         });
@@ -69,12 +70,12 @@ export class Listeners {
             FormInformation.init();
         });
 
-        document.getElementById('menu-dropdown-settings')?.addEventListener('click', (event: MouseEvent) => {
-            ModalsSettings.clickEvent(event);
+        document.getElementById('menu-dropdown-settings')?.addEventListener('click', () => {
+            ModalsSettings.clickEvent();
         });
         document.getElementById('menu-dropdown-settings')?.addEventListener('keyup', (event: KeyboardEvent) => {
             if (!actionKeyHandler(event)) return;
-            ModalsSettings.clickEvent(event);
+            ModalsSettings.clickEvent();
         });
 
         document.getElementById('nav-filter-more')?.addEventListener('click', () => {
@@ -149,10 +150,30 @@ export class Listeners {
         // when clicking outside of search suggestions, make sure suggestions div disappears
         // Need to handle doc, inline facts, and fact list elems, as the latter click events aren't propagating to doc.
         document?.addEventListener('click', (event) => {
-            if (event.target?.id !== "global-search") {
+            if (event.target instanceof HTMLElement && event.target?.id !== "global-search" && event.target?.id !== 'moreFactsBtn') {
                 ConstantsFunctions.emptyHTMLByID('suggestions');
             }
-        })
+
+            const openDropdowns = document.querySelectorAll('.dropdown-menu.show')
+
+            openDropdowns.forEach((dropdown) => {
+                const dropdownComponent = dropdown.closest('.dropdown')
+
+                if (dropdownComponent) {
+                    if(event.target instanceof Node && !dropdownComponent.contains(event.target)) {
+                        const dropdownBtn = dropdownComponent.querySelector('[data-bs-toggle="dropdown"]')
+
+                        if(dropdownBtn) {
+                            const bsDropdown = bootstrap.Dropdown.getOrCreateInstance(dropdownBtn)
+                            bsDropdown.hide()
+                        }
+                    }
+                }
+            })
+
+        }, true)
+
+
 
         document.getElementById('sections-menu-search-submit')?.addEventListener('submit', (event) => {
             event.preventDefault();

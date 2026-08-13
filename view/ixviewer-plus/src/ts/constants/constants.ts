@@ -12,7 +12,7 @@ import { Section } from "../interface/meta";
 type MetaDocument = any;
 
 export const Constants = {
-	version: "26.1",
+	version: "26.3",
 	featureSet: "plus",
 	appStart: 0,
 	loadPhaseComplete: 0,
