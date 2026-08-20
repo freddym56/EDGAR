@@ -60,12 +60,12 @@ def writeTextDoc(filing, text, reportZip, reportFolder, filename, zipDir="", enc
 
 def writeXmlDoc(filing, etree, reportZip, reportFolder, filename, zipDir=""):
     xmlText = treeToString(etree.getroottree(), method='xml', with_tail=False, pretty_print=True, encoding='utf-8', xml_declaration=True)
-    writeTextDoc(filing, xmlText, reportZip, reportFolder, filename, zipDir="")
+    writeTextDoc(filing, xmlText, reportZip, reportFolder, filename, zipDir=zipDir)
 
 
 def writeHtmlDoc(filing, root, reportZip, reportFolder, filename, zipDir=""):
     htmlText = treeToString(root, method='html', with_tail=False, pretty_print=True, encoding='utf-8')
-    writeTextDoc(filing, htmlText, reportZip, reportFolder, filename, zipDir="")
+    writeTextDoc(filing, htmlText, reportZip, reportFolder, filename, zipDir=zipDir)
 
 
 def writeJsonDoc(lines, pathOrStream, sort_keys=True):
