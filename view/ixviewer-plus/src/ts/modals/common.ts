@@ -5,33 +5,14 @@
 
 import * as bootstrap from "bootstrap";
 import { Modals } from "./modals";
-import { ModalsContinuedAt } from "./continued-at";
 import { FactPages } from "./fact-pages";
-import { Pagination } from "../pagination/sideBarPagination";
 import { FactMap } from "../facts/map";
 import { ConstantsFunctions } from "../constants/functions";
 import { ErrorsMinor } from "../errors/minor";
 import { actionKeyHandler } from "../helpers/utils";
 
 export const ModalsCommon = {
-	currentSlide: 0,
 	currentDetailTab: 0,
-
-	carouselInformation: [
-		{
-			"dialog-title": "Attributes" // Aspects
-		},
-		{
-			"dialog-title": "Labels"
-		},
-		{
-			"dialog-title": "References"
-		},
-		{
-			"dialog-title": "Calculation"
-		}
-	],
-
 	getAttributes: null,
 
 	clickEvent: (event: Event, element: HTMLElement) => {
@@ -40,178 +21,58 @@ export const ModalsCommon = {
 
 		event.preventDefault();
 		event.stopPropagation();
-
+		
 		const id = element.getAttribute('continued-main-fact-id') || element.getAttribute('id');
 		if (!id) {
 			ErrorsMinor.factNotFound();
 			return;
 		}
 
-		const modal = document.getElementById('fact-modal')
-		if (modal) {
-			Modals.hide('fact-nested-modal')
-			modal.classList.remove('d-none');
-			Modals.bringToFront(modal)
+		ModalsCommon.renderFactDetailData(element);
+		ModalsCommon.createTitles(id);
+		// ModalsCommon.listeners();
+
+		// Open fact sidebar
+		const sidebar = document.getElementById('facts-menu')
+		if (sidebar && !sidebar?.classList.contains("show")) {
+			bootstrap.Collapse.getOrCreateInstance(sidebar).show();
 		}
-		// document.getElementById("fact-modal-drag")?.focus();
 
-		ModalsCommon.carouselData(element);
-		ModalsCommon.createTitles(id, ModalsCommon.currentSlide);
-		ModalsCommon.createCarousel();
-		ModalsCommon.listeners();
-
-		document.getElementById('fact-modal-jump')?.setAttribute('data-id', id as string);
+		// Pagination.findFactAndGoTo(id);
+		Modals.clearAndCloseCopy('fact-copy-content')
 	},
 
 	listeners: () => {
-		const oldActions = document.querySelector('#fact-modal .dialog-header-actions');
-		const newActions = (oldActions as HTMLElement).cloneNode(true);
-		oldActions?.parentNode?.replaceChild(newActions, oldActions);
-
-		// we add draggable
-		Modals.initDrag(document.getElementById("fact-modal-drag") as HTMLElement);
-
-		document.getElementById('fact-modal-jump')?.addEventListener('click', (event: MouseEvent) => {
-			Pagination.goToFactInSidebar(event);
-		});
-		document.getElementById('fact-modal-jump')?.addEventListener('keyup', (event: KeyboardEvent) => {
-			if (!actionKeyHandler(event)) return;
-			Pagination.goToFactInSidebar(event);
-		});
-
 		document.getElementById('fact-modal-copy-content')?.addEventListener('click', (event: MouseEvent) => {
-			Modals.copyContent(event, 'fact-modal-carousel', 'fact-copy-content');
+			Modals.copyContent(event, 'fact-details-panel', 'fact-copy-content');
 		});
 		document.getElementById('fact-modal-copy-content')?.addEventListener('keyup', (event: KeyboardEvent) => {
 			if (!actionKeyHandler(event)) return;
-			Modals.copyContent(event, 'fact-modal-carousel', 'fact-copy-content');
+			Modals.copyContent(event, 'fact-details-panel', 'fact-copy-content');
 		});
-
-		document.getElementById('fact-modal-compress')?.addEventListener('click', (event: MouseEvent) => {
-			Modals.expandToggle(event, 'fact-modal', 'fact-modal-expand', 'fact-modal-compress');
-		});
-		document.getElementById('fact-modal-compress')?.addEventListener('keyup', (event: KeyboardEvent) => {
-			if (!actionKeyHandler(event)) return;
-			Modals.expandToggle(event, 'fact-modal', 'fact-modal-expand', 'fact-modal-compress');
-		});
-
-		document.getElementById('fact-modal-expand')?.addEventListener('click', (event: MouseEvent) => {
-			Modals.expandToggle(event, 'fact-modal', 'fact-modal-expand', 'fact-modal-compress');
-		});
-		document.getElementById('fact-modal-expand')?.addEventListener('keyup', (event: KeyboardEvent) => {
-			if (!actionKeyHandler(event)) return;
-			Modals.expandToggle(event, 'fact-modal', 'fact-modal-expand', 'fact-modal-compress');
-		});
-
-		const closeBtn = document.getElementById('fact-modal-close');
-		if(closeBtn) {
-			closeBtn.onclick = () => Modals.hide('fact-modal');
-			closeBtn.onkeyup = (event: KeyboardEvent) => {
-				if (!actionKeyHandler(event)) return;
-				Modals.hide('fact-modal');
-			}
-		}
-
-		window.addEventListener("keyup", ModalsCommon.keyboardEvents);
 	},
 
-	createTitles: (id: string, currentSlide = 0) => {
-		if (currentSlide > 0) {
-			currentSlide--;
-		}
+	createTitles: (id: string) => {
+
 		const factInfo = FactMap.getByID(id);
-		const span = document.createElement('span');
-		const dialogTitle = document.createTextNode(`${ModalsCommon.carouselInformation[currentSlide]['dialog-title']}`);
-		span.appendChild(dialogTitle);
-		document.getElementById('fact-modal-title')?.firstElementChild?.replaceWith(span);
 
 		const span1 = document.createElement('span');
 		const dialogSubTitle = document.createTextNode(`${ConstantsFunctions.getFactLabel(factInfo?.labels || [])}`);
 		span1.appendChild(dialogSubTitle);
-		document.getElementById('fact-modal-subtitle')?.firstElementChild?.replaceWith(span1);
+		document.getElementById('fact-detail-label')?.firstElementChild?.replaceWith(span1);
 	},
 
-	createCarousel: () => {
-		new bootstrap.Carousel(document.getElementById('fact-modal-carousel') as HTMLElement, {});
-		const thisCarousel = document.getElementById('fact-modal-carousel');
+	renderFactDetailData: (element: HTMLElement) => {
 
-		thisCarousel?.addEventListener('slide.bs.carousel' as any, (event: CarouselEvent) => {
-			ModalsCommon.currentSlide = event.to + 1;
-			const previousActiveIndicator = event.from;
-			const newActiveIndicator = event.to;
-			
-			document.querySelector(`#fact-modal-carousel-indicators [data-bs-slide-to="${previousActiveIndicator}"]`)?.classList.remove("active");
-			document.querySelector(`#fact-modal-carousel-indicators [data-bs-slide-to="${newActiveIndicator}"]`)?.classList.add("active");
-
-			const span = document.createElement('span');
-			const dialogTitle = document.createTextNode(`${ModalsCommon.carouselInformation[event.to]['dialog-title']}`);
-			span.appendChild(dialogTitle);
-			document.getElementById('fact-modal-title')?.firstElementChild?.replaceWith(span);
-			ModalsCommon.currentDetailTab = newActiveIndicator;
-		});
-		bootstrap.Carousel.getInstance(document.getElementById('fact-modal-carousel') as HTMLElement)?.to(ModalsCommon.currentDetailTab);
-	},
-
-	focusOnContent: () => {
-		document
-			.getElementById(
-				"fact-modal-carousel-page-" + ModalsCommon.currentSlide
-			)?.focus();
-	},
-
-	keyboardEvents: (event: KeyboardEvent) => {
-		const thisCarousel = bootstrap.Carousel.getInstance(document.getElementById('fact-modal-carousel') as HTMLElement);
-		const searchInput = document.getElementById('global-search');
-		if (document.activeElement !== searchInput) {
-			if (event.key === '1') {
-				thisCarousel?.to(0);
-				ModalsCommon.focusOnContent();
-				return false;
-			}
-			if (event.key === '2') {
-				thisCarousel?.to(1);
-				ModalsCommon.focusOnContent();
-				return false;
-			}
-			if (event.key === '3') {
-				thisCarousel?.to(2);
-				ModalsCommon.focusOnContent();
-				return false;
-			}
-			if (event.key === '4') {
-				thisCarousel?.to(3);
-				ModalsCommon.focusOnContent();
-				return false;
-			}
-			if (event.key === 'ArrowLeft') {
-				thisCarousel?.prev();
-				ModalsCommon.focusOnContent();
-				return false;
-			}
-			if (event.key === 'ArrowRight') {
-				thisCarousel?.next();
-				ModalsCommon.focusOnContent();
-				return false;
-			}
-		}
-	},
-
-	carouselData: (element: HTMLElement) => {
-		Modals.renderCarouselIndicators(
-			"fact-modal-carousel",
-			"fact-modal-carousel-indicators",
-			ModalsContinuedAt.carouselInformation,
-			ModalsCommon.currentSlide
-		);
 		const id = element.hasAttribute('continued-main-fact-id') ? element.getAttribute('continued-main-fact-id') : element.getAttribute('id');
 		const factInfo = FactMap.getByID(id as string);
 		if (factInfo) {
 
 			// we now render one slide at a time!
-			FactPages.firstPage(factInfo, 'fact-modal-carousel-page-1');
-			FactPages.secondPage(factInfo, 'fact-modal-carousel-page-2');
-			FactPages.thirdPage(factInfo, 'fact-modal-carousel-page-3');
-			FactPages.fourthPage(factInfo, 'fact-modal-carousel-page-4');
+			FactPages.firstPage(factInfo, 'fact-details-attributes');
+			FactPages.secondPage(factInfo, 'fact-details-labels');
+			FactPages.thirdPage(factInfo, 'fact-details-references');
+			FactPages.fourthPage(factInfo, 'fact-details-calculations');
 			ConstantsFunctions.getCollapseToFactValue();
 		}
 	},

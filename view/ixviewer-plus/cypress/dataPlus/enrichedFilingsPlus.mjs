@@ -3867,6 +3867,16 @@ export const filings = [
 		"timeout": "15000",
 	},
 	{
+		"accessionNum": "000110465926049711",
+		"docPath": "/Archives/edgar/data/1964789/000110465926049711/hut-20260611xdef14a.htm#EXECUTIVEOFFICERCOMPENSATION_558620",
+		"timeout": "15000",
+	},
+	{
+		"accessionNum": "000119312526054586",
+		"docPath": "/Archives/edgar/data/1669811/000119312526054586/dfin-20251231.htm",
+		"timeout": "15000",
+	},
+	{
 		"accessionNum": "000114036125011755",
 		"docPath": "/Archives/edgar/data/60086/000114036125011755/ny20041383x1_def14a.htm",
 		"factCount": 119,

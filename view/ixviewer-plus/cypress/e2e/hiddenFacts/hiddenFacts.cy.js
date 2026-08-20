@@ -15,7 +15,7 @@ describe(`Hidden Facts`, () => {
             .click();
 
         cy.get('div.alert-warning').should('not.exist');
-        cy.get(selectors.factModal).should('be.visible');
+        cy.get(selectors.factSidebar).should('be.visible');
     });
 
     it('Hidden within Hidden Fact', () => {
@@ -30,13 +30,13 @@ describe(`Hidden Facts`, () => {
         cy.loadFiling(nmexfiling);
 
         cy.get('[id="fact-identifier-195"]', {timeout: 2000}).click();
-        cy.get(selectors.nestedCount).should('have.text', '3');
+        // NestedCount should be test after UI is update to handle nested facts
+        // cy.get(selectors.nestedCount).should('have.text', '3');
         
         cy.get('[id="fact-identifier-6"]').click();
-        cy.get(selectors.factModal).should('be.visible');
-        cy.get(selectors.factModalClose).click();
+        cy.get(selectors.factSidebar).should('be.visible');
         cy.get('[id="fact-identifier-5"]').click();
-        cy.get(selectors.factModal).should('be.visible');
+        cy.get(selectors.factSidebar).should('be.visible');
     });
 
     it('Normal fact within Hidden Fact', () => {
@@ -47,13 +47,11 @@ describe(`Hidden Facts`, () => {
 
         // hidden fact ref
         cy.get('[id="fact-identifier-27"]', {timeout: 2000}).click();
-        cy.get(selectors.nestedFactModal).should('be.visible');
-        cy.get(selectors.nestedCount).should('have.text', '2');
-        cy.get(selectors.nestedFactModalClose).click();
+        cy.get(selectors.factSidebar).should('be.visible')
 
         // nested normal fact
         cy.get('#fact-identifier-25').click();
-        cy.get(selectors.factModal).should('be.visible');
+        cy.get(selectors.factSidebar).should('be.visible')
     });
 
     it('Hidden Fact should have file location (2)', () => {
@@ -66,7 +64,7 @@ describe(`Hidden Facts`, () => {
             .click();
         
         cy.get('div.alert-warning').should('not.exist');
-        cy.get(selectors.factModal).should('be.visible');
+        cy.get(selectors.factSidebar).should('be.visible');
     });
 
     it('Nested Hidden Fact is scrolled to and highlighted', () => {

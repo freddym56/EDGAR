@@ -69,46 +69,46 @@ describe('Inline docs layout matches plain html version', () => {
         cy.get('div > div:nth-child(2) > div:nth-child(15) > div > div:nth-child(2) > hr').should('have.css', 'margin-bottom', '5px')
     })
 
-    
-    it('HR original left and right margin should not be changed (±2px tolerance)', () => {
-       cy.loadByAccessionNum('000119312525229869')
-       cy.get('hr[style*="width:120pt"][style*="height:0.75pt"][style*="margin-top:4.0pt"][style*="margin-bottom:0pt"]')
-       .first()
-       .then(($hr) => {
-        const ixML =parseFloat(getComputedStyle($hr[0]).marginLeft);
-        const ixMR =parseFloat(getComputedStyle($hr[0]).marginRight);
-      
-        expect(Math.abs(ixML - 279)).to.be.lte(2); // ±2px tolerance
-        expect(Math.abs(ixMR - 279)).to.be.lte(2);
-       })
 
-       cy.get('hr[style*="margin-top:40.0pt"][style*="margin-bottom:0.25pt"][style*="margin-left:0.25pt"][style*="margin-right:0.25pt"]')
-       .first()
-       .then(($hr) => {
-        const ixML =parseFloat(getComputedStyle($hr[0]).marginLeft);
-        const ixMR =parseFloat(getComputedStyle($hr[0]).marginRight);
-      
-        expect(Math.abs(ixML - 0.333333)).to.be.lte(2); // ±2px tolerance
-        expect(Math.abs(ixMR - 0.333333)).to.be.lte(2);
-       })
+    it('HR original left and right margin should not be changed (±2px tolerance)', () => {
+        cy.loadByAccessionNum('000119312525229869')
+        cy.get('hr[style*="width:120pt"][style*="height:0.75pt"][style*="margin-top:4.0pt"][style*="margin-bottom:0pt"]')
+            .first()
+            .then(($hr) => {
+                const ixML = parseFloat(getComputedStyle($hr[0]).marginLeft);
+                const ixMR = parseFloat(getComputedStyle($hr[0]).marginRight);
+
+                expect(Math.abs(ixML - 279)).to.be.lte(2); // ±2px tolerance
+                expect(Math.abs(ixMR - 279)).to.be.lte(2);
+            })
+
+        cy.get('hr[style*="margin-top:40.0pt"][style*="margin-bottom:0.25pt"][style*="margin-left:0.25pt"][style*="margin-right:0.25pt"]')
+            .first()
+            .then(($hr) => {
+                const ixML = parseFloat(getComputedStyle($hr[0]).marginLeft);
+                const ixMR = parseFloat(getComputedStyle($hr[0]).marginRight);
+
+                expect(Math.abs(ixML - 0.333333)).to.be.lte(2); // ±2px tolerance
+                expect(Math.abs(ixMR - 0.333333)).to.be.lte(2);
+            })
 
         cy.get('hr[style*="width:540pt"][style*="height:0.75pt"][style*="margin-top:4.0pt"][style*="margin-bottom:1.5pt"][style*="margin-left:0%"][style*="top:-1pt"]')
-       .first()
-       .then(($hr) => {
-        const ixML =parseFloat(getComputedStyle($hr[0]).marginLeft);
-    
-        expect(Math.abs(ixML - 0)).to.be.lte(2); // ±2px tolerance
-       })
-       
+            .first()
+            .then(($hr) => {
+                const ixML = parseFloat(getComputedStyle($hr[0]).marginLeft);
+
+                expect(Math.abs(ixML - 0)).to.be.lte(2); // ±2px tolerance
+            })
+
         cy.loadByAccessionNum('000005114323000021')
         cy.get('hr[style*="page-break-after:always"]')
-       .first()
-       .then(($hr) => {
-        const ixML =parseFloat(getComputedStyle($hr[0]).marginLeft);
-        const ixMR =parseFloat(getComputedStyle($hr[0]).marginRight);
-        expect(Math.abs(ixML - 0)).to.be.lte(2); // ±2px tolerance
-        expect(Math.abs(ixMR - 0)).to.be.lte(2);
-       })
+            .first()
+            .then(($hr) => {
+                const ixML = parseFloat(getComputedStyle($hr[0]).marginLeft);
+                const ixMR = parseFloat(getComputedStyle($hr[0]).marginRight);
+                expect(Math.abs(ixML - 0)).to.be.lte(2); // ±2px tolerance
+                expect(Math.abs(ixMR - 0)).to.be.lte(2);
+            })
     })
 
     it('Table should have 100% width', () => {
@@ -225,7 +225,6 @@ describe('Inline docs layout matches plain html version', () => {
         cy.loadByAccessionNum('000143774923034166');
         // Looking at a text block fact
         cy.get('[id="fact-identifier-185"]').click().then($fact => {
-            cy.get(selectors.factModalClose).click()
             // cy.get('[id="fact-identifier-185"]').should('have.css', 'outline-width', '2px')
             const outlineWidth = parseFloat(getComputedStyle($fact[0]).outlineWidth);
             expect(outlineWidth).to.be.within(1, 2.2); // Orig value = 2px
@@ -260,11 +259,11 @@ describe('Inline docs layout matches plain html version', () => {
         })
     })
 
-    it('Dycom Filing Address font should be times new roman', () => {+
+    it('Dycom Filing Address font should be times new roman', () => {
         cy.loadByAccessionNum('000094787124000794')
         cy.get('#fact-identifier-8').should('have.css', 'font-family', '"Times New Roman"');
     })
-    
+
     it('TCW Filing Table font should be arial', () => {
         cy.loadByAccessionNum('000119312524185882')
         cy.get('div:nth-child(3) > div > div:nth-child(97) > div:nth-child(7) > table > tbody > tr:nth-child(7) > td:nth-child(1) > div')
@@ -282,5 +281,46 @@ describe('Inline docs layout matches plain html version', () => {
         // /Archives/edgar/data/60086/000114036125011755/ny20041383x1_def14a.htm
         cy.loadByAccessionNum('000114036125011755')
         cy.get('.BRDSX_BRDSX_block-main-columns').should('have.css', 'box-sizing', 'content-box');
+    })
+
+    it('Table row height 1', () => {
+        // /Archives/edgar/data/1964789/000110465926049711/hut-20260611xdef14a.htm#EXECUTIVEOFFICERCOMPENSATION_558620
+        cy.loadByAccessionNum('000110465926049711')
+        cy.get('#xbrl-section-current > div:nth-child(44) > div > div:nth-child(2) > table:nth-child(7) > tbody > tr:nth-child(7)').then(($tr) => {
+            const ht = parseFloat(getComputedStyle($tr[0]).height);
+            expect(ht).to.be.within(2, 5); // set by chrome.  May change with chrome updates.
+        })
+    })
+
+    it('Table row height 2', () => {
+        // /Archives/edgar/data/1669811/000119312526054586/dfin-20251231.htm
+        cy.loadByAccessionNum('000119312526054586')
+        cy.get('#xbrl-section-current > div:nth-child(99) > table > tbody > tr:nth-child(2) > td:nth-child(9) > p').then(($p) => {
+            const ht = parseFloat(getComputedStyle($p[0]).height);
+            expect(ht).to.gt(24); // set by chrome.  May change with chrome updates.
+        })
+    })
+    
+    it('Table row height 3', () => {
+        // /Archives/edgar/data/1669811/000119312526054586/dfin-20251231.htm&xbrl=true#index_to_exhibits
+        cy.loadByAccessionNum('000119312526054586')
+        cy.get('#xbrl-section-current > div:nth-child(355) > table > tbody > tr:nth-child(12)').then(($tr) => {
+            const ht = parseFloat(getComputedStyle($tr[0]).height);
+            expect(ht).to.gt(20); // set by chrome.  May change with chrome updates.
+        })
+    })
+})
+
+describe('Table Width Test', () => {
+    it("getComputedStyle method", () => {
+        cy.viewport(1920, 1080);
+        cy.loadByAccessionNum('000175392625000093');
+        cy.get('table').contains('table', '5225 Wiley Post Way, Suite 500').then(($table) => {
+            let width = window.getComputedStyle($table[0]).width;
+            //Width is currently a string like '1870px'. This will strip the letters out and convert it to a number
+            width = Number(width.replace(/px/g,''));
+            //Giving it 1% wiggle room so it doesn't have to be pixel-perfect
+            cy.expect(width).to.be.within(0.99*1870, 1.01*1870);
+        })
     })
 })

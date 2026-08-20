@@ -299,6 +299,7 @@ function closeSidebars(): void {
     // The sidebars are open (but empty); close them so the XBRL doc content becomes visible
     document.getElementById('sections-menu')?.classList.remove('show');
     document.getElementById('facts-menu')?.classList.remove('show');
+    document.getElementById('help-menu')?.classList.remove('show');
 }
 
 function progressiveLoadDoc(xhtml: string): void {

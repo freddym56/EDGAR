@@ -38,18 +38,14 @@ export const ConstantsFunctions = {
 		window.parent.document.title = `${viewType}: ${name} ${form} ${date}`;
 	},
 
-	emptyHTMLByID: (id: string) =>
-	{
+	emptyHTMLByID: (id: string) => {
 		ConstantsFunctions.emptyHTML(`#${id}`);
 	},
-	
-	emptyHTML: (selector: string) =>
-	{
+
+	emptyHTML: (selector: string) => {
 		const element = document.querySelector(selector);
-		if (element)
-		{
-			while (element.firstChild)
-			{
+		if (element) {
+			while (element.firstChild) {
 				element.firstChild?.remove();
 			}
 		}
@@ -71,15 +67,32 @@ export const ConstantsFunctions = {
 		Constants.getFormInformation = input
 	},
 
-	getFactLabel: (labels: Array<{ Label?: string | null}>): string => {
+	getFactLabel: (labels: Array<{ Label?: string | null }>): string => {
 		const label = labels.find((e): e is { Label: string } => !!e.Label);
 		return label ? label.Label : 'Not Available.';
+	},
+	getHiddenElementHeight: (element: HTMLElement) => {
+		const clone = element.cloneNode(true) as HTMLElement;
+		const rect = element.getBoundingClientRect();
+
+		Object.assign(clone.style, {
+			visibility: "hidden",
+			position: "absolute",
+			display: "block",
+			width: rect.width + "px",
+			top: "-9999px",
+		});
+
+		document.body.appendChild(clone);
+		const height = clone.offsetHeight;
+		clone.remove();
+		return height;
 	},
 
 	getCollapseToFactValue: () => {
 		const factValueModals = Array.from(document.querySelectorAll('.fact-value-modal'));
 		factValueModals.forEach((current) => {
-			if ((current as HTMLElement)?.offsetHeight && (current as HTMLElement)?.offsetHeight as number > 33 && current.parentNode?.parentNode?.querySelector('.fact-collapse')) {
+			if (ConstantsFunctions.getHiddenElementHeight(current as HTMLElement) > 33 && current.parentNode?.parentNode?.querySelector('.fact-collapse')) {
 
 				const a = document.createElement('a');
 				a.classList.add('ms-1')
@@ -97,7 +110,7 @@ export const ConstantsFunctions = {
 		});
 	},
 
-	changeInstance: (instanceIndex: number, targetInstanceFile: string | null, onBack = false):Promise<boolean> => {
+	changeInstance: (instanceIndex: number, targetInstanceFile: string | null, onBack = false): Promise<boolean> => {
 		return new Promise<boolean>((resolve) => {
 			Modals.close(new Event(''));
 
@@ -142,7 +155,7 @@ export const ConstantsFunctions = {
 						console.error('Failed to Re-Load Instance.')
 						resolve(false);
 					}
-				}) 
+				})
 			}
 		})
 	},
@@ -337,7 +350,7 @@ export const ConstantsFunctions = {
 		const enabledFactsArray = FactsGeneral.specialSort(enabledFacts);
 		Pagination.init(
 			enabledFactsArray,
-			('#facts-menu-list-pagination .pagination'),
+			('#fact-list .pagination'),
 			('#facts-menu-list-pagination .list-group'),
 			true
 		);

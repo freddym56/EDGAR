@@ -58,6 +58,8 @@ export const Constants = {
 
 	hoverOption: typeof window !== 'undefined' && window.localStorage.getItem("hoverOption") === "true" || false,
 
+	openSidebarOption: typeof window !== 'undefined' && (window.localStorage.getItem("openSidebarOption") ?? "true") ===  "true",
+
 	getHTMLAttributes: {} as Record<any, unknown>,
 
 	getPaginationPerPage: 10,

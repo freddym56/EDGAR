@@ -1,6 +1,5 @@
 import "../styles.scss";
 import { Constants } from "./constants/constants";
-import { Errors } from "./errors/errors";
 import { ErrorsMajor } from "./errors/major";
 import { Listeners } from "./listeners";
 import { SetCustomCSS } from "./settings";
@@ -39,7 +38,6 @@ import { initSearch } from "./flex-search/search-worker-interface";
         console.log(`CSS Mode: ${(document.compatMode == "CSS1Compat" ? "Standards 🎉" : "Quirks 😢")}`);
         const liteMode = Constants.sumOfDocsSizes > Constants.docSizeFallbackLimit;
         if (formLoaded && !liteMode) {
-            Errors.updateMainContainerHeight(false);
             App.initialSetup();
             removeHideClassFromSidebars();
 

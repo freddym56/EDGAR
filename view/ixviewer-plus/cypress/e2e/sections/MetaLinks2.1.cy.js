@@ -11,6 +11,6 @@ describe(`Sections | Filing with metalinks 2.1`, () => {
     it('should be able to acces fact segment labels when metalinks 2.1', () => {
         // /Archives/edgar/data/920760/000162828016017488/len-20160531_95xixbrl.htm
         cy.loadByAccessionNum('000162828016017488');
-        cy.get('[id="error-container"]').should('not.be.visible')
+        cy.get('[id="error-container"]').children().should('have.length', 0)
     });
 });

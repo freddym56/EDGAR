@@ -17,22 +17,42 @@ describe(`Fact sidebar | fact attributes`, () => {
         cy.loadFiling(filing)
         // click first fact
         cy.get('#fact-identifier-2', { timeout: Number(filing.timeout) }).first().click()
-        cy.get(selectors.showFactInSidebar).click() 
-        cy.get(selectors.factSidebar).should('be.visible') 
+
+        cy.get(selectors.factListDisplayBtn).click() 
+
         cy.get('div[id="facts-menu"] a[data-id="fact-identifier-2"]').click()
+
         cy.get('div[id="facts-menu"] a[data-id="fact-identifier-2"]')
             .should('have.attr', 'selected-fact', 'true')
+
+        cy.get(selectors.factDetailDisplayBtn).click()
+
+        cy.get(selectors.factSidebar).should('be.visible') 
+        cy.hash().should('eq', '#fact-identifier-2') 
 
         cy.get(selectors.nextFact).click()
+
+        cy.hash().should('eq', '#fact-identifier-3') 
+        
+        cy.get(selectors.factListDisplayBtn).click() 
+        
         // first fact should not longer be foucsed
         cy.get('div[id="facts-menu"] a[data-id="fact-identifier-2"]')
-            .should('have.attr', 'selected-fact', 'false')
+        .should('have.attr', 'selected-fact', 'false')
+        
+        
         cy.get('div[id="facts-menu"] a[data-id="fact-identifier-3"]', {force: true}).click()
         cy.get('div[id="facts-menu"] a[data-id="fact-identifier-3"]', {force: true})
-            .should('have.attr', 'selected-fact', 'true')
-
+        .should('have.attr', 'selected-fact', 'true')
+        
+        
+        cy.get(selectors.factDetailDisplayBtn).click() 
+        
+        cy.hash().should('eq', '#fact-identifier-3') 
         cy.get(selectors.prevFact).click()
-        // first fact should be focused again
+        cy.hash().should('eq', '#fact-identifier-2') 
+
+        // // first fact should be focused again
         cy.wait(300)
         cy.get('div[id="facts-menu"] a[data-id="fact-identifier-2"]', {force: true})
             .should('have.attr', 'selected-fact', 'true')
@@ -49,42 +69,19 @@ describe(`Fact sidebar | fact attributes`, () => {
             timeout : 12000
         }
         cy.loadFiling(filing)
-        cy.get("#fact-identifier-9").click()
-        cy.get(selectors.showFactInSidebar).click() 
-        cy.get(selectors.factSidebar).should('be.visible')      
-        cy.get('div[id="facts-menu"] a[data-id="fact-identifier-9"]').click()
-        cy.get('div[id="facts-menu"] a[data-id="fact-identifier-9"]')
-            .should('have.attr', 'selected-fact', 'true')
-        cy.get("#fact-identifier-9").should('be.visible');
-        cy.hash().should('eq', '#fact-identifier-9') 
-        cy.get('div[id="dynamic-xbrl-form"]').then($viewerElem => {
-            cy.expect($viewerElem.scrollTop()).to.equal(0)
-        })
 
-    
-        cy.get(selectors.nextFact).click()
-        cy.wait(300)
-        // first fact should not longer be focused
-        cy.get('div[id="facts-menu"] a[data-id="fact-identifier-9"]')
-            .should('have.attr', 'selected-fact', 'false')
-        cy.get('div[id="facts-menu"] a[data-id="fact-identifier-10"]', {force: true}).click()
-        cy.get('div[id="facts-menu"] a[data-id="fact-identifier-10"]', {force: true})
-            .should('have.attr', 'selected-fact', 'true')
-        cy.get("#fact-identifier-9").should('be.visible');
+        // Click on fact from XBRL Document
+        cy.get("#fact-identifier-10").click()
+
         cy.hash().should('eq', '#fact-identifier-10') 
+        
+        cy.get(selectors.factSidebar).should('be.visible') 
 
-        cy.get(selectors.sidebarPaginationLast).click() 
-        cy.get(selectors.sidebarPaginationInfo).should('contain.text', ' of') 
-        cy.get(selectors.sidebarPaginationSelect).should('contain.text', 'Page 6')
+        // Click on fact from fact sidebar
+        cy.get(selectors.factListDisplayBtn).click() 
+        cy.get('div[id="facts-menu"] a[data-id="fact-identifier-11"]').click()
 
-        cy.get(selectors.sidebarPaginationPrev).click() 
-        cy.get(selectors.sidebarPaginationInfo).should('contain.text', ' of') 
-        cy.get(selectors.sidebarPaginationSelect).should('contain.text', 'Page 5')
-        cy.get('div[id="facts-menu"] a[data-id="fact-identifier-56"]', {force: true}).click()
-        cy.get('div[id="facts-menu"] a[data-id="fact-identifier-56"]', {force: true})
-            .should('have.attr', 'selected-fact', 'true').should('be.visible')
-        cy.get(selectors.factModal).should('be.visible') 
-        cy.expect(distFromBtmOfViewportToBtmOfPage()).to.equal(0)
+        cy.hash().should('eq', '#fact-identifier-11') 
     })
 
     it('pagination should work', () => {
@@ -93,8 +90,7 @@ describe(`Fact sidebar | fact attributes`, () => {
 
         // click first fact (doc type 10-k)
         cy.get('#fact-identifier-2', { timeout: Number(filing.timeout) }).first().click()  // should bring up sidebar
-        cy.get(selectors.showFactInSidebar).click()
-        
+        cy.get(selectors.factListDisplayBtn).click() 
         cy.get(selectors.sidebarPaginationInfo).should('contain.text', ' of')
         cy.get(selectors.sidebarPaginationSelect).should('contain.text', 'Page 1')
 
@@ -120,7 +116,7 @@ describe(`Fact sidebar | fact attributes`, () => {
     });
 
 
-    it("should open the Fact Modal and highlight the selected fact in the viewer", () =>
+    it("should open the highlight the selected fact in the viewer", () =>
     {
         let filing = readFilingDataAccNum('000121390023047204')
         cy.loadFiling(filing)
@@ -144,12 +140,9 @@ describe(`Fact sidebar | fact attributes`, () => {
                     cy.get(fact).click();
                     cy.get(fact).should("exist");
 
-                    cy.get(selectors.factModal).should("satisfy", Cypress.dom.isVisible);
+                    cy.get(selectors.factSidebar).should("satisfy", Cypress.dom.isVisible);
 
                     //TODO: check that the titles of the fact and the modal are the same??
-
-                    //Close the modal
-                    cy.get(selectors.factModalClose).click();
 
                     cy.get(fact).invoke("attr", "data-id").then((id) =>
                     {
@@ -164,13 +157,13 @@ describe(`Fact sidebar | fact attributes`, () => {
                 if (i != max)
                 {
                     //Click to the next page of facts
-                    cy.get("#facts-menu-list-pagination .pagination a.page-link > .fas.fa-angle-right").click();
+                    cy.get(selectors.sidebarPaginationNext).click();
                 }
             }
         });
     });
 
-    it("should open the Fact Modal and highlight the selected fact in the viewer after hitting next button", () =>
+    it("should highlight the selected fact in the viewer after hitting next button", () =>
     {
         let filing = readFilingDataAccNum('000121390023047204')
         cy.loadFiling(filing)
@@ -179,6 +172,7 @@ describe(`Fact sidebar | fact attributes`, () => {
         //Cypress will wait until the text matches, then continue
         cy.get(selectors.factCountBadge, { timeout: filing.timeout }).invoke("text").should("match", /[a-z0-9,]+/);
         cy.get(selectors.factSidebarToggleBtn).click();
+        cy.get(selectors.factDetailDisplayBtn).click()
 
         cy.get(selectors.nextFact).click();
         cy.get('div[id="facts-menu"] a[data-id="fact-identifier-0"]', {force: true})
@@ -210,8 +204,7 @@ describe(`Fact sidebar | fact attributes`, () => {
         cy.loadFiling(filing)
 
         cy.get('#fact-identifier-0', { timeout: Number(filing.timeout) }).first().click() ; // should bring up sidebar
-        cy.get(selectors.showFactInSidebar).click();
-
+        cy.get(selectors.factListDisplayBtn).click() 
         cy.get(selectors.sidebarPaginationPrev).should('have.class', 'disabled');
         cy.get(selectors.sidebarFact(0)).should('be.visible')
         cy.get("#prevFactPage").focus();
@@ -234,10 +227,10 @@ describe(`Fact sidebar | fact attributes`, () => {
         cy.loadFiling(filing)
 
         cy.get('#fact-identifier-0', { timeout: Number(filing.timeout) }).first().click() ; // should bring up sidebar
-        cy.get(selectors.showFactInSidebar).click();
 
         cy.get(selectors.moreFiltersHeader).click()
         cy.get(selectors.periodFilterTagsDrawer).should('be.visible')
+        cy.get(selectors.factListDisplayBtn).click() 
         cy.get(selectors.sidebarFact(0)).click()
         cy.get(selectors.periodFilterTagsDrawer).should('not.be.visible')
     });

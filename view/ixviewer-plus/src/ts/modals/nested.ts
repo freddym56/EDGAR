@@ -2,16 +2,9 @@
  * Data and content created by government employees within the scope of their employment 
  * are not subject to domestic copyright protection. 17 U.S.C. 105.
  */
-import * as bootstrap from "bootstrap";
 import { ConstantsFunctions } from "../constants/functions";
 import { FactMap } from "../facts/map";
-import { ixScrollTo } from "../helpers/utils";
-import { Pagination } from "../pagination/sideBarPagination";
-import { ModalsCommon } from "./common";
-import { FactPages } from "./fact-pages";
-import { Modals } from "./modals";
-import { Facts } from "../facts/facts";
-import { actionKeyHandler } from "../helpers/utils";
+
 
 export const ModalsNested = {
 
@@ -157,199 +150,12 @@ export const ModalsNested = {
 		event.preventDefault();
 		event.stopPropagation();
 
-		Modals.hide('fact-modal')
-
-		const modal = document.getElementById('fact-nested-modal')
-		if (modal) {
-			Modals.hide('fact-modal')
-			modal.classList.remove('d-none');
-			Modals.bringToFront(modal)
-		}
-
-		document.getElementById('fact-nested-modal-drag')?.focus();
+	
 		// we empty the ID Array
 		ModalsNested.getAllElementIDs = [];
 		// we load the ID Array
 		ModalsNested.getAllNestedFacts(element);
-
-		ModalsNested.createLabelCarousel();
-
-		ModalsNested.createContentCarousel(0);
-
-		ModalsNested.listeners();
-
-		document.getElementById('nested-fact-modal-jump')?.setAttribute('data-id', (ModalsNested.getAllElementIDs[0] as HTMLElement).id);
-
-		Modals.renderCarouselIndicators('modal-fact-nested-content-carousel',
-			'fact-nested-modal-carousel-indicators', ModalsNested.carouselInformation);
-
-
-		new bootstrap.Carousel(document.getElementById('modal-nested-fact-labels') as HTMLElement, {});
-		const thisLabelCarousel = document.getElementById('modal-nested-fact-labels');
-
-		new bootstrap.Carousel(document.getElementById('modal-fact-nested-content-carousel') as HTMLElement, {});
-		const thisContentCarousel = document.getElementById('modal-fact-nested-content-carousel');
-
-		thisLabelCarousel?.addEventListener('slide.bs.carousel' as any, (event: CarouselEvent) => {
-			const span = document.createElement('span');
-			const dialogTitle = document.createTextNode(`${event.to + 1}`);
-			span.appendChild(dialogTitle);
-			document.getElementById('nested-page')?.firstElementChild?.replaceWith(span);
-
-			ModalsNested.currentSlide = ModalsCommon.currentDetailTab;
-
-			// we add something...
-			document.getElementById('nested-fact-modal-jump')?.setAttribute('data-id', ModalsNested.getAllElementIDs[event.to].id);
-
-			// we hide the copy & paste area
-			document.getElementById('fact-nested-copy-paste')?.classList.add('d-none');
-
-			let selectedElement = ModalsNested.getElementById((ModalsNested.getAllElementIDs[event.to]).id);
-
-			if (selectedElement instanceof Array)
-			{
-				selectedElement = selectedElement[0];
-			}
-
-			if (selectedElement == null) return;
-
-			// selectedElement.scrollIntoView(false);    // keeping as comment to remember alternative function
-			Facts.updateURLHash(selectedElement.id);
-			Facts.setIsSelected(selectedElement.id);
-			ixScrollTo(selectedElement);
-
-			ModalsNested.createContentCarousel(event.to);
-
-			bootstrap.Carousel.getInstance(document.getElementById('modal-fact-nested-content-carousel')!)?.to(ModalsNested.currentSlide);
-
-			ModalsCommon.currentDetailTab = ModalsNested.currentSlide;
-		});
-
-
-		thisContentCarousel?.addEventListener('slide.bs.carousel' as any, (event: CarouselEvent) => {
-
-			ModalsNested.currentSlide = event.to + 1;
-			const previousActiveIndicator = event.from;
-			const newActiveIndicator = event.to;
-			document.getElementById('fact-nested-modal-carousel-indicators')?.querySelector(
-				'[data-bs-slide-to="' + previousActiveIndicator + '"]')?.classList.remove('active');
-			document.getElementById('fact-nested-modal-carousel-indicators')?.querySelector(
-				'[data-bs-slide-to="' + newActiveIndicator + '"]')?.classList.add('active');
-			ModalsCommon.currentDetailTab = newActiveIndicator;
-		});
-		bootstrap.Carousel.getInstance(document.getElementById('modal-fact-nested-content-carousel')!)?.to(0);
-		ModalsCommon.currentDetailTab = ModalsNested.currentSlide;
 	},
 
-	listeners: () => {
-		const oldActions = document.querySelector('#fact-nested-modal .dialog-header-actions');
-		const newActions = (oldActions as HTMLElement).cloneNode(true);
-		oldActions?.parentNode?.replaceChild(newActions, oldActions);
 
-		// we add draggable
-		Modals.initDrag(document.getElementById('fact-nested-modal-drag') as HTMLElement);
-
-		document.getElementById('nested-fact-modal-jump')?.addEventListener('click', (event: MouseEvent) => {
-			Pagination.goToFactInSidebar(event);
-		});
-		document.getElementById('nested-fact-modal-jump')?.addEventListener('keyup', (event: KeyboardEvent) => {
-			if (!actionKeyHandler(event)) return;
-			Pagination.goToFactInSidebar(event);
-		});
-
-		document.getElementById('fact-nested-modal-copy-content')?.addEventListener('click', (event: MouseEvent) => {
-			Modals.copyContent(event, 'modal-fact-nested-content-carousel', 'fact-nested-copy-paste');
-		});
-		document.getElementById('fact-nested-modal-copy-content')?.addEventListener('keyup', (event: KeyboardEvent) => {
-			Modals.copyContent(event, 'modal-fact-nested-content-carousel', 'fact-nested-copy-paste');
-		});
-
-		document.getElementById('fact-nested-modal-compress')?.addEventListener('click', (event: MouseEvent) => {
-			Modals.expandToggle(event, 'fact-nested-modal', 'fact-nested-modal-expand', 'fact-nested-modal-compress');
-		});
-		document.getElementById('fact-nested-modal-compress')?.addEventListener('keyup', (event: KeyboardEvent) => {
-			if (!actionKeyHandler(event)) return;
-			Modals.expandToggle(event, 'fact-nested-modal', 'fact-nested-modal-expand', 'fact-nested-modal-compress');
-		});
-
-		document.getElementById('fact-nested-modal-expand')?.addEventListener('click', (event: MouseEvent) => {
-			Modals.expandToggle(event, 'fact-nested-modal', 'fact-nested-modal-expand', 'fact-nested-modal-compress');
-		});
-		document.getElementById('fact-nested-modal-expand')?.addEventListener('keyup', (event: KeyboardEvent) => {
-			if (!actionKeyHandler(event)) return;
-			Modals.expandToggle(event, 'fact-nested-modal', 'fact-nested-modal-expand', 'fact-nested-modal-compress');
-		});
-
-		const closeBtn = document.getElementById('fact-nested-modal-close');
-		if(closeBtn) {
-			closeBtn.onclick = () => Modals.hide('fact-nested-modal');
-			closeBtn.onkeyup = (event: KeyboardEvent) => {
-				if (!actionKeyHandler(event)) return;
-				Modals.hide('fact-nested-modal');
-			}
-		}
-		window.addEventListener("keyup", ModalsNested.keyboardEvents);
-	},
-
-	keyboardEvents: (event: KeyboardEvent) => {
-		const thisCarousel = bootstrap.Carousel.getInstance(document.getElementById('modal-fact-nested-content-carousel') as HTMLElement);
-
-		if (event.key === '1') {
-			thisCarousel?.to(0);
-			ModalsNested.focusOnContent();
-			return false;
-		}
-		if (event.key === '2') {
-			thisCarousel?.to(1);
-			ModalsNested.focusOnContent();
-			return false;
-		}
-		if (event.key === '3') {
-			thisCarousel?.to(2);
-			ModalsNested.focusOnContent();
-			return false;
-		}
-		if (event.key === '4') {
-			thisCarousel?.to(3);
-			ModalsNested.focusOnContent();
-			return false;
-		}
-		if (event.key === 'ArrowLeft') {
-			thisCarousel?.prev();
-			ModalsNested.focusOnContent();
-			return false;
-		}
-		if (event.key === 'ArrowRight') {
-			thisCarousel?.next();
-			ModalsNested.focusOnContent();
-			return false;
-		}
-	},
-
-	focusOnContent: () => {
-		document.getElementById(`modal-fact-nested-content-carousel-page-${ModalsNested.currentSlide}`)?.focus();
-	},
-
-	carouselData: (element: HTMLElement | HTMLElement[] | null) => {
-		let factID: string;
-		if (Array.isArray(element)) {
-			factID = element[0].getAttribute('continued-main-fact-id') || element[0].getAttribute('id') || "";
-		} else {
-			factID = element?.getAttribute('continued-main-fact-id') || element?.getAttribute('id') || "";
-		}
-
-		const factInfo = FactMap.getByID(factID);
-		if (!factInfo) return;
-
-		FactPages.firstPage(factInfo, 'modal-fact-nested-content-carousel-page-1');
-		FactPages.secondPage(factInfo, 'modal-fact-nested-content-carousel-page-2');
-		FactPages.thirdPage(factInfo, 'modal-fact-nested-content-carousel-page-3');
-		FactPages.fourthPage(factInfo, 'modal-fact-nested-content-carousel-page-4');
-		ConstantsFunctions.getCollapseToFactValue();
-	},
-
-	dynamicallyAddControls: () => {
-		Modals.renderCarouselIndicators('modal-fact-nested-content-carousel',
-			'fact-nested-modal-carousel-indicators', ModalsNested.carouselInformation);
-	}
 };

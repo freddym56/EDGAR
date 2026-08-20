@@ -321,12 +321,16 @@ export const FactPages = {
 		factInfo.labels.forEach((current) => {
 			for (const property in current) {
 				const trElement = document.createElement("tr");
+				// trElement.classList.add("w-100")
 				const thElement = document.createElement("th");
+				// thElement.classList.add("col-4")
 				const thContent = document.createTextNode(property);
 				thElement.appendChild(thContent);
 
 				const tdElement = document.createElement("td");
+				// tdElement.classList.add("col-8")
 				const divElement = document.createElement("div");
+				divElement.classList.add("break-word")
 				const divContent = document.createTextNode((current as any)[property]);
 				divElement.appendChild(divContent);
 				tdElement.appendChild(divElement);
@@ -361,6 +365,7 @@ export const FactPages = {
 							const smallContent = document.createTextNode(' (Will Leave SEC Website)');
 							small.appendChild(smallContent);
 							const thContent = document.createTextNode(`${key}`);
+							
 							thElement.appendChild(thContent);
 							thElement.appendChild(small);
 						} else {
@@ -368,9 +373,11 @@ export const FactPages = {
 							thElement.appendChild(thContent);
 						}
 
+						
 						const tdElement = document.createElement("td");
-
+						
 						const divElement = document.createElement("div");
+						divElement.classList.add("break-word")
 
 						if (val === 'URI') {
 							const aTag = document.createElement('a');
@@ -471,3 +478,11 @@ export const FactPages = {
 
 
 };
+
+
+
+// Possible handling of nested facts
+// "Disclosure of geographical areas [text block]"
+// 	"Nested Fact 3 Name (level 1)"
+// 		"Nested Fact 1 Name (level 2)"
+		

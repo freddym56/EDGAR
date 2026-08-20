@@ -6,7 +6,6 @@ import * as bootstrap from "bootstrap";
 import { Constants } from "../constants/constants";
 import { FactMap } from "../facts/map";
 import { ModalsCommon } from "../modals/common";
-import { ModalsNested } from "../modals/nested";
 
 import { FactsMenu } from "./menu";
 // import { FactsTable } from "./table";
@@ -16,6 +15,8 @@ import { ixScrollTo } from "../helpers/utils";
 import { actionKeyHandler } from "../helpers/utils";
 import { Search } from "../search/search";
 import { addToJsPerfTable } from "../helpers/ixPerformance";
+import { Pagination } from "../pagination/sideBarPagination";
+import { ModalsNested } from "../modals/nested";
 
 export const Facts = {
 	updateFactCounts: () => {
@@ -278,8 +279,6 @@ export const Facts = {
 		if (event instanceof KeyboardEvent && !(event.key === 'Enter' || event.key === 'Space' || event.key === ' '))
 			return;
 
-		document.getElementById("fact-modal")?.classList.add("d-none");
-		document.getElementById("fact-nested-modal")?.classList.add("d-none");
 		const elementRecursion = (element: HTMLElement): { href: string, _target: string } | null => {
 			if (typeof element.hasAttribute == "function" && element.hasAttribute('href')) {
 				return {
@@ -305,11 +304,24 @@ export const Facts = {
 			if (id == null) return;
 			FactMap.setIsSelected(id as string);
 			// FactsUi.setIsSelected(id as string);
-			if (Facts.isElementNested(element)) {
-				ModalsNested.nestedClickEvent(event, element);
-			} else {
-				ModalsCommon.clickEvent(event, element);
-			}
+
+			
+			ModalsCommon.clickEvent(event, element);
+			
+			
+			// Treat Nested Facts as Facts unitl nested facts are handled in UI
+			// if (Facts.isElementNested(element)) {
+			// 	Facts.buildFactMenuDom(id)
+			// 	ModalsNested.nestedClickEvent(event, element);
+			// } else {
+			// 	ModalsCommon.clickEvent(event, element);
+			// }
+
+			// Pagination.goToFactInSidebar(event)
+			Pagination.findFactAndGoTo(id);
+
+			//
+			FactsMenu.updateFactMenuDisplay(event)
 		}
 	},
 
@@ -410,4 +422,49 @@ export const Facts = {
 			Constants.appWindow.location.hash = `#${factId}`;
 		}
 	},
+
+	updateFactMenuDisplay: (event: MouseEvent | KeyboardEvent) => {
+		if ("key" in event && !(event.key === "Enter" || event.key === "Space" || event.key === " ")) {
+			return;
+		}
+		const element = event.target as HTMLElement;
+		const menuElement = element?.closest('.offcanvas-body') as HTMLElement | null;
+
+		if (!menuElement) return;
+
+		const ulElement = event.currentTarget as HTMLElement
+		ulElement.querySelectorAll('li a').forEach(link => {
+			link.removeAttribute('aria-current')
+		})
+
+
+		element.setAttribute('aria-current', 'page')
+
+		const isExpandDetailsBtn = element.id === 'fact-detail-display-btn';
+		const isExpandListBtn = element.id === 'fact-list-display-btn';
+
+		let newState = 'default'
+
+		if (isExpandDetailsBtn) {
+			newState = 'fact-detail-display'
+		} else if (isExpandListBtn) {
+			newState = 'fact-list-display'
+		}
+
+		menuElement.dataset.factMenuDisplay = newState;
+	},
+
+	buildFactMenuDom: (id: string) => {
+		const factInfo = FactMap.getByID(id);
+
+		if (factInfo === null) {
+			const htmlString = `<div style="text-align: center; width: 100%;">No Reports Data</div>`;
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(htmlString, 'text/html')
+            const elem = doc.querySelector('body > div') as HTMLElement
+            document.getElementById("fact-detail-acc")?.appendChild(elem);
+		}
+
+		return 1
+	}
 };

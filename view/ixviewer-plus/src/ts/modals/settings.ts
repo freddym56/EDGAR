@@ -32,6 +32,8 @@ export const ModalsSettings = {
 		(document.getElementById('scroll-position-select') as HTMLInputElement).value = Constants.scrollPosition;
 		// set correct hover value
 		(document.getElementById('hover-option-select') as HTMLInputElement).value = Constants.hoverOption.toString();
+		// set correct open sidebar option value
+		(document.getElementById('open-sidebar-option-select') as HTMLInputElement).value = Constants.openSidebarOption.toString();
 	},
 
 	listeners: () => {
@@ -63,5 +65,18 @@ export const ModalsSettings = {
 			localStorage.setItem('hoverOption', 'false');
 			Constants.hoverOption = false;
 		}
-	}
+	},
+	openSidebarOption: (event: Event) => {
+		console.log(event)
+		if (event?.target?.value === 'true') {
+
+			localStorage.setItem('openSidebarOption', 'true');
+			Constants.openSidebarOption = true;
+		} else {
+
+			localStorage.setItem('openSidebarOption', 'false');
+			Constants.openSidebarOption = false;
+		}
+	},
+
 };

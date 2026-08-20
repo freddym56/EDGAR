@@ -171,7 +171,7 @@ describe("Section links should be navigatable (metalinks 2.0)", () => {
     })
 });
 
-describe.only("Sections links 2", () => {
+describe("Sections links 2", () => {
     /*
     In this case filing summary has "??" in the short name, but the ml rep doesn't.  It's tricky to match the ml report, but we should, and should display it
     function is findMatchingMetaReport() in merge-data-utils
@@ -184,7 +184,7 @@ describe.only("Sections links 2", () => {
     })
 });
 
-describe.only("Sections has DEI report", () => {
+describe("Sections has DEI report", () => {
     it('should show hard to match reports', () => {
         cy.loadByAccessionNum('000001260120000228')
         cy.get(selectors.sectionsHeader).click();

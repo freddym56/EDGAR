@@ -31,8 +31,6 @@ export const ErrorsMajor: {
 			const closeBtn = Errors.createBsCloseBtn();
 			instanceHeader.appendChild(closeBtn);
 			document.getElementById('error-container')?.appendChild(instanceHeader);
-
-			Errors.updateMainContainerHeight();
 		}
 	},
 
@@ -50,7 +48,6 @@ export const ErrorsMajor: {
 		instanceHeader.appendChild(closeBtn);
 		document.getElementById('error-container')?.appendChild(instanceHeader);
 
-		Errors.updateMainContainerHeight();
 
 		if (!PRODUCTION) {
 			const log: Logger<ILogObj> = new Logger();
@@ -72,7 +69,6 @@ export const ErrorsMajor: {
 		instanceHeader.appendChild(closeBtn);
 		document.getElementById('error-container')?.appendChild(instanceHeader);
 
-		Errors.updateMainContainerHeight();
 
 		if (!PRODUCTION) {
 			const log: Logger<ILogObj> = new Logger();
@@ -94,7 +90,6 @@ export const ErrorsMajor: {
 		instanceHeader.appendChild(closeBtn);
 		document.getElementById('error-container')?.appendChild(instanceHeader);
 
-		Errors.updateMainContainerHeight();
 
 		if (!PRODUCTION) {
 			const log: Logger<ILogObj> = new Logger();
@@ -119,7 +114,6 @@ export const ErrorsMajor: {
 		const closeBtn = Errors.createBsCloseBtn();
 		instanceHeader.appendChild(closeBtn);
 		document.getElementById('error-container')?.appendChild(instanceHeader);
-		Errors.updateMainContainerHeight();
 
 		if (!PRODUCTION) {
 			const log: Logger<ILogObj> = new Logger();
@@ -141,7 +135,6 @@ export const ErrorsMajor: {
 		instanceHeader.appendChild(closeBtn);
 		document.getElementById('error-container')?.appendChild(instanceHeader);
 		
-		Errors.updateMainContainerHeight();
 
 		if (!PRODUCTION) {
 			const log: Logger<ILogObj> = new Logger();

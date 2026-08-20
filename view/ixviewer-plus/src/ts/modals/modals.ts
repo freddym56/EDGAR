@@ -4,8 +4,6 @@
  */
 
 import { ConstantsFunctions } from "../constants/functions";
-// import { FactMap } from "../facts/map";
-import { ModalsCommon } from "./common";
 import { ModalsFormInformation } from "./form-information";
 
 const resetModalZIndexes = () => {
@@ -72,7 +70,6 @@ export const Modals = {
 		document.getElementById('fact-copy-paste')?.classList.add('d-none');
 
 		window.removeEventListener('keyup', ModalsFormInformation.keyboardEvents);
-		window.removeEventListener('keyup', ModalsCommon.keyboardEvents);
 
 		// to simplify things, we are going to go through and close every
 		// dialog.
@@ -83,15 +80,8 @@ export const Modals = {
 		foundDialogsArray.forEach((current) => {
 
 			current.classList.remove('expand-modal');
-			const viewPortWidth = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
-			if (viewPortWidth >= 576) {
-				document.getElementById('fact-modal-expand')?.classList.remove('d-none');
-				document.getElementById('fact-nested-modal-expand')?.classList.remove('d-none');
 
-			}
-			document.getElementById('fact-modal-compress')?.classList.add('d-none');
-			document.getElementById('fact-nested-modal-compress')?.classList.add('d-none');
-
+			
 			current.classList.add('d-none');
 		});
 	},
@@ -108,14 +98,18 @@ export const Modals = {
 		if ("key" in event && !(event.key === "Enter" || event.key === "Space" || event.key === " ")) {
 			return;
 		}
+		event.stopPropagation();
+
+		const element = event.currentTarget as HTMLElement
 
 		if (!document.getElementById(copyPasteElement)?.classList.contains('d-none')) {
 			document.getElementById(copyPasteElement)?.classList.add('d-none');
+			element.classList.remove('active')
 		} else {
 			const sectionToPopulate = '#' + copyPasteElement;
 			document.getElementById(copyPasteElement)?.classList.remove('d-none');
 
-			const foundCarouselPagesArray = Array.from(document.getElementById(elementIdToCopy)?.querySelectorAll('.carousel-item') || []);
+			const foundCarouselPagesArray = Array.from(document.getElementById(elementIdToCopy)?.querySelectorAll('.carousel-item, .detail-item') || []);
 			// TODO should we just put all of the innerText automatically into the user's clipboard?
 
 			// th elements are the keys
@@ -149,6 +143,8 @@ export const Modals = {
 			if (textarea != null) {
 				textarea.textContent = textToCopy.trim();
 			}
+
+			element.classList.add('active')
 		}
 	},
 
@@ -156,9 +152,15 @@ export const Modals = {
 		(document.getElementById(input) as HTMLElement).classList.add('d-none');
 	},
 
+	clearAndCloseCopy: (input: string) => {
+		(document.getElementById(input) as HTMLElement).classList.add('d-none');
+		(document.querySelector(`#${input} textarea`) as HTMLElement).textContent = "";
+		(document.getElementById('fact-modal-copy-content') as HTMLElement).classList.remove('active');
+	},
+
 	expandToggle: (
 		event: MouseEvent | KeyboardEvent,
-		idToTarget = 'fact-modal',
+		idToTarget = '',
 		idToExpand = 'fact-modal-expand',
 		idToCompress = 'fact-modal-compress'
 	) => {
@@ -169,9 +171,6 @@ export const Modals = {
 		) {
 			return;
 		}
-		// idToTarget = idToTarget || 'fact-modal';
-		// idToExpand = idToExpand || 'fact-modal-expand';
-		// idToCompress = idToCompress || 'fact-modal-compress';
 
 		const modalElement = document.getElementById(idToTarget);
 		modalElement?.classList.toggle('expand-modal');
@@ -179,14 +178,12 @@ export const Modals = {
 
 			document.getElementById(idToExpand)?.classList.add('d-none');
 			document.getElementById(idToCompress)?.classList.remove('d-none');
-			document.getElementById('fact-modal-drag')?.classList.add('d-none');
 			document.getElementById(idToCompress)?.focus();
 
 		} else {
 
 			document.getElementById(idToExpand)?.classList.remove('d-none');
 			document.getElementById(idToCompress)?.classList.add('d-none');
-			document.getElementById('fact-modal-drag')?.classList.remove('d-none');
 			document.getElementById(idToExpand)?.focus();
 		}
 	},

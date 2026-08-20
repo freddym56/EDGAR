@@ -20,7 +20,6 @@ export const ErrorsMinor = {
 		instanceHeader.appendChild(closeBtn);
 		document.getElementById('error-container')?.appendChild(instanceHeader);
 
-		Errors.updateMainContainerHeight();
 	},
 
 	factNotFound: () => {
@@ -39,7 +38,6 @@ export const ErrorsMinor = {
 		instanceHeader.appendChild(closeBtn);
 		document.getElementById('error-container')?.appendChild(instanceHeader);
 
-		Errors.updateMainContainerHeight();
 	},
 
 
@@ -59,7 +57,6 @@ export const ErrorsMinor = {
 		document.getElementById('error-container')?.appendChild(instanceHeader);
 
 
-		Errors.updateMainContainerHeight();
 	},
 
 	message: (input: string) => {
@@ -76,6 +73,5 @@ export const ErrorsMinor = {
 		instanceHeader.appendChild(closeBtn);
 		document.getElementById('error-container')?.appendChild(instanceHeader);
 		
-		Errors.updateMainContainerHeight();
 	},
 };

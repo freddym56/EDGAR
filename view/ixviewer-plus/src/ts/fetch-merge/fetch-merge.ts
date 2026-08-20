@@ -18,11 +18,6 @@ import { fetchJson, fetchText, setScaleInfo, enrichWithMetalinks } from './merge
 import { extractReportsAndMenuCats, mapReports } from '../helpers/common-node-js/map-reports.js'
 import { parseFilingSummary } from "../helpers/common-node-js/parser.js";
 
-// common code with rfileviewer for Arelle GUI, SECWS and sec.gov
-import { mapReports } from "../../viewer-common-src/map-reports.js";
-import { normalizeCategory } from "../../viewer-common-src/category-normalizer.js";
-
-
 /* Created by staff of the U.S. Securities and Exchange Commission.
  * Data and content created by government employees within the scope of their employment
  * are not subject to domestic copyright protection. 17 U.S.C. 105.
@@ -170,7 +165,6 @@ export class FetchAndMerge {
             if (initialLoad) {
                 const [meta, summ] = await metaAndSummary();
 
-                /* Prior code before utilizing viewer-common-src functions
                 getInstanceXmlUrlFromFilingSummary(summ, meta.instances);
                 
                 // iterate over FilingSummary.xml Reports to build sections, adding data from metalinks
@@ -182,27 +176,6 @@ export class FetchAndMerge {
                 this.sections = enrichWithMetalinks(fsReportsData, Object.values(meta.sections), filingSummaryInputFiles);
 
                 this.setSectionGroupType(this.sections);
-                */
-
-                // PROPOSED REPLACEMENT CODE
-
-                const mapped = mapReports({ FilingSummary: summ }, console.debug);
-                const instancesReports = mapped.instancesReports;
-
-                this.sections = buildSectionsArrayFlatter(summ, Object.values(meta.sections), this.metaVersion ?? "");
-
-                for (const section of this.sections) {
-                    const ir = section.instanceHtm ? instancesReports[section.instanceHtm] : undefined;
-                    const hasStatements = ir?.hasStmt ?? / - Statement - /i.test(String(section.longName ?? ""));
-                    ir && (ir._priorMenuCat ??= null);
-                    const nc = normalizeCategory(section.menuCat, section.longName, section.role, hasStatements, ir, ir?._priorMenuCat);
-                    section.normalizedCategory = nc;
-                    if (ir) ir._priorMenuCat = nc;
-                }
-
-                this.setSectionGroupType(this.sections);
-
-                // END PROPOSED REPLACEMENT CODE
 
                 metalinks = meta;
                 this.instances = metalinks.instances;

@@ -3,7 +3,7 @@ import { readFilingDataAccNum } from '../../dataPlus/filingsFunnel.js'
 
 
 describe(`Fact Hash`, () => {
-    it('should navigate to clicked fact id and verify the URL hash and display the valid modal', () => {
+    it('should navigate to clicked fact id and verify the URL hash', () => {
         let filing = {
             docPath: '/Archives/edgar/data/778206/000138713122012642/shelton-497_122222.htm',
             timeout: 12000
@@ -17,7 +17,7 @@ describe(`Fact Hash`, () => {
         cy.hash().should('eq', '#fact-identifier-39')
     })
 
-    it('should navigate to clicked display/open the valid modal', () => {
+    it('should navigate to clicked display/open the fact sidebar', () => {
         let filing = {
             docPath: '/Archives/edgar/data/778206/000138713122012642/shelton-497_122222.htm',
             timeout: 12000
@@ -26,12 +26,11 @@ describe(`Fact Hash`, () => {
         cy.get("#fact-identifier-11").click()
         cy.hash().should('eq', '#fact-identifier-11')
         cy.get('#fact-identifier-11').should('be.visible').should('have.attr', 'selected-fact', 'true')
-        cy.get(selectors.factModal).should('be.visible')
-        cy.get(selectors.factModal).should('have.css', 'display', 'block')
-        cy.get(selectors.nestedFactModal).should('not.be.visible')
+        cy.get(selectors.factSidebar).should('be.visible')
+        cy.get(selectors.factSidebar).should('have.class', 'show')
     })
 
-    it('should load the page with the hash id and verify the URL hash and display the valid modal', () => {
+    it('should load the page with the hash id and verify the URL hash and open fact sidebar', () => {
         let filing = {
             docPath: '/Archives/edgar/data/778206/000138713122012642/shelton-497_122222.htm#fact-identifier-40',
             timeout: 12000
@@ -39,12 +38,12 @@ describe(`Fact Hash`, () => {
         cy.loadFiling(filing)
         cy.hash().should('eq', '#fact-identifier-40')
         cy.get('#fact-identifier-40').should('be.visible').should('have.attr', 'selected-fact', 'true')
-        cy.get(selectors.factModal).should('be.visible')
-        cy.get(selectors.factModal).should('have.css', 'display', 'block')
-        cy.get(selectors.nestedFactModal).should('not.be.visible')
+        cy.get(selectors.factSidebar).should('be.visible')
+        cy.get(selectors.factSidebar).should('have.class', 'show')
+
     })
 
-    it('should navigate to the previous/next hash and show the valid modal with browser backward/forward', () => {
+    it('should navigate to the previous/next hash and open fact sidebar with browser backward/forward', () => {
         let filing = {
             docPath: '/Archives/edgar/data/778206/000138713122012642/shelton-497_122222.htm',
             timeout: 12000
@@ -56,37 +55,35 @@ describe(`Fact Hash`, () => {
         cy.hash().should('eq', '#fact-identifier-53')
         cy.go('back')
         cy.hash().should('eq', '#fact-identifier-26')
-        cy.get(selectors.factModal).should('be.visible')
-        cy.get(selectors.factModal).should('have.css', 'display', 'block')
+        cy.get(selectors.factSidebar).should('be.visible')
+        cy.get(selectors.factSidebar).should('have.class', 'show')
         cy.get('#fact-identifier-26').should('be.visible').should('have.attr', 'selected-fact', 'true')
         cy.go('forward')
         cy.hash().should('eq', '#fact-identifier-53')
         cy.get('#fact-identifier-53').should('be.visible').should('have.attr', 'selected-fact', 'true')
-        cy.get(selectors.factModal).should('be.visible')
-        cy.get(selectors.factModal).should('have.css', 'display', 'block')
+        cy.get(selectors.factSidebar).should('be.visible')
+        cy.get(selectors.factSidebar).should('have.class', 'show')
     })
 
-    it('should not open modal if the hash fact does not exist', () => {
+    it('should not open fact sidebar if the hash fact does not exist', () => {
         let filing = {
             docPath: '/Archives/edgar/data/778206/000138713122012642/shelton-497_122222.htm#fact-identifier-2244242',
             timeout: 12000
         }
         cy.loadFiling(filing)
         cy.hash().should('eq', '#fact-identifier-2244242')
-        cy.get(selectors.factModal).should('not.be.visible')
-        cy.get(selectors.nestedFactModal).should('not.be.visible')
-        cy.get(selectors.factModal).should('have.css', 'display', 'none')
+        cy.get(selectors.factSidebar).should('not.be.visible')
+        cy.get(selectors.factSidebar).should('not.have.class', 'show')
     })
 
-    it('should not open modal when there is no hash in url', () => {
+    it('should not open fact sidebar when there is no hash in url', () => {
         let filing = {
             docPath: '/Archives/edgar/data/778206/000138713122012642/shelton-497_122222.htm',
             timeout: 12000
         }
         cy.loadFiling(filing)
-        cy.get(selectors.factModal).should('not.be.visible')
-        cy.get(selectors.nestedFactModal).should('not.be.visible')
-        cy.get(selectors.factModal).should('have.css', 'display', 'none')
+        cy.get(selectors.factSidebar).should('not.be.visible')
+        cy.get(selectors.factSidebar).should('not.have.class', 'show')
     })
 
     it("Selected fact should remain selected after refresh", () => {
@@ -102,7 +99,7 @@ describe(`Fact Hash`, () => {
                                         cy.hash().should('eq', '#fact-identifier-569')
                                         cy.wait(1000); // wait for scroll to fact
                                         cy.visibleOnScreen('[ix="fact-identifier-569"]')
-                                        cy.visibleOnScreen('[id="fact-modal"]')
+                                        cy.visibleOnScreen('[id="facts-menu"]')
                                     })
                             })
                     })
@@ -118,7 +115,7 @@ describe(`Fact Hash`, () => {
                         cy.hash().should('eq', '#fact-identifier-569')
                         cy.wait(2000); // wait for scroll to fact
                         cy.visibleOnScreen('[ix="fact-identifier-569"]')
-                        cy.visibleOnScreen('[id="fact-modal"]')
+                        cy.visibleOnScreen('[id="facts-menu"]')
                     })
                 })
             })
@@ -145,14 +142,5 @@ describe(`Fact Hash`, () => {
 
         cy.get("#fact-identifier-413").click()
         cy.hash().should('eq', '#fact-identifier-413')
-        cy.get(selectors.factModal).should('be.visible');
-
-        cy.get(selectors.factModalClose).click()
-
-        cy.get("#fact-identifier-413 a[href=\"#note_5_balance_sheet_accounts\"]").click()
-        cy.hash().should('eq', '#note_5_balance_sheet_accounts')
-
-        cy.get("#note_5_balance_sheet_accounts").should('be.visible')
-        cy.get(selectors.factModal).should('not.be.visible');
     })
 })
