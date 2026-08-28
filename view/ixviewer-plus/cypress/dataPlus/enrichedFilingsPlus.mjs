@@ -3877,6 +3877,11 @@ export const filings = [
 		"timeout": "15000",
 	},
 	{
+		"accessionNum": "000020040626000153",
+		"docPath": "/Archives/edgar/data/200406/000020040626000153/jnj-20260628.htm#fact-identifier-2253",
+		"timeout": "15000",
+	},
+	{
 		"accessionNum": "000114036125011755",
 		"docPath": "/Archives/edgar/data/60086/000114036125011755/ny20041383x1_def14a.htm",
 		"factCount": 119,

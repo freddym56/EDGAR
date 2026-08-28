@@ -45,7 +45,7 @@ export const ErrorsMinor = {
 		console.log('factNotInSearch')
 		const content = 
 			`<div class="alert-height alert alert-warning show mb-0">
-				Fact not found in current search and filter results.
+				Selected Fact does not appear in current search and filter results.
 			</div>`;
 
 		const parser = new DOMParser();

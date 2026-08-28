@@ -7,6 +7,7 @@ import { fixImages } from "../app/app-helper";
 import { ConstantsFunctions } from "../constants/functions";
 import { xmlToDom } from "../helpers/utils";
 import { LabelEnum, SegmentClass, SingleFact } from "../interface/fact";
+import DOMPurify from "dompurify";
 
 const formatSegment = (segment: string) => {
 	if (segment) {
@@ -321,18 +322,14 @@ export const FactPages = {
 		factInfo.labels.forEach((current) => {
 			for (const property in current) {
 				const trElement = document.createElement("tr");
-				// trElement.classList.add("w-100")
 				const thElement = document.createElement("th");
-				// thElement.classList.add("col-4")
 				const thContent = document.createTextNode(property);
 				thElement.appendChild(thContent);
 
 				const tdElement = document.createElement("td");
-				// tdElement.classList.add("col-8")
 				const divElement = document.createElement("div");
-				divElement.classList.add("break-word")
-				const divContent = document.createTextNode((current as any)[property]);
-				divElement.appendChild(divContent);
+				divElement.classList.add("break-word");
+				divElement.innerHTML = DOMPurify.sanitize((current as any)[property]);
 				tdElement.appendChild(divElement);
 
 				trElement.appendChild(thElement);

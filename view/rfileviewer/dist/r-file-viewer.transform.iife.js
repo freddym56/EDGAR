@@ -2612,7 +2612,8 @@ var RFileViewer = (() => {
       }`;
     } else {
       bootstrap += `
-      var url_filing_dir = ('${aliasDir}') ? '${aliasDir}' : (location.pathname.replace(/\\/[^/]*$/, '/') || '/');
+      var url_filing_dir = (('${aliasDir}') ? '${aliasDir}' : (location.pathname.replace(/\\/[^/]*$/, '/') || '/'))
+            .replace(/\\/$/,'');  // remove any trailing '/' for ix_viewer_url
       function ix_viewer_url(report_file) {
         // provide URL to initiate inline XBRL viewer for report_file
         return applyRedline(\`/ix?doc=\${url_filing_dir}/\${report_file}&xbrl=true\`);

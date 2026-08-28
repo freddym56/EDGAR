@@ -250,7 +250,7 @@ export class Listeners {
             }
 
               
-                    FactsMenu.updateFactMenuState('fact-list-display');
+            FactsMenu.updateFactMenuState('fact-list-display');
 
         });
 

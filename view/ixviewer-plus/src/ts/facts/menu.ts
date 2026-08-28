@@ -4,6 +4,7 @@
  */
 
 import { ConstantsFunctions } from "../constants/functions";
+import { Pagination } from "../pagination/sideBarPagination";
 
 export const FactsMenu = {
 
@@ -22,7 +23,7 @@ export const FactsMenu = {
 		FactsMenu.prepareForPagination();
 
 	},
-	// Todo create two methods for updating the display ( 1. by passing event from element inside container anothe for the actual updating on the elements state)
+	
 	updateFactMenuState: (newState: string) => {
 		const navElement = document.getElementById('fact-display-nav') as HTMLElement
 		const menuElement = navElement?.closest('.fact-menu-container') as HTMLElement | null;
@@ -33,22 +34,45 @@ export const FactsMenu = {
 			btn.classList.remove('active')
 		})
 
+		const selectedFactId = ConstantsFunctions.getSelectedFactId()
+
 		switch (newState) {
 			case "fact-detail-display":
-				menuElement.querySelectorAll('#fact-details-panel-toolbar .view-btn[data-view]').forEach((btn) => btn.classList.toggle('active', btn.dataset.view === "detail"));
 				menuElement.querySelector('#fact-detail-display-btn')?.classList.add('active')
+				
+				if (menuElement.dataset.factMenuDisplay !== "fact-split-display") {
+					menuElement.querySelectorAll('#fact-details-panel-toolbar .view-btn[data-view]').forEach((btn) => btn.classList.toggle('active', btn.dataset.view === "detail"));
+					menuElement.dataset.factMenuDisplay = newState;
+				} 
 
+
+		
 				break;
 			case "fact-list-display":
 				menuElement.querySelector('#fact-list-display-btn')?.classList.add('active')
 
+				menuElement.dataset.factMenuDisplay = newState; 
+				if(selectedFactId) {
+					Pagination.findFactAndGoTo(selectedFactId);
+				}
+				break;
+
+			case "fact-split-display":
+				menuElement.querySelector('#fact-detail-display-btn')?.classList.add('active')
+				menuElement.dataset.factMenuDisplay = newState;
+				if(selectedFactId) {
+					Pagination.findFactAndGoTo(selectedFactId);
+				}
+
 				break;
 
 			default:
+
+				menuElement.dataset.factMenuDisplay = newState;
 				break;
 		}
 
-		menuElement.dataset.factMenuDisplay = newState;
+		// menuElement.dataset.factMenuDisplay = newState;
 	},
 	updateFactMenuDisplay: (event: MouseEvent | KeyboardEvent) => {
 		if ("key" in event && !(event.key === "Enter" || event.key === "Space" || event.key === " ")) {
@@ -85,6 +109,7 @@ export const FactsMenu = {
 		if (viewBtn?.dataset.view === 'split') newState = 'fact-split-display';
 
 		menuElement.dataset.factMenuDisplay = newState;
+		FactsMenu.updateFactMenuState(newState)
 	},
 
 	/**

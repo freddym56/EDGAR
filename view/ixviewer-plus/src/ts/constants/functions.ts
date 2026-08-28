@@ -51,6 +51,16 @@ export const ConstantsFunctions = {
 		}
 	},
 
+	ixSaniParse: (htmlString: string) => {
+		// must me valid html
+		// e.g. passing a <td> elem without table will result in <td> being omitted
+		const saniString = DOMPurify.sanitize(htmlString);
+		const parser = new DOMParser();
+		const doc = parser.parseFromString(saniString, 'text/html');
+		const dom = doc.body.firstElementChild as HTMLElement;
+		return dom;
+	},
+
 	setInstanceFiles: (input: InstanceFile[]) => {
 		Constants.getInstances = input;
 	},
@@ -358,5 +368,13 @@ export const ConstantsFunctions = {
 			('.paginationprevnext'),
 			('#facts-menu-list-pagination .list-group'),
 			true);
+	},
+	
+	getSelectedFactId: () => {
+		if(Constants.appWindow.location.hash.startsWith('#fact-identifier')) {
+			let id = Constants.appWindow.location.hash;
+			id = id.startsWith('#') ? id.slice(1) : id;
+			return id
+		}
 	}
 }

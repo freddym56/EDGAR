@@ -223,3 +223,13 @@ describe('Member class should have all chars', () => {
 
     })
 })
+
+describe('Label fields', () => {
+    it('should decode hmtl chars like &amp;', () => {
+        // /Archives/edgar/data/200406/000020040626000153/jnj-20260628.htm#fact-identifier-2253
+        cy.loadByAccessionNum('000020040626000153');
+        cy.get(selectors.factDetailDisplayBtn).click();
+        cy.get(selectors.labelsHeader).click();
+        cy.get('#fact-details-labels > tbody').should('contain.text', 'Additions to Property, Plant & Equipment');
+    })
+})

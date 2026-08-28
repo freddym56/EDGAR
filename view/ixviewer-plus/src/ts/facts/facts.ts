@@ -109,15 +109,15 @@ export const Facts = {
 
 		element.addEventListener("keyup", (event: KeyboardEvent) => {
 			const parent = event.currentTarget.parentElement
-			
+
 			if (parent?.children.length === 1 && parent.tagName.startsWith('ix:')) {
 				if (parent.textContent.trim() === event.currentTarget.textContent.trim()) {
 					return
 				}
 			}
-			
+
 			if (!actionKeyHandler(event)) return;
-			
+
 			if (element instanceof HTMLElement) {
 				const id = element.hasAttribute('continued-main-fact-id') ? element.getAttribute('continued-main-fact-id') : element.getAttribute('id');
 				Facts.updateURLHash(id as string);
@@ -318,7 +318,8 @@ export const Facts = {
 			// }
 
 			// Pagination.goToFactInSidebar(event)
-			Pagination.findFactAndGoTo(id);
+			const showNotFoundError = document.getElementById('facts-menu')?.dataset.factMenuDisplay !== 'fact-list-display'
+			Pagination.findFactAndGoTo(id, showNotFoundError);
 
 			//
 			FactsMenu.updateFactMenuDisplay(event)
@@ -459,10 +460,10 @@ export const Facts = {
 
 		if (factInfo === null) {
 			const htmlString = `<div style="text-align: center; width: 100%;">No Reports Data</div>`;
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(htmlString, 'text/html')
-            const elem = doc.querySelector('body > div') as HTMLElement
-            document.getElementById("fact-detail-acc")?.appendChild(elem);
+			const parser = new DOMParser();
+			const doc = parser.parseFromString(htmlString, 'text/html')
+			const elem = doc.querySelector('body > div') as HTMLElement
+			document.getElementById("fact-detail-acc")?.appendChild(elem);
 		}
 
 		return 1

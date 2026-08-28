@@ -9,7 +9,6 @@ import { Constants } from "../constants/constants";
 let worker: Worker;
 
 export const initSearch = (factMap: any) => {
-    console.log('initSearch')
     if (typeof window !== 'undefined' && window.Worker) {
         const searchStart = performance.now();
         worker = new Worker(

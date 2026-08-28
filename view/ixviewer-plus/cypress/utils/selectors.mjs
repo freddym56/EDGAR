@@ -137,6 +137,10 @@ export const selectors = {
     factSidebar: 'div[id="facts-menu"]',
     factInFactBrowser: 'a[data-id^="fact-identifier-"]',
 
+    factSidebarListDisplay: 'div[id="facts-menu"][data-fact-menu-display="fact-list-display"]',
+    factSidebarDetailDisplay: 'div[id="facts-menu"][data-fact-menu-display="fact-detail-display"]',
+    factSidebarSplitDisplay: 'div[id="facts-menu"][data-fact-menu-display="fact-split-display"]',
+
     factMenu: 'div#facts-menu',
 
     factModal: 'div#fact-modal',
@@ -149,8 +153,10 @@ export const selectors = {
     factModalClose: 'i#fact-modal-close',
     factExpandMoreLess: 'a[data-cy="factExpandMoreLess"]',
 
-    factListDisplayBtn: 'div#fact-display-nav button#fact-list-display-btn',
-    factDetailDisplayBtn: 'div#fact-display-nav button#fact-detail-display-btn',
+    factListDisplayBtn: '#fact-list-display-btn',
+    factDetailDisplayBtn: '#fact-detail-display-btn',
+
+    labelsHeader: '#labelsHeader',
 
     factValueInModal: '#fact-details-attributes > tbody > tr:nth-child(2) > td > div',
     modalFootnoteVal: '[data-cy="Footnote-value"]',

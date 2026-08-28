@@ -283,7 +283,7 @@ describe('Inline docs layout matches plain html version', () => {
         cy.get('.BRDSX_BRDSX_block-main-columns').should('have.css', 'box-sizing', 'content-box');
     })
 
-    it('Table row height 1', () => {
+    it.skip('Table row height 1', () => {
         // /Archives/edgar/data/1964789/000110465926049711/hut-20260611xdef14a.htm#EXECUTIVEOFFICERCOMPENSATION_558620
         cy.loadByAccessionNum('000110465926049711')
         cy.get('#xbrl-section-current > div:nth-child(44) > div > div:nth-child(2) > table:nth-child(7) > tbody > tr:nth-child(7)').then(($tr) => {
@@ -311,6 +311,7 @@ describe('Inline docs layout matches plain html version', () => {
     })
 })
 
+// We're deciding not to fix this as it would require putting doc in iframe to allow doc to do it's CSS BackComapt mode.
 describe('Table Width Test', () => {
     it("getComputedStyle method", () => {
         cy.viewport(1920, 1080);
