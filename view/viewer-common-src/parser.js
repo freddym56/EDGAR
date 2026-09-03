@@ -38,7 +38,7 @@ export async function parseFilingSummary(xmlInput, log_debug) {
     // --- Case 1: XML string ---
     if (looksLikeXml) {
       // Lazy-load fast-xml-parser only when needed
-      const parser = new XMLParser({ ignoreAttributes: false, attributeNamePrefix: '' });
+      const parser = new XMLParser({ ignoreAttributes: false, attributeNamePrefix: '', attributesGroupName: '_attributes', textNodeName: '_text' });
       filingSummary = parser.parse(s);
 
     // --- Case 2: JSON string ---

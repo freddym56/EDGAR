@@ -7,8 +7,7 @@
 // Use .js file suffix for sec-gov and m365.cloud.microsoft/chat acceptability
 // provide ts-check compatibility for ixviewer shared use
 
-// report/instance mapping; matches Python behavior. [2](https://secoit.sharepoint.com/teams/EBOEDGARPIPlanning/_layouts/15/Doc.aspx?sourcedoc=%7B892721AB-7D41-4643-BD94-B591E1AEC1C3%7D&file=EER-817%20Sync%20Perl-Generated%20Menu%20and%20IXViewer%20Menu.docx&action=default&mobileredirect=true&DefaultItemOpen=1)
-// import { escapeHtml } from './sanitize.js';
+// report/instance mapping; matches Python behavior.
 import { escapeHtml } from './sanitize.js';
 import { normalizeCategory } from './category-normalizer.js';
 
@@ -31,19 +30,6 @@ import { normalizeCategory } from './category-normalizer.js';
 
 /** @typedef {Record<string, InstancesReportsEntry>} InstancesReports */
 
-// Robustly unwrap values that can be strings or objects with _text or attributes
-const toText = (v) => {
-  if (v == null) return '';
-  if (typeof v === 'string') return v;
-  // Common XML-to-JSON shapes: {_text: "..."}, {"#text": "..."}, and { _attributes: { ... } }
-  if (typeof v === 'object') {
-    if (typeof v._text === 'string') return v._text.trim().toLowerCase();
-    if (typeof v['#text'] === 'string') return v['#text'].trim().toLowerCase();
-    if (v._attributes && typeof v._attributes._text === 'string') return v._attributes._text.trim().toLowerCase();
-  }
-  return String(v).trim().toLowerCase();
-};
-
 /**
  * Map FilingSummary.xml into instances + reports with flags & normalized categories.
  *
@@ -53,8 +39,8 @@ const toText = (v) => {
  *   instancesReports: InstancesReports,
  *   original: string,
  *   doctype: string,
- *   inputFiles: Array<string>,
  *   log: Array<{type:string,text:string}>,
+ *   inputFiles: Array<string>,
  *   majorversion?: string,
  *   nreports?: number,
  *   nbooks?: number
@@ -79,16 +65,15 @@ export function mapReports(filingSummary, log_debug = () => {}) {
     "doctype": "",
     "log": fsLog
   };
-  
+
   // Collect reports per instance
   const reports = [];
   const reportsHaveInstanceAttr = reportNodes.some(report => !!report?._attributes?.instance);
-  const firstInst = (reportsHaveInstanceAttr) 
-    ? null // first file for old FilingSummary.xml
-    : inputFiles.find(f => /\.xml$/i.test(f) && !/(pre|cal|def|lab|ref)\.xml$/i.test(f));
+  const firstInst = (reportsHaveInstanceAttr) ? null : // first file for old FilingSummary.xml
+    inputFiles.find(f => /\.xml$/i.test(f) && !/(pre|cal|def|lab|ref)\.xml$/i.test(f));
   let position = 1;
   for (const report of reportNodes) {
-    const instance = report?.instance ?? firstInst ?? "N/A";
+    const instance = report?._attributes?.instance ?? firstInst ?? "N/A";
     if (instance) {
       instancesReports[instance] ??= { reports: [] };
       instancesReports[instance].reports.push(report);
@@ -103,14 +88,12 @@ export function mapReports(filingSummary, log_debug = () => {}) {
   /** @type {Record<string, any>} */
   const fileMap = {};
   for (const f of inputFiles) {
-    // const original = f?._attributes?.original;
-    const original = f?.original;
+    const original = f?._attributes?.original;
     if (original && instancesReports[original]) {
       fileMap[original] = f;
       const ir = instancesReports[original];
       ir.original = original;
-      // if (f?._attributes?.doctype) ir.doctype = f._attributes.doctype;
-      if (f?.doctype) ir.doctype = f.doctype;
+      if (f?._attributes?.doctype) ir.doctype = f._attributes.doctype;
       setFlags(ir, f);
     }
   }
@@ -141,14 +124,7 @@ export function mapReports(filingSummary, log_debug = () => {}) {
     const ir = instancesReports[key];
     let priorMenuCat = null;
     for (const r of ir.reports) {
-      r.normalizedCategory = priorMenuCat = normalizeCategory(
-        r?.MenuCategory,
-        r?.LongName,
-        r?.Role,
-        ir?.hasStmt,
-        ir, 
-        priorMenuCat
-      );
+      r.normalizedCategory = priorMenuCat = normalizeCategory(r?.MenuCategory, r?.LongName, r?.Role, ir?.hasStmt, ir, priorMenuCat);
     }
   }
 
@@ -261,7 +237,7 @@ export function extractReportsAndMenuCats(fsParsed) {
   *   • This function must remain environment‑agnostic (Node/Web/Worker).
   *   • All rendering concerns belong to renderAccordionMenu().
   */
-  
+
   const allReports = [];
   const inlineUrlDoctypes = new Map(); 
   const rfvMenu = fsParsed.rfvMenu = []; 

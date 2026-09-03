@@ -2,7 +2,7 @@
 // Data and content created by government employees within the scope of their employment
 // are not subject to domestic copyright protection. 17 U.S.C. 105.
 
-// FilingSummary.xml parser; matches Python behavior. [2](https://secoit.sharepoint.com/teams/EBOEDGARPIPlanning/_layouts/15/Doc.aspx?sourcedoc=%7B892721AB-7D41-4643-BD94-B591E1AEC1C3%7D&file=EER-817%20Sync%20Perl-Generated%20Menu%20and%20IXViewer%20Menu.docx&action=default&mobileredirect=true&DefaultItemOpen=1)
+// FilingSummary.xml parser; matches Python behavior.
 
 import { XMLParser } from 'fast-xml-parser';  // static import
 
@@ -38,7 +38,7 @@ export async function parseFilingSummary(xmlInput, log_debug) {
     // --- Case 1: XML string ---
     if (looksLikeXml) {
       // Lazy-load fast-xml-parser only when needed
-      const parser = new XMLParser({ ignoreAttributes: false, attributeNamePrefix: '' });
+      const parser = new XMLParser({ ignoreAttributes: false, attributeNamePrefix: '', attributesGroupName: '_attributes', textNodeName: '_text' });
       filingSummary = parser.parse(s);
 
     // --- Case 2: JSON string ---

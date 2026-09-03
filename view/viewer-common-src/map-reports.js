@@ -40,6 +40,7 @@ import { normalizeCategory } from './category-normalizer.js';
  *   original: string,
  *   doctype: string,
  *   log: Array<{type:string,text:string}>,
+ *   inputFiles: Array<string>,
  *   majorversion?: string,
  *   nreports?: number,
  *   nbooks?: number
@@ -132,6 +133,7 @@ export function mapReports(filingSummary, log_debug = () => {}) {
   mappedFilingSummary.majorversion = verText.split('.')[0];
   mappedFilingSummary.nreports = reports.length;
   mappedFilingSummary.nbooks = reports.filter(r => r?.ReportType === 'Book').length;
+  mappedFilingSummary.inputFiles = inputFiles;
 
   // Log - flatten logs into single array of log entries
   if (typeof process === 'undefined' || !process.env.BLOCK_LOGS) { // process uninitialized for tranform PythonMonkey executions
