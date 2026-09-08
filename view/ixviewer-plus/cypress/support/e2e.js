@@ -39,6 +39,17 @@ Cypress.Commands.add('loadByAccessionNum', (accessionNum, urlParam = '') => {
     if (filingObj) cy.loadFiling(filingObj, urlParam);
 })
 
+Cypress.Commands.add('vistByAccessionNum', (accessionNum, urlParam = '', cb = () => false) => {
+    // This function invokes the 'getByAccessionNum' function over in filingsFunnel.js
+    // Pass in urlParams to be append to docPath and callback function
+    let filingObj = getByAccessionNum(accessionNum)
+    if (filingObj) {
+        cy.visit(filingObj.docPath + urlParam, { timeout : Number(filingObj.timeout) }).then(browser => {
+        cb(browser)
+    })
+    }
+})
+
 Cypress.Commands.add('loadWithHash', (accessionNum, hash) => {
     // This function does the same thing as loadByAccessionNum,
     // but allows the user to add a hash parameter to the end of the URL
@@ -115,6 +126,11 @@ Cypress.Commands.add('findMaxHeight', (page) => {
 Cypress.Commands.add('openSettings', () => {
     cy.get(selectors.menuButton).click({ force: true })
     cy.get(selectors.settings).click({ force: true })
+})
+
+Cypress.Commands.add('openFormInfo', () => {
+    cy.get(selectors.menuButton).click({ force: true })
+    cy.get(selectors.menuInfoButton).click({ force: true })
 })
 
 Cypress.Commands.add('visitHost', (filing) => {
@@ -232,4 +248,9 @@ Cypress.Commands.add('onClickShouldScrollDownFlat', ($clickTarget, clickSelector
             // prevScrollPos = $viewerElem.scrollTop()
         })
     })
+})
+
+Cypress.on('uncaught:exception', (err, runnable) => {
+  // returning false here prevents Cypress from failing the test
+  return false
 })

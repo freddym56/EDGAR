@@ -56,13 +56,12 @@ describe(`Fact Continuation`, () => {
         cy.get('#fact-identifier-200', { timeout: Number(filing.timeout) }).click()
         cy.wait(500);
         cy.get('#fact-identifier-200')
-        cy.get('[id="fact-nested-modal-close"]').click();
         cy.get('#fact-identifier-200')
             .should('have.attr', 'selected-fact', 'true')
         cy.get("[continued-main-fact-id='fact-identifier-200']")
             .should('have.attr', 'selected-fact', 'true')
 
-        cy.get('#fact-identifier-199', { timeout: Number(filing.timeout) }).click()
+        cy.get('#fact-identifier-199', { timeout: Number(filing.timeout) }).click('top')
         cy.wait(500);
         cy.get('#fact-identifier-199').should('be.visible')
             .should('have.attr', 'selected-fact', 'true')
@@ -74,7 +73,6 @@ describe(`Fact Continuation`, () => {
         // clicked on continuation of fact 200 and expect all continied fact and main continued fact to be selected
         cy.get("[id='iinn_ScheduleOfFinancialLiabilities-c0_cont_3']", { timeout: Number(filing.timeout) }).click()
         cy.wait(500);
-        cy.get('[id="fact-nested-modal-close"]').click();
         cy.get('#fact-identifier-200')
             .should('have.attr', 'selected-fact', 'true')
         cy.get("[continued-main-fact-id='fact-identifier-200']")

@@ -6,7 +6,6 @@ import * as bootstrap from "bootstrap";
 import { Constants } from "../constants/constants";
 import { FactMap } from "../facts/map";
 import { ModalsCommon } from "../modals/common";
-import { ModalsNested } from "../modals/nested";
 
 import { FactsMenu } from "./menu";
 // import { FactsTable } from "./table";
@@ -16,12 +15,14 @@ import { ixScrollTo } from "../helpers/utils";
 import { actionKeyHandler } from "../helpers/utils";
 import { Search } from "../search/search";
 import { addToJsPerfTable } from "../helpers/ixPerformance";
+import { Pagination } from "../pagination/sideBarPagination";
+import { ModalsNested } from "../modals/nested";
 
 export const Facts = {
 	updateFactCounts: () => {
 		let factCount = FactMap.getFactCount();
 		Constants.factCount = factCount;
-		
+
 		// FactsTable.update();
 		const instanceFactCountElems = Array.from(document.querySelectorAll(".fact-total-count"));
 
@@ -77,7 +78,7 @@ export const Facts = {
 			let id = Constants.appWindow.location.hash;
 
 			const element = document.querySelector(id);
-			
+
 			if (element instanceof HTMLElement) {
 				Facts.clickEvent(event, element);
 				// element.scrollIntoView(false); // keeping as comment to remember alternative function
@@ -88,6 +89,14 @@ export const Facts = {
 
 	setInlineFactListeners(element: HTMLElement) {
 		element.addEventListener("click", (event: MouseEvent) => {
+			const parent = event.currentTarget.parentElement
+
+			if (parent?.children.length === 1 && parent.tagName.startsWith('ix:')) {
+				if (parent.textContent.trim() === event.currentTarget.textContent.trim()) {
+					return
+				}
+			}
+
 			event.stopPropagation();
 			event.preventDefault();
 			Search.closeSuggestions();
@@ -99,7 +108,16 @@ export const Facts = {
 		});
 
 		element.addEventListener("keyup", (event: KeyboardEvent) => {
+			const parent = event.currentTarget.parentElement
+
+			if (parent?.children.length === 1 && parent.tagName.startsWith('ix:')) {
+				if (parent.textContent.trim() === event.currentTarget.textContent.trim()) {
+					return
+				}
+			}
+
 			if (!actionKeyHandler(event)) return;
+
 			if (element instanceof HTMLElement) {
 				const id = element.hasAttribute('continued-main-fact-id') ? element.getAttribute('continued-main-fact-id') : element.getAttribute('id');
 				Facts.updateURLHash(id as string);
@@ -186,12 +204,12 @@ export const Facts = {
 										Facts.setInlineFactListeners(continuedFactElem);
 										continuedFactElem.setAttribute("continued-main-fact-id", mainID);
 										continuedFactElem.setAttribute("continued-fact", "true");
-										continuedFactElem.setAttribute("enabled-fact", `${fact.isEnabled}`);	
-										continuedFactElem.setAttribute("selected-fact", `${fact.isSelected}`);	
+										continuedFactElem.setAttribute("enabled-fact", `${fact.isEnabled}`);
+										continuedFactElem.setAttribute("selected-fact", `${fact.isSelected}`);
 										setDisplayAttribute(fact, continuedFactElem);
 										// continuedFactElem)?.setAttribute("text-block-fact", "true");
-														
-										continuedFactElem.setAttribute("highlight-fact", `${fact.isHighlight}`);						
+
+										continuedFactElem.setAttribute("highlight-fact", `${fact.isHighlight}`);
 										target.setAttribute('highlight-fact', `${fact.isHighlight}`);
 										fact.continuedIDs.push(continuedAtId);
 										if (continuedFactElem.hasAttribute("continuedat")) {
@@ -207,7 +225,7 @@ export const Facts = {
 				unobserveAfter ? observer.unobserve(target) : null;
 			});
 		}, {
-			root: document.getElementById('dynamic-xbrl-form'), 
+			root: document.getElementById('dynamic-xbrl-form'),
 			rootMargin: '200px',
 		});
 
@@ -218,7 +236,7 @@ export const Facts = {
 			observer.observe(inlineFact);
 		});
 
-		if (LOGPERFORMANCE || Constants.logPerfParam ) {
+		if (LOGPERFORMANCE || Constants.logPerfParam) {
 			const endPerformance = performance.now();
 			addToJsPerfTable('facts.inViewPort()', startPerformance, endPerformance);
 		}
@@ -261,8 +279,6 @@ export const Facts = {
 		if (event instanceof KeyboardEvent && !(event.key === 'Enter' || event.key === 'Space' || event.key === ' '))
 			return;
 
-		document.getElementById("fact-modal")?.classList.add("d-none");
-		document.getElementById("fact-nested-modal")?.classList.add("d-none");
 		const elementRecursion = (element: HTMLElement): { href: string, _target: string } | null => {
 			if (typeof element.hasAttribute == "function" && element.hasAttribute('href')) {
 				return {
@@ -288,11 +304,25 @@ export const Facts = {
 			if (id == null) return;
 			FactMap.setIsSelected(id as string);
 			// FactsUi.setIsSelected(id as string);
-			if (Facts.isElementNested(element)) {
-				ModalsNested.nestedClickEvent(event, element);
-			} else {
-				ModalsCommon.clickEvent(event, element);
-			}
+
+			
+			ModalsCommon.clickEvent(event, element);
+			
+			
+			// Treat Nested Facts as Facts unitl nested facts are handled in UI
+			// if (Facts.isElementNested(element)) {
+			// 	Facts.buildFactMenuDom(id)
+			// 	ModalsNested.nestedClickEvent(event, element);
+			// } else {
+			// 	ModalsCommon.clickEvent(event, element);
+			// }
+
+			// Pagination.goToFactInSidebar(event)
+			const showNotFoundError = document.getElementById('facts-menu')?.dataset.factMenuDisplay !== 'fact-list-display'
+			Pagination.findFactAndGoTo(id, showNotFoundError);
+
+			//
+			FactsMenu.updateFactMenuDisplay(event)
 		}
 	},
 
@@ -364,7 +394,7 @@ export const Facts = {
 		});
 	},
 
-	resetAllPopups: ():Promise<void> => {
+	resetAllPopups: (): Promise<void> => {
 		return new Promise((resolve) => {
 			const foundPopupClassesArray = Array.from(document.querySelectorAll(".popover"));
 			foundPopupClassesArray.forEach((current) => {
@@ -393,4 +423,49 @@ export const Facts = {
 			Constants.appWindow.location.hash = `#${factId}`;
 		}
 	},
+
+	updateFactMenuDisplay: (event: MouseEvent | KeyboardEvent) => {
+		if ("key" in event && !(event.key === "Enter" || event.key === "Space" || event.key === " ")) {
+			return;
+		}
+		const element = event.target as HTMLElement;
+		const menuElement = element?.closest('.offcanvas-body') as HTMLElement | null;
+
+		if (!menuElement) return;
+
+		const ulElement = event.currentTarget as HTMLElement
+		ulElement.querySelectorAll('li a').forEach(link => {
+			link.removeAttribute('aria-current')
+		})
+
+
+		element.setAttribute('aria-current', 'page')
+
+		const isExpandDetailsBtn = element.id === 'fact-detail-display-btn';
+		const isExpandListBtn = element.id === 'fact-list-display-btn';
+
+		let newState = 'default'
+
+		if (isExpandDetailsBtn) {
+			newState = 'fact-detail-display'
+		} else if (isExpandListBtn) {
+			newState = 'fact-list-display'
+		}
+
+		menuElement.dataset.factMenuDisplay = newState;
+	},
+
+	buildFactMenuDom: (id: string) => {
+		const factInfo = FactMap.getByID(id);
+
+		if (factInfo === null) {
+			const htmlString = `<div style="text-align: center; width: 100%;">No Reports Data</div>`;
+			const parser = new DOMParser();
+			const doc = parser.parseFromString(htmlString, 'text/html')
+			const elem = doc.querySelector('body > div') as HTMLElement
+			document.getElementById("fact-detail-acc")?.appendChild(elem);
+		}
+
+		return 1
+	}
 };

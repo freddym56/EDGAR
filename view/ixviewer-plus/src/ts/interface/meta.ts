@@ -19,18 +19,6 @@ export interface Section {
     order: number,
     position: number | undefined,
     inlineFactSelector: string,
-    firstAnchor: {
-        contextRef: string,
-        name: string,
-        baseRef: string,
-        ancestors: string[],
-    },
-    uniqueAnchor: {
-        contextRef: string,
-        name: string,
-        baseRef: string,
-        ancestors: string[],
-    },
     instanceHtm: string,
     instanceDocName: string,
     instanceIndex: number,
@@ -42,6 +30,20 @@ export interface Section {
     instanceSectionBodyId: string,
     menuCatHeaderId: string,
     menuCatBodyId: string,
+    meta: {
+        firstAnchor: {
+            contextRef: string,
+            name: string,
+            baseRef: string,
+            ancestors: string[],
+        },
+        uniqueAnchor: {
+            contextRef: string,
+            name: string,
+            baseRef: string,
+            ancestors: string[],
+        },
+    }
 }
 
 export interface SectionFact {

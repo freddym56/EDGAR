@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FilingSummary>
+  <Version>2.25</Version>
+  <MyReports>
+    <Report instance="report1.htm">
+      <ShortName>Balance Sheet</ShortName>
+      <LongName>Company - Statement - Balance Sheet</LongName>
+      <ReportType>Report</ReportType>
+      <Role>http://fasb.org/us-gaap/2024/role/link</Role>
+      <XmlFileName>report1.xml</XmlFileName>
+      <HtmlFileName>report1.htm</HtmlFileName>
+      <doctype>10-K</doctype>
+    </Report>
+    <Report instance="report2.xhtml">
+      <ShortName>Risk/Return Summary</ShortName>
+      <LongName>Fund - Disclosure - Summary Prospectus</LongName>
+      <MenuCategory>Risk/Return</MenuCategory>
+      <ReportType>Report</ReportType>
+      <Role>http://xbrl.sec.gov/rr/2024/role/link</Role>
+      <XmlFileName>report2.xml</XmlFileName>
+      <HtmlFileName>report2.xhtml</HtmlFileName>
+      <doctype>N-1A</doctype>
+    </Report>
+  </MyReports>
+  <InputFiles>
+    <File original="report1.htm" isRR="false" isOEF="false" isN2Prospectus="false" isVip="false"
+          isFeeExhibit="false" isNcsr="false" isProxy="false" isN1a="false" isSdr="false"
+          isOnlyShr="false" isRxp="false" isUsgaap="true" isIfrs="false" isOnlyDei="false"
+          isDefinitelyFs="true"/>
+    <File original="report2.xhtml" isRR="true" isOEF="false" isN2Prospectus="false" isVip="false"
+          isFeeExhibit="false" isNcsr="false" isProxy="false" isN1a="true" isSdr="false"
+          isOnlyShr="false" isRxp="false" isUsgaap="false" isIfrs="false" isOnlyDei="false"
+          isDefinitelyFs="false"/>
+  </InputFiles>
+</FilingSummary>
+

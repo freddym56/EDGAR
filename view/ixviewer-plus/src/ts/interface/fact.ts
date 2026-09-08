@@ -37,7 +37,7 @@ export interface SingleFact {
     unitRef?: string;
     measure?: string;
     balance?: Balance;
-    segment?: Array<SegmentClass[] | SegmentClass>;
+    segment?: SegmentArray;
     isContinued: boolean;
     continuedIDs: Array<string>;
     filterContent: {
@@ -163,3 +163,5 @@ export interface SegmentClass {
     member: null; // value
     memberLabel?: string;
 }
+
+export type SegmentArray = Array<SegmentClass[] | SegmentClass>

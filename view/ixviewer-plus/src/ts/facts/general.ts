@@ -10,8 +10,8 @@ import { ConstantsFunctions } from "../constants/functions";
 import { Pagination } from "../pagination/sideBarPagination";
 import { Constants } from "../constants/constants";
 import { Facts } from "../facts/facts";
-import { Search } from "../search/search";
 import { formatFactValue } from  "../modals/fact-pages";
+import { SegmentArray } from "../interface/fact"
 
 export const FactsGeneral = {
 	getElementByNameContextref: (name: string, contextref: string) => {
@@ -71,7 +71,7 @@ export const FactsGeneral = {
 		const aElement = document.createElement('a');
 		aElement.setAttribute(
 			'class',
-			'text-body sidebar-fact ix-focus-inset border-bottom click text-decoration-none click list-group-item list-group-item-action p-1'
+			'text-body sidebar-fact ix-focus-inset border-bottom click text-decoration-none click list-group-item list-group-item-action p-1 ps-3'
 		);
 		if (hidden) {
 			aElement.classList.add('d-none');
@@ -82,14 +82,6 @@ export const FactsGeneral = {
 			aElement.setAttribute('data-href', factInfo?.file || "");
 		}
 		aElement.setAttribute('tabindex', '13');
-
-		aElement.addEventListener('click', (e) => {
-			FactsGeneral.goToInlineFact(e, aElement);
-			Search.closeSuggestions();
-		});
-		aElement.addEventListener('keyup', (e) => {
-			FactsGeneral.goToInlineFact(e, aElement);
-		});
 
 		const conceptWrapper = document.createElement('div');
 		conceptWrapper.setAttribute('class', 'd-flex w-100 justify-content-between');
@@ -103,9 +95,14 @@ export const FactsGeneral = {
 		conceptWrapper.appendChild(conceptElem);
 		conceptWrapper.appendChild(badge);
 
+		const factWrapper = document.createElement('div');
+		factWrapper.setAttribute('class', 'd-flex w-100');
+
 		const factValElem = document.createElement('p');
 		factValElem.setAttribute('class', 'mb-0');
 		factValElem.setAttribute('data-cy', 'factVal');
+
+		
 
 	
 		let factValue = factInfo?.value ?? '';
@@ -118,6 +115,20 @@ export const FactsGeneral = {
 		const p3Text = factInfo?.isHTML || factInfo?.isContinued ? 'Click to see Fact.' : factValue;
 		const pElement3Content = document.createTextNode(p3Text);
 		factValElem.appendChild(pElement3Content);
+
+		const factDetailButton = document.createElement('button')
+		factDetailButton.setAttribute('class', 'fact-details-btn');
+		
+		const factDetailIcon = document.createElement('i')
+		factDetailIcon.setAttribute('class', 'fas fa-info-circle detail-icon');
+
+		factDetailButton.appendChild(factDetailIcon);
+		
+		factWrapper.appendChild(factValElem);
+		factWrapper.appendChild(factDetailButton);
+
+		const container = document.createElement('div')
+		container.setAttribute('class', 'd-flex justify-content-between');
 
 		const periodElem = document.createElement('p');
 		periodElem.setAttribute('class', 'mb-0 lighter-text');
@@ -134,22 +145,23 @@ export const FactsGeneral = {
 		docNameElem.appendChild(docNameText);
 
 		aElement.appendChild(conceptWrapper);
-		aElement.appendChild(factValElem);
-		aElement.appendChild(periodElem);
-		aElement.appendChild(docNameElem);
+		aElement.appendChild(factWrapper);
+		container.appendChild(periodElem);
+		container.appendChild(docNameElem);
+		aElement.appendChild(container);
 		factElem.appendChild(aElement);
 
 		return factElem;
 	},
 
-	getFactBadge: (factInfo: any) => {
-		const dimensions = factInfo.segment?.some((element: any) => element.dimension);
+	getFactBadge: (factInfo: any) => { 
+		const hasDimensions = FactsGeneral.segmentHasProp(factInfo.segment, 'dimension');
 
 		const spanElement = document.createElement('span');
 		const nestedSpanElement = document.createElement('span');
 
-		const title = `${factInfo.isAdditional ? ' Additional' : ''}${factInfo.isCustom ? ' Custom' : ''}${dimensions ? ' Dimension' : ''}`.trim();
-		const label = `${factInfo.isAdditional ? ' A' : ''}${factInfo.isCustom ? ' C' : ''}${dimensions ? ' D' : ''}`.trim();
+		const title = `${factInfo.isAdditional ? ' Additional' : ''}${factInfo.isCustom ? ' Custom' : ''}${hasDimensions ? ' Dimension' : ''}`.trim();
+		const label = `${factInfo.isAdditional ? ' A' : ''}${factInfo.isCustom ? ' C' : ''}${hasDimensions ? ' D' : ''}`.trim();
 		nestedSpanElement.setAttribute('title', title.split(' ').join(' & '));
 		nestedSpanElement.setAttribute('class', 'mx-1 my-0 badge text-bg-dark');
 
@@ -164,5 +176,14 @@ export const FactsGeneral = {
 	{
 		return [...unsortedArray].sort((a, b) => +a.isAdditional - +b.isAdditional)
 			.map(({ id }) => id);
+	},
+
+	// possibly refactor to more gerenal helper - depending if nested array's object property check are used else where 
+	segmentHasProp: (segment: SegmentArray, prop: string): boolean => {
+		if(Array.isArray(segment)) return segment.some(s => FactsGeneral.segmentHasProp(s as SegmentArray, prop));
+		if(segment && typeof segment === 'object') {
+			return prop in segment;
+		} 
+		return false
 	}
 };

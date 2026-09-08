@@ -59,7 +59,8 @@ export function fixLinks(doc = document): void {
                 // }
 
                 // works but doesn't work with back / forward
-                linkElem.addEventListener('click', () => {
+                linkElem.addEventListener('click', (e) => {
+                    e.stopPropagation()
                     HelpersUrl.updateAppWindowHash(href);
                 })
             }

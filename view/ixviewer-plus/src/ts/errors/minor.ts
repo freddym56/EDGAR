@@ -20,7 +20,6 @@ export const ErrorsMinor = {
 		instanceHeader.appendChild(closeBtn);
 		document.getElementById('error-container')?.appendChild(instanceHeader);
 
-		Errors.updateMainContainerHeight();
 	},
 
 	factNotFound: () => {
@@ -39,7 +38,6 @@ export const ErrorsMinor = {
 		instanceHeader.appendChild(closeBtn);
 		document.getElementById('error-container')?.appendChild(instanceHeader);
 
-		Errors.updateMainContainerHeight();
 	},
 
 
@@ -47,7 +45,7 @@ export const ErrorsMinor = {
 		console.log('factNotInSearch')
 		const content = 
 			`<div class="alert-height alert alert-warning show mb-0">
-				Fact not found in current search and filter results.
+				Selected fact does not appear in current search and filter results.
 			</div>`;
 
 		const parser = new DOMParser();
@@ -59,7 +57,6 @@ export const ErrorsMinor = {
 		document.getElementById('error-container')?.appendChild(instanceHeader);
 
 
-		Errors.updateMainContainerHeight();
 	},
 
 	message: (input: string) => {
@@ -76,6 +73,5 @@ export const ErrorsMinor = {
 		instanceHeader.appendChild(closeBtn);
 		document.getElementById('error-container')?.appendChild(instanceHeader);
 		
-		Errors.updateMainContainerHeight();
 	},
 };

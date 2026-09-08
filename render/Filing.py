@@ -376,6 +376,12 @@ class Filing(object):
             facts = list(self.unusedFactSet)
 
         else:
+            # clear fact.inCubes from any prior Filing.mainFun call on this modelXbrl.
+            # Not clearing them could cause RemoveStuntedCashFlowColumns to treat facts as appearing in other reports.
+            for fact in self.modelXbrl.facts:
+                if hasattr(fact, 'inCubes'):
+                    fact.inCubes.clear()
+
             # build cubes
             for linkroleUri in self.modelXbrl.relationshipSet(arelle.XbrlConst.parentChild).linkRoleUris:
                 cube = Cube.Cube(self, linkroleUri)

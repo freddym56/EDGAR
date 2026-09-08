@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<Erxl xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="77" xsi:noNamespaceSchemaLocation="erxl.xsd">
+<Erxl xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="78" xsi:noNamespaceSchemaLocation="erxl.xsd">
     <!-- 
 This file was created by staff of the U.S. Securities and Exchange Commission.
 Data and content created by government employees within the scope of their employment
@@ -273,6 +273,67 @@ are not subject to domestic copyright protection. 17 U.S.C. 105.
         <FileTypeName>Entry Point</FileTypeName>
         <Elements>0</Elements>
         <Namespace>http://xbrl.sec.gov/fnd-uit/2026</Namespace>
+        <Prefix>fnd-uit</Prefix>
+    </Loc>
+    <!-- FND 2026q3 -->
+    <Loc>
+        <Family>FND</Family>
+        <Version>2026q3</Version>
+        <Href>https://xbrl.sec.gov/fnd/2026q3/fnd-2026q3.xsd</Href>
+        <AttType>SCH</AttType>
+        <FileTypeName>Schema</FileTypeName>
+        <Elements>1</Elements>
+        <Namespace>http://xbrl.sec.gov/fnd/2026q3</Namespace>
+        <Prefix>fnd</Prefix>
+    </Loc>
+    <Loc>
+        <Family>FND</Family>
+        <Version>2026q3</Version>
+        <Href>https://xbrl.sec.gov/fnd/2026q3/fnd-2026q3_lab.xsd</Href>
+        <AttType>SCH</AttType>
+        <FileTypeName>Entry Point</FileTypeName>
+        <Elements>0</Elements>
+        <Namespace>http://xbrl.sec.gov/fnd-lab/2026q3</Namespace>
+        <Prefix>fnd-lab</Prefix>
+    </Loc>
+    <Loc>
+        <Family>FND</Family>
+        <Version>2026q3</Version>
+        <Href>https://xbrl.sec.gov/fnd/2026q3/fnd-cef-2026q3.xsd</Href>
+        <AttType>SCH</AttType>
+        <FileTypeName>Entry Point</FileTypeName>
+        <Elements>0</Elements>
+        <Namespace>http://xbrl.sec.gov/fnd-cef/2026q3</Namespace>
+        <Prefix>fnd-cef</Prefix>
+    </Loc>
+    <Loc>
+        <Family>FND</Family>
+        <Version>2026q3</Version>
+        <Href>https://xbrl.sec.gov/fnd/2026q3/fnd-cef-2026q3_pre.xsd</Href>
+        <AttType>SCH</AttType>
+        <FileTypeName>Entry Point</FileTypeName>
+        <Elements>0</Elements>
+        <Namespace>http://xbrl.sec.gov/fnd-cef-pre/2026q3</Namespace>
+        <Prefix>fnd-cef-pre</Prefix>
+    </Loc>
+    <Loc>
+        <Family>FND</Family>
+        <Version>2026q3</Version>
+        <Href>https://xbrl.sec.gov/fnd/2026q3/fnd-oef-2026q3.xsd</Href>
+        <AttType>SCH</AttType>
+        <FileTypeName>Entry Point</FileTypeName>
+        <Elements>0</Elements>
+        <Namespace>http://xbrl.sec.gov/fnd-oef/2026q3</Namespace>
+        <Prefix>fnd-oef</Prefix>
+    </Loc>
+    <Loc>
+        <Family>FND</Family>
+        <Version>2026q3</Version>
+        <Href>https://xbrl.sec.gov/fnd/2026q3/fnd-uit-2026q3.xsd</Href>
+        <AttType>SCH</AttType>
+        <FileTypeName>Entry Point</FileTypeName>
+        <Elements>0</Elements>
+        <Namespace>http://xbrl.sec.gov/fnd-uit/2026q3</Namespace>
         <Prefix>fnd-uit</Prefix>
     </Loc>
     <!-- NAICS 2026 -->

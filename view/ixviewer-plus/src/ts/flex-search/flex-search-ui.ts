@@ -1,12 +1,15 @@
 import { Facts } from "../facts/facts";
 import { UserFiltersDropdown } from "../user-filters/dropdown";
 import { FactMap } from "../facts/map";
+import { FactsMenu } from "../facts/menu";
 
 export const searchUiUpdate = (searchResults = null) => {
     FactMap.setHighlightedFacts(searchResults);
     Facts.inViewPort(true); // to hightlight only facts that match current search
     Facts.updateFactCounts();
     hideSearchingHourglass();
+
+    FactsMenu.updateFactMenuState('fact-list-display', false); 
 }
 
 export const filtersUiUpdate = () => {

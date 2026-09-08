@@ -38,21 +38,27 @@ export const ConstantsFunctions = {
 		window.parent.document.title = `${viewType}: ${name} ${form} ${date}`;
 	},
 
-	emptyHTMLByID: (id: string) =>
-	{
+	emptyHTMLByID: (id: string) => {
 		ConstantsFunctions.emptyHTML(`#${id}`);
 	},
-	
-	emptyHTML: (selector: string) =>
-	{
+
+	emptyHTML: (selector: string) => {
 		const element = document.querySelector(selector);
-		if (element)
-		{
-			while (element.firstChild)
-			{
+		if (element) {
+			while (element.firstChild) {
 				element.firstChild?.remove();
 			}
 		}
+	},
+
+	ixSaniParse: (htmlString: string) => {
+		// must me valid html
+		// e.g. passing a <td> elem without table will result in <td> being omitted
+		const saniString = DOMPurify.sanitize(htmlString);
+		const parser = new DOMParser();
+		const doc = parser.parseFromString(saniString, 'text/html');
+		const dom = doc.body.firstElementChild as HTMLElement;
+		return dom;
 	},
 
 	setInstanceFiles: (input: InstanceFile[]) => {
@@ -71,15 +77,32 @@ export const ConstantsFunctions = {
 		Constants.getFormInformation = input
 	},
 
-	getFactLabel: (labels: Array<{ Label?: string | null}>): string => {
+	getFactLabel: (labels: Array<{ Label?: string | null }>): string => {
 		const label = labels.find((e): e is { Label: string } => !!e.Label);
 		return label ? label.Label : 'Not Available.';
+	},
+	getHiddenElementHeight: (element: HTMLElement) => {
+		const clone = element.cloneNode(true) as HTMLElement;
+		const rect = element.getBoundingClientRect();
+
+		Object.assign(clone.style, {
+			visibility: "hidden",
+			position: "absolute",
+			display: "block",
+			width: rect.width + "px",
+			top: "-9999px",
+		});
+
+		document.body.appendChild(clone);
+		const height = clone.offsetHeight;
+		clone.remove();
+		return height;
 	},
 
 	getCollapseToFactValue: () => {
 		const factValueModals = Array.from(document.querySelectorAll('.fact-value-modal'));
 		factValueModals.forEach((current) => {
-			if ((current as HTMLElement)?.offsetHeight && (current as HTMLElement)?.offsetHeight as number > 33 && current.parentNode?.parentNode?.querySelector('.fact-collapse')) {
+			if (ConstantsFunctions.getHiddenElementHeight(current as HTMLElement) > 33 && current.parentNode?.parentNode?.querySelector('.fact-collapse')) {
 
 				const a = document.createElement('a');
 				a.classList.add('ms-1')
@@ -97,15 +120,15 @@ export const ConstantsFunctions = {
 		});
 	},
 
-	changeInstance: (instanceIndex: number, targetInstanceFile: string | null, onBack = false):Promise<boolean> => {
+	changeInstance: (instanceIndex: number, targetInstanceFile: string | null, onBack = false): Promise<boolean> => {
 		return new Promise<boolean>((resolve) => {
 			Modals.close(new Event(''));
 
 			Constants.getInstances.forEach((instanceFile) => {
-				instanceFile.current = instanceFile.instance === instanceIndex ? true : false;
+				instanceFile.current = instanceFile.instanceIndex === instanceIndex ? true : false;
 				instanceFile.docs.forEach((doc, index) => {
 					if (targetInstanceFile) {
-						if (instanceFile.instance === instanceIndex && targetInstanceFile === doc.slug) {
+						if (instanceFile.instanceIndex === instanceIndex && targetInstanceFile === doc.slug) {
 							doc.current = true;
 						} else {
 							doc.current = false;
@@ -115,7 +138,7 @@ export const ConstantsFunctions = {
 					}
 				});
 			});
-
+			
 			const needToLoadInstance = Constants.getInstances[instanceIndex].docs.some(element => !element.loaded);
 			if (needToLoadInstance) {
 				// not loaded, go get the requested instance
@@ -142,7 +165,7 @@ export const ConstantsFunctions = {
 						console.error('Failed to Re-Load Instance.')
 						resolve(false);
 					}
-				}) 
+				})
 			}
 		})
 	},
@@ -337,7 +360,7 @@ export const ConstantsFunctions = {
 		const enabledFactsArray = FactsGeneral.specialSort(enabledFacts);
 		Pagination.init(
 			enabledFactsArray,
-			('#facts-menu-list-pagination .pagination'),
+			('#fact-list .pagination'),
 			('#facts-menu-list-pagination .list-group'),
 			true
 		);
@@ -345,5 +368,13 @@ export const ConstantsFunctions = {
 			('.paginationprevnext'),
 			('#facts-menu-list-pagination .list-group'),
 			true);
+	},
+	
+	getSelectedFactId: () => {
+		if(Constants.appWindow.location.hash.startsWith('#fact-identifier')) {
+			let id = Constants.appWindow.location.hash;
+			id = id.startsWith('#') ? id.slice(1) : id;
+			return id
+		}
 	}
 }

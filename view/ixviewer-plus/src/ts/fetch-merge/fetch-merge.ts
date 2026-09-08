@@ -12,7 +12,11 @@ import { InstanceFile, MetaLinks, MetaLinksResponse, XhtmlFileMeta } from '../in
 import { Calculation, Meta, Section } from '../interface/meta';
 import { UrlParams } from '../interface/url-params';
 import { XhtmlPrepData, XhtmlPrepper } from './prepare-inline-doc';
-import { buildSectionsArrayFlatter, fetchJson, fetchText, setScaleInfo } from './merge-data-utils';
+import { fetchJson, fetchText, setScaleInfo, enrichWithMetalinks } from './merge-data-utils';
+
+// common code with rfileviewer for Arelle GUI, SECWS and sec.gov
+import { extractReportsAndMenuCats, mapReports } from '../helpers/common-node-js/map-reports.js'
+import { parseFilingSummary } from "../helpers/common-node-js/parser.js";
 
 /* Created by staff of the U.S. Securities and Exchange Commission.
  * Data and content created by government employees within the scope of their employment
@@ -136,7 +140,7 @@ export class FetchAndMerge {
             //track which HTML slugs we've seen already
             const instanceHtmSlugs = new Set<string>();  // stored in filing summary as foo.htm
             filingSummaryReports.forEach((r) => {
-                const reportInstanceHtmSlug = r._attributes?.instance;
+                const reportInstanceHtmSlug = r?._attributes?.instance;
                 if (reportInstanceHtmSlug && !instanceHtmSlugs.has(reportInstanceHtmSlug)) {
                     instanceHtmSlugs.add(reportInstanceHtmSlug);
 
@@ -164,7 +168,13 @@ export class FetchAndMerge {
                 getInstanceXmlUrlFromFilingSummary(summ, meta.instances);
                 
                 // iterate over FilingSummary.xml Reports to build sections, adding data from metalinks
-                this.sections = buildSectionsArrayFlatter(summ, Object.values(meta.sections), this.metaVersion || "");
+                const mappedFsReports = mapReports({ FilingSummary: summ }, console.debug);
+                
+                const filingSummaryInputFiles = mappedFsReports.inputFiles;
+                const fsReportsData = extractReportsAndMenuCats(mappedFsReports);
+                
+                this.sections = enrichWithMetalinks(fsReportsData, Object.values(meta.sections), filingSummaryInputFiles);
+
                 this.setSectionGroupType(this.sections);
 
                 metalinks = meta;
@@ -281,7 +291,7 @@ export class FetchAndMerge {
         const promises = this.activeInstance?.docs?.map((doc: { url: string }) => {
             return new Promise<{ xhtml: string } | ErrorResponse>((resolve) => {
 
-                const isWorkstation = doc.url.includes("DisplayDocument.do?");
+                const isWorkstation = doc.url.includes("DisplayDocument.do");
 
                 let ixvUrl = doc.url;
                 if (isWorkstation) {
@@ -321,7 +331,7 @@ export class FetchAndMerge {
         return new Promise<(MetaLinks & { instances: InstanceFile[] }) | ErrorResponse>((resolve) => {
             let jsonUrl = this.params.metalinks;
             //TODO: use `HelpersUrl.isWorkstation` instead
-            const isWorkstation = jsonUrl.includes("DisplayDocument.do?");
+            const isWorkstation = jsonUrl.includes("DisplayDocument.do");
             if (isWorkstation) {
                 if (Object.prototype.hasOwnProperty.call(this.params, 'redline') && this.params.redline) {
                     jsonUrl = jsonUrl.replace('MetaLinks.json', 'PrivateMetaLinks.json');
@@ -332,7 +342,8 @@ export class FetchAndMerge {
                 .then((mlData: MetaLinksResponse) => {
                     let XHTMLSlug = this.params.doc.substring(this.params.doc.lastIndexOf('/') + 1);
                     if (XHTMLSlug.startsWith("DisplayDocument.do") || XHTMLSlug.startsWith("view.html")) {
-                        XHTMLSlug = this.params.doc.substring(this.params.doc.lastIndexOf('filename=') + 9);
+                        // strip &filename parameter up to next parameter or end
+                        XHTMLSlug = (XHTMLSlug.match(/filename=([^&]*)/)||[])[1] || '';
                     }
 
                     const instanceFileNames = Object.keys(mlData.instance).join().split(/[ ,]+/);
@@ -340,13 +351,21 @@ export class FetchAndMerge {
                     if (instanceFileNames.includes(XHTMLSlug)) {
                         const instanceObjects: InstanceFile[] = Object.entries(mlData.instance).map(([currentInstance, instData], instanceIndex) => {
                             // Sections
-                            //TODO: combine these using `Object.entries`
-                            Object.keys(instData.report).forEach((report) => {
-                                instData.report[report].instanceIndex = instanceIndex; // why?
-                            });
-                            Object.values(instData.report).forEach(report => {
+                            const keys = Object.keys(instData.report)
+                            const len = keys.length
+
+                            for(let i = 0; i< len; i++) {
+                                const report = instData.report[keys[i]]
+
+                                report.instanceIndex = instanceIndex;
                                 report.instanceHtm = currentInstance;
-                            });
+
+                                // Below checks for baseRef. If Merge conflict, keep these two linse in report iteration
+                                // Remove these comments after Merge
+                                report.firstAnchor && (report.firstAnchor.baseRef ??= currentInstance);
+                                report.uniqueAnchor && (report.uniqueAnchor.baseRef ??= currentInstance);
+                            }
+
 
                             //NOTE: `sections` get reassigned at every step of this loop, is unused in the rest of the logic
                             //  per loop step, and gets returned (the last value to which it's assigned) once the loop ends
@@ -369,7 +388,7 @@ export class FetchAndMerge {
 
                             const instFile: InstanceFile = {
                                 current: currentInstance.split(' ').includes(XHTMLSlug),
-                                instance: instanceIndex, // Why?
+                                instanceIndex: instanceIndex, // Why?
                                 map: new Map<string, SingleFact>(),
                                 metaInstance: Object.assign(instData),
                                 instanceHtm: currentInstance,
@@ -383,34 +402,43 @@ export class FetchAndMerge {
                         });
 
                         const [instance] = instanceObjects.filter(({ current }) => current);
-                        const meta: MetaLinks = { ...mlData, instance, sections, version: mlData.version, meta: {} as Meta, inlineFiles: [] };
+                        const meta: MetaLinks = {
+                            ...mlData,
+                            instance,
+                            sections,
+                            version: mlData.version,
+                            meta: {} as Meta,
+                            inlineFiles: []
+                        };
                         resolve(Object.assign(meta, { instances: instanceObjects }));
                     } else {
                         // this may occur when transferring a filing from one domain to another.  Not sure how to fix...
                         if (!PRODUCTION) {
                             console.log('instanceFileNames does not include XHTMLSlug. fetch-merge > fetchMeta())')
                         }
-                        throw new Error('Incorrect MetaLinks.json Instance');
+                        throw new Error(`The document "${XHTMLSlug}" was not found in MetaLinks.json. Available documents: ${instanceFileNames.join(', ')}.`);
                     }
                 })
-                .catch((error) => resolve({ error: true, messages: [`${error}; could not find "${this.params.metalinks}"`] }));
+                .catch((error) => resolve({ error: true, messages: [`${error.message}`] }));
         });
     }
 
     private fetchSummary(): Promise<FilingSummary | ErrorResponse> {
         let filingSummXmlUrl = this.params.summary;
 
-        //TODO: use the new `isWorkstation` func in HelpersUrl instead
-        const isWorkstation = filingSummXmlUrl.includes("DisplayDocument.do?");
+        const isWorkstation = filingSummXmlUrl.includes("DisplayDocument.do");
         if (isWorkstation && this.params.redline) {
             filingSummXmlUrl = filingSummXmlUrl.replace('FilingSummary.xml', 'PrivateFilingSummary.xml');
         }
 
         return fetchText(filingSummXmlUrl, { credentials: 'include', mode: 'same-origin' })
-            .then((data) => {
-                const xmlData = this.decodeWorkstationXmlInHtml(isWorkstation, data, "</FilingSummary>");
-                const convertedXml = convert.xml2json(xmlData, { compact: true });
-                return JSON.parse(convertedXml).FilingSummary as FilingSummary;
+            .then(async (data) => {
+                const xmlData = isWorkstation
+                    ? this.decodeWorkstationXmlInHtml(isWorkstation, data, "</FilingSummary>")
+                    : data;
+            
+                const nodeParsedXml = await parseFilingSummary(xmlData);
+                return nodeParsedXml.FilingSummary as FilingSummary;
             })
             .catch((error) => {
                 return ({ error: true, messages: [`${error}; could not find "${this.params.summary}"`] })
@@ -421,7 +449,7 @@ export class FetchAndMerge {
         let xmlUrl = this.activeInstance?.xmlUrl;
         if (!xmlUrl) return Promise.reject({ error: true, messages: ["Issue fetching XML URLs"] });
         
-        const isWorkstation = xmlUrl.includes("DisplayDocument.do?");
+        const isWorkstation = xmlUrl.includes("DisplayDocument.do");
         if (isWorkstation) {
             // If methods from HelpersUrl are used here some very strange bugs occur, such as window and localStorage undefined.
             if (Object.prototype.hasOwnProperty.call(this.params, 'redline') && this.params.redline) {

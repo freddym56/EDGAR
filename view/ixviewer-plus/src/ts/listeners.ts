@@ -2,9 +2,11 @@
  * Data and content created by government employees within the scope of their employment
  * are not subject to domestic copyright protection. 17 U.S.C. 105.
  */
+import * as bootstrap from "bootstrap";
 
 import { FactsChart } from "./facts/chart";
 import { FactsMenu } from "./facts/menu";
+import { FactsGeneral } from "./facts/general";
 import { FactsTable } from "./facts/table";
 import { FormInformation } from "./form-information/form-information";
 import { Modals } from "./modals/modals";
@@ -21,6 +23,7 @@ import { actionKeyHandler, stopPropPrevDefault } from "./helpers/utils";
 import { Constants } from "./constants/constants";
 import { ConstantsFunctions } from "./constants/functions";
 import { HelpersUrl } from "./helpers/url";
+import { attachSidebarRezier } from "./resizer/resizers"
 
 export class Listeners {
     constructor() {
@@ -49,7 +52,7 @@ export class Listeners {
                     return inst.docs.find(doc => doc.slug === targetDoc);
                 })
                 if (instanceToChangeTo) {
-                    ConstantsFunctions.changeInstance(instanceToChangeTo.instance, targetDoc, true);
+                    ConstantsFunctions.changeInstance(instanceToChangeTo.instanceIndex, targetDoc, true);
                 }
             }
         });
@@ -69,12 +72,12 @@ export class Listeners {
             FormInformation.init();
         });
 
-        document.getElementById('menu-dropdown-settings')?.addEventListener('click', (event: MouseEvent) => {
-            ModalsSettings.clickEvent(event);
+        document.getElementById('menu-dropdown-settings')?.addEventListener('click', () => {
+            ModalsSettings.clickEvent();
         });
         document.getElementById('menu-dropdown-settings')?.addEventListener('keyup', (event: KeyboardEvent) => {
             if (!actionKeyHandler(event)) return;
-            ModalsSettings.clickEvent(event);
+            ModalsSettings.clickEvent();
         });
 
         document.getElementById('nav-filter-more')?.addEventListener('click', () => {
@@ -103,25 +106,25 @@ export class Listeners {
                 UserFiltersMoreFiltersBalances.clickEvent(event, 'credit');
             }
         });
-        
+
 
         // Array includes: form-information-instance, form-information-zip, form-information-zip, form-information-help, form-information-html
         const links = [...document.querySelectorAll(`a[id*="form-information-"]`)];
         links.forEach(link => {
             link.addEventListener('keyup', (event) => {
                 if (event instanceof KeyboardEvent && (event.key === 'Enter' || event.key === 'Space' || event.key === ' ')) {
-                    const id= link.getAttribute('id');
+                    const id = link.getAttribute('id');
                     document.getElementById(id as string)?.click();
                 }
             });
         });
         //#facts-menu-button          
         document.getElementById('facts-menu-button')?.addEventListener("keyup", (event: KeyboardEvent) => {
-            if (event instanceof KeyboardEvent && (event.key === 'Enter' || event.key === 'Space' || event.key === ' ')){
+            if (event instanceof KeyboardEvent && (event.key === 'Enter' || event.key === 'Space' || event.key === ' ')) {
                 event.preventDefault();
                 document.getElementById('facts-menu-button')?.click();
             }
-        });  
+        });
 
         document.getElementById("current-filters-reset-all")?.addEventListener("click", () => {
             UserFiltersDropdown.resetAll();
@@ -145,14 +148,81 @@ export class Listeners {
         document.getElementById('nav-filter-tags-dropdown')?.addEventListener('change', (event) => {
             UserFiltersTagsRadios.clickEvent(event);
         });
+        
+        // Fact Menu 
+        document.getElementById('fact-display-nav')?.addEventListener('click', (event: MouseEvent) => {
+            FactsMenu.updateFactMenuDisplay(event);
+        });
+        document.getElementById('fact-display-nav')?.addEventListener('keyup', (event: KeyboardEvent) => {
+            if (!actionKeyHandler(event)) return;
+            FactsMenu.updateFactMenuDisplay(event);
+        });
+        
+        document.getElementById('fact-details-panel-toolbar')?.addEventListener("click", (event: MouseEvent) => {
+            FactsMenu.updateFactDetailDisplay(event);
+        });
+        
+        document.getElementById('fact-details-panel-toolbar')?.addEventListener("keyup", (event: KeyboardEvent) => {
+            if (!actionKeyHandler(event)) return;
+            FactsMenu.updateFactDetailDisplay(event);
+        });
+
+        // Suggestion List Item handlers
+        const handleSuggestionsClick = (event: MouseEvent) => {
+            const aElement = event.target instanceof HTMLElement ? event.target?.closest('a.sidebar-fact') : null
+            if (aElement) {
+                FactsGeneral.goToInlineFact(event, aElement as HTMLElement);
+                Search.closeSuggestions();
+                
+                if(!aElement.closest('.fact-list-wrapper')) {     
+                    FactsMenu.updateFactMenuState('fact-detail-display');
+                }
+            }
+
+            if(event.target?.closest('.detail-icon')) {
+                FactsMenu.updateFactMenuDisplay(event)
+            }
+        }
+
+        const handleSuggestionsKey = (event: KeyboardEvent) => {
+            const aElement = event.target instanceof HTMLElement ? event.target?.closest('a.sidebar-fact') : null
+            if (aElement) {
+                FactsGeneral.goToInlineFact(event, aElement as HTMLElement);
+            }
+        }
+
+        document.getElementById('suggestions')?.addEventListener("click", handleSuggestionsClick)
+        document.getElementById('suggestions')?.addEventListener("keyup", handleSuggestionsKey)
+        document.getElementById('facts-menu-list-pagination')?.addEventListener("click", handleSuggestionsClick)
+        document.getElementById('facts-menu-list-pagination')?.addEventListener("keyup", handleSuggestionsKey)
 
         // when clicking outside of search suggestions, make sure suggestions div disappears
         // Need to handle doc, inline facts, and fact list elems, as the latter click events aren't propagating to doc.
         document?.addEventListener('click', (event) => {
-            if (event.target?.id !== "global-search") {
+            if (event.target instanceof HTMLElement && event.target?.id !== "global-search" && event.target?.id !== 'moreFactsBtn') {
                 ConstantsFunctions.emptyHTMLByID('suggestions');
             }
-        })
+
+            const openDropdowns = document.querySelectorAll('.dropdown-menu.show')
+
+            openDropdowns.forEach((dropdown) => {
+                const dropdownComponent = dropdown.closest('.dropdown')
+
+                if (dropdownComponent) {
+                    if (event.target instanceof Node && !dropdownComponent.contains(event.target)) {
+                        const dropdownBtn = dropdownComponent.querySelector('[data-bs-toggle="dropdown"]')
+
+                        if (dropdownBtn) {
+                            const bsDropdown = bootstrap.Dropdown.getOrCreateInstance(dropdownBtn)
+                            bsDropdown.hide()
+                        }
+                    }
+                }
+            })
+
+        }, true)
+
+
 
         document.getElementById('sections-menu-search-submit')?.addEventListener('submit', (event) => {
             event.preventDefault();
@@ -198,11 +268,11 @@ export class Listeners {
                 Search.clear();
             }
         });
-        
+
         const searchOptions = document.querySelectorAll('input[name="search-options"], #searchOptionsContainer label');
         searchOptions.forEach(opt => {
             opt.addEventListener('keyup', (event) => {
-                const keyEvent = <KeyboardEvent> event;
+                const keyEvent = <KeyboardEvent>event;
                 if (keyEvent.key == 'Space' || keyEvent.key == ' ') {
                     let search = document.getElementById('global-search') as HTMLInputElement;
                     let searchText = search?.value;
@@ -226,11 +296,18 @@ export class Listeners {
             });
         })
 
+        // Resizer listeners 
+        attachSidebarRezier(document.getElementById('facts-menu'), {growRight: false})
+        attachSidebarRezier(document.getElementById('sections-menu'))
+        attachSidebarRezier(document.getElementById('help-menu'))
+
+
+
         // Custom handler to allow up down arrow keys to navigate search options
         const searchCheckboxes = document.querySelectorAll('#global-search-options, input[name="search-options"]');
         searchCheckboxes.forEach((checkbox, index) => {
             checkbox.addEventListener('keyup', (event) => {
-                const keyEvent = <KeyboardEvent> event;
+                const keyEvent = <KeyboardEvent>event;
                 if (keyEvent.key == 'ArrowUp') {
                     if (index === 0) {
                         (searchCheckboxes[searchCheckboxes.length - 1] as HTMLElement)?.focus();
@@ -262,12 +339,16 @@ export class Listeners {
             ModalsSettings.scrollPosition(event);
         });
 
+        document.getElementById('open-sidebar-option-select')?.addEventListener("change", (event: Event) => {
+            ModalsSettings.openSidebarOption(event);
+        });
+
         document.getElementById('fact-copy-content-close')?.addEventListener('click', (event: MouseEvent) => {
-            Modals.copyContent(event, 'fact-modal-carousel', 'fact-copy-content');
+            Modals.copyContent(event, 'fact-details-panel', 'fact-copy-content');
         });
 
         document.getElementById('fact-copy-content-close')?.addEventListener('keyup', (event: KeyboardEvent) => {
-            Modals.copyContent(event, 'fact-modal-carousel', 'fact-copy-content');
+            Modals.copyContent(event, 'fact-details-panel', 'fact-copy-content');
         });
 
         document.getElementById('fact-nested-copy-content')?.addEventListener('click', (event: MouseEvent) => {
@@ -280,7 +361,30 @@ export class Listeners {
         // scroll-position-select
         // scrollPosition
 
+        document.getElementById('fact-modal-copy-content')?.addEventListener('click', (event: MouseEvent) => {
+			Modals.copyContent(event, 'fact-details-panel', 'fact-copy-content');
+		});
+		document.getElementById('fact-modal-copy-content')?.addEventListener('keyup', (event: KeyboardEvent) => {
+			if (!actionKeyHandler(event)) return;
+			Modals.copyContent(event, 'fact-details-panel', 'fact-copy-content');
+		});
+
         const closeOtherSideBars = (barToOpenId: string) => {
+            if (!Constants.openSidebarOption) {
+                // These Checks need to be combine to make more general
+                if (barToOpenId === 'help-menu') {
+                    const settingSidebar = document.getElementById('sections-menu');
+                    settingSidebar?.classList?.remove('show');
+                }
+
+                if (barToOpenId === 'sections-menu') {
+                    const settingSidebar = document.getElementById('help-menu');
+                    settingSidebar?.classList?.remove('show');
+                }
+
+                return
+            }
+            
             const sidebars = document.getElementsByClassName('sidebar');
             for (const elem in sidebars) {
                 const sidebarElem = sidebars[elem]
@@ -297,7 +401,7 @@ export class Listeners {
         helpMenu?.addEventListener('show.bs.collapse', (event: Event) => {
             closeOtherSideBars(event!.target!.id)
         })
-        
+
         // help sidebar section - prevent propagation
         const helpSidebarCollapsableSections = document.querySelectorAll('#help-sections .collapse');
         helpSidebarCollapsableSections?.forEach(helpSection => {
@@ -341,7 +445,7 @@ export class Listeners {
 export const addVArrowNav = (navigableElems: NodeListOf<Element>) => {
     navigableElems.forEach((elem, index) => {
         elem.addEventListener('keyup', (event) => {
-            const keyEvent = <KeyboardEvent> event;
+            const keyEvent = <KeyboardEvent>event;
             if (keyEvent.key == 'ArrowUp') {
                 if (index === 0) {
                     (navigableElems[navigableElems.length - 1] as HTMLElement)?.focus();

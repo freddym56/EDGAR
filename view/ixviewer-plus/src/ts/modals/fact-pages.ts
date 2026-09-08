@@ -7,6 +7,7 @@ import { fixImages } from "../app/app-helper";
 import { ConstantsFunctions } from "../constants/functions";
 import { xmlToDom } from "../helpers/utils";
 import { LabelEnum, SegmentClass, SingleFact } from "../interface/fact";
+import DOMPurify from "dompurify";
 
 const formatSegment = (segment: string) => {
 	if (segment) {
@@ -327,8 +328,8 @@ export const FactPages = {
 
 				const tdElement = document.createElement("td");
 				const divElement = document.createElement("div");
-				const divContent = document.createTextNode((current as any)[property]);
-				divElement.appendChild(divContent);
+				divElement.classList.add("break-word");
+				divElement.innerHTML = DOMPurify.sanitize((current as any)[property]);
 				tdElement.appendChild(divElement);
 
 				trElement.appendChild(thElement);
@@ -361,6 +362,7 @@ export const FactPages = {
 							const smallContent = document.createTextNode(' (Will Leave SEC Website)');
 							small.appendChild(smallContent);
 							const thContent = document.createTextNode(`${key}`);
+							
 							thElement.appendChild(thContent);
 							thElement.appendChild(small);
 						} else {
@@ -368,9 +370,11 @@ export const FactPages = {
 							thElement.appendChild(thContent);
 						}
 
+						
 						const tdElement = document.createElement("td");
-
+						
 						const divElement = document.createElement("div");
+						divElement.classList.add("break-word")
 
 						if (val === 'URI') {
 							const aTag = document.createElement('a');
@@ -471,3 +475,11 @@ export const FactPages = {
 
 
 };
+
+
+
+// Possible handling of nested facts
+// "Disclosure of geographical areas [text block]"
+// 	"Nested Fact 3 Name (level 1)"
+// 		"Nested Fact 1 Name (level 2)"
+		

@@ -1,8 +1,8 @@
 export const selectors = {
 
+    factMenuBtn: '[data-cy="facts-menu-button"]',
     xbrlForm: 'div[id="dynamic-xbrl-form"]',
     webpackOverlay: "webpack-dev-server-client-overlay-div",
-
     factCountBadge: 'a[id="facts-menu-button"] span.fact-total-count',
     docTab0: 'a[data-cy="inlineDocTab-0"]',
     docTab1: 'a[data-cy="inlineDocTab-1"]',
@@ -22,7 +22,12 @@ export const selectors = {
     menuHelp: 'a[id="form-information-help"]',
     menuVersion: 'span[id="form-information-version"]',
 
+    formInformationClose: 'i[id="form-information-modal-close"]',
+    formInformationDrag: 'i[id="form-information-modal-drag"]',
+
     infoModal: 'tbody[id="form-information-modal-carousel-page-1"]',
+    formInfoModal : 'div#form-information-modal',
+    settingsModal : 'div#settings-modal',
 
     taggedSections: '#tagged-sections',
     sectionsHeader: 'button[id="sections-dropdown-link"]',
@@ -31,7 +36,7 @@ export const selectors = {
     sectionActive: 'div.section-active',
     sectionHeaderActive: 'div[id^="sectionDoc-"].section-active button[data-cy*="instance-header"]',
     sectionSidebarBody: 'div[id^=instance-body-sectionDoc-]',
-    sectionsLinks: '.section-link',
+    sectionsLinks: 'a.section-link',
     getNthSection: (n) => {
         return `div[id="tagged-sections"] > div:nth-child(${n})`;
     },
@@ -45,7 +50,9 @@ export const selectors = {
 
     settings: 'a[data-test="menu-dropdown-settings"]',
     hoverForQuickInfoSelect: 'select[id="hover-option-select"]',
+    openSidebarOptionSelect: 'select[id="open-sidebar-option-select"]',
     settingsClose: 'i[id="settings-modal-close"]',
+    settingsDrag: 'i[id="settings-modal-drag"]',
 
     helpLink: 'a[id="form-information-help"]',
     gettingStarted: 'button[data-bs-target="#help-getting-started"]',
@@ -130,9 +137,15 @@ export const selectors = {
     factSidebar: 'div[id="facts-menu"]',
     factInFactBrowser: 'a[data-id^="fact-identifier-"]',
 
+    factSidebarListDisplay: 'div[id="facts-menu"][data-fact-menu-display="fact-list-display"]',
+    factSidebarDetailDisplay: 'div[id="facts-menu"][data-fact-menu-display="fact-detail-display"]',
+    factSidebarSplitDisplay: 'div[id="facts-menu"][data-fact-menu-display="fact-split-display"]',
+
+    factMenu: 'div#facts-menu',
+
     factModal: 'div#fact-modal',
     factModalDrag: '#fact-modal-drag',
-    factModalToggleCopyContent: 'i[id="fact-modal-copy-content"]',
+    factModalToggleCopyContent: 'button[id="fact-modal-copy-content"]',
     factModalExpand: 'i#fact-modal-expand',
     factModalCopyableContent: 'div#fact-copy-content',
     factModalCopyableContentEXP: 'textarea#fact-copy-content-textarea',
@@ -140,39 +153,43 @@ export const selectors = {
     factModalClose: 'i#fact-modal-close',
     factExpandMoreLess: 'a[data-cy="factExpandMoreLess"]',
 
-    factValueInModal: '#fact-modal-carousel-page-1 > tbody > tr:nth-child(2) > td > div',
+    factListDisplayBtn: '#fact-list-display-btn',
+    factDetailDisplayBtn: '#fact-detail-display-btn',
+
+    labelsHeader: '#labelsHeader',
+
+    factValueInModal: '#fact-details-attributes > tbody > tr:nth-child(2) > td > div',
     modalFootnoteVal: '[data-cy="Footnote-value"]',
 
-    factModalCarouselPrevArrow: 'div#fact-modal div.dialog-footer button[data-test="modal-fact-prev"]',
-    factModalCarouselNextArrow: 'div#fact-modal div.dialog-footer button[data-test="modal-fact-next"]',
+    factModalCarouselPrevArrow: 'div#facts-menu div.card-footer button[data-test="modal-fact-prev"]',
+    factModalCarouselNextArrow: 'div#facts-menu div.card-footer button[data-test="modal-fact-next"]',
     factModalCarouselPage1Btn: 'li[data-slide-to="0"]',
     factModalCarouselPage2Btn: 'li[data-slide-to="1"]',
     factModalCarouselPage3Btn: 'li[data-slide-to="2"]',
     factModalCarouselPage4Btn: 'li[data-slide-to="3"]',
-    factModalCarouselPage1: 'div#fact-modal-carousel > div.carousel-inner > div.carousel-item:nth-child(1)',
-    factModalCarouselPage2: 'div#fact-modal-carousel > div.carousel-inner > div.carousel-item:nth-child(2)',
-    factModalCarouselPage3: 'div#fact-modal-carousel > div.carousel-inner > div.carousel-item:nth-child(3)',
-    factModalCarouselPage4: 'div#fact-modal-carousel > div.carousel-inner > div.carousel-item:nth-child(4)',
+    factModalCarouselPage1: 'div#fact-details-panel > div.carousel-inner > div.carousel-item:nth-child(1)',
+    factModalCarouselPage2: 'div#fact-details-panel > div.carousel-inner > div.carousel-item:nth-child(2)',
+    factModalCarouselPage3: 'div#fact-details-panel > div.carousel-inner > div.carousel-item:nth-child(3)',
+    factModalCarouselPage4: 'div#fact-details-panel > div.carousel-inner > div.carousel-item:nth-child(4)',
     getCarouselPage: (ordinal) => `div.carousel-inner > div.carousel-item:nth-child(${ordinal})`,
 
     nestedFactModalCarouselPrevArrow: 'button[data-test="modal-fact-nested-prev"]',
     nestedFactModalCarouselNextArrow: 'button[data-test="modal-fact-nested-next"]',
     nestedFactModalClose: 'i#fact-nested-modal-close',
 
-    factModalJump: 'div.dialog-header-actions i[id="fact-modal-jump"]',
+    factModalJump: 'div.dialog-header-actions i[id="fact-panel-jump"]',
     factSidebarToggleBtn: '#facts-menu-button',
-    showFactInSidebar: 'div.dialog-header-actions i[id="fact-modal-jump"]',
-    factSidebar: 'div[id="facts-menu"]',
+    showFactInSidebar: 'div.dialog-header-actions i[id="fact-panel-jump"]',
     factSideBarClose: 'div#facts-menu div.offcanvas-header button.btn-close',
     prevFact: 'a[id="prevFact"]',
     nextFact: 'a[id="nextFact"]',
-    factModalSubtitle: 'p#fact-modal-subtitle',
+    factDetailLabel: 'p#fact-detail-label',
     sidebarPaginationInfo: 'div.pagination-info',
     sidebarPaginationSelect: 'select#facts-menu-page-select',
-    sidebarPaginationFirst: 'div#facts-menu-list-pagination nav ul.pagination li:nth-child(1)',
-    sidebarPaginationPrev: 'div#facts-menu-list-pagination nav ul.pagination li:nth-child(2)',
-    sidebarPaginationNext: 'div#facts-menu-list-pagination nav ul.pagination li:nth-child(3)',
-    sidebarPaginationLast: 'div#facts-menu-list-pagination nav ul.pagination li:nth-child(4)',
+    sidebarPaginationFirst: 'div#fact-list .pagination-wrapper nav ul.pagination li:nth-child(1)',
+    sidebarPaginationPrev: 'div#fact-list .pagination-wrapper nav ul.pagination li:nth-child(2)',
+    sidebarPaginationNext: 'div#fact-list .pagination-wrapper nav ul.pagination li:nth-child(3)',
+    sidebarPaginationLast: 'div#fact-list .pagination-wrapper nav ul.pagination li:nth-child(4)',
     sidebarFact: (id) => `div[id="facts-menu"] a[data-id="fact-identifier-${id}"]`,
     sidebarFactConcept: (id) => `div[id="facts-menu"] a[data-id="fact-identifier-${id}"] [data-cy=concept]`,
     sidebarFactBadge: (id) => `div[id="facts-menu"] a[data-id="fact-identifier-${id}"] [data-cy=badge]`,
@@ -188,8 +205,8 @@ export const selectors = {
 
     // inline doc pagination
     docPagination: '[data-cy="doc-pagination"]',
-    goToTopOfDoc: 'a#to-top-btn',
-    goToPrevInlinePage: 'a#to-prev-btn',
-    goToNextInlinePage: 'a#to-next-btn',
-    goToBtnOfDoc: 'a#to-bottom-btn',
+    goToTopOfDoc: '[data-cy="doc-pagination"] a#to-top-btn',
+    goToPrevInlinePage: '[data-cy="doc-pagination"] a#to-prev-btn',
+    goToNextInlinePage: '[data-cy="doc-pagination"] a#to-next-btn',
+    goToBtnOfDoc: '[data-cy="doc-pagination"] a#to-bottom-btn',
 }

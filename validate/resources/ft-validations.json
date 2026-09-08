@@ -541,7 +541,8 @@
             "SC TO",
             "SF-1",
             "SF-3",
-            "S-8"
+            "S-8",
+            "F-80"
         ],
         "table-3-1-map": {
             "424B1": [
@@ -6051,7 +6052,7 @@
             "store-db-name": "@lcName",
             "store-db-object": "offsetTable",
             "store-db-valid-values": [
-                "@table-3-1"
+                "@table-3-1-form-types"
             ],
             "comment-validation": "Required, if a Fee Offset Claimed or Fee Offset Source line is included.",
             "comment-exception-handling": "",

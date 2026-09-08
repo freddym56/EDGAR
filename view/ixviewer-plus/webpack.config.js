@@ -34,7 +34,7 @@ module.exports = (env = { copy: true, analyze: false }, argv = { mode: `producti
   console.log('env', env)
   return {
     mode: argv.mode,
-
+    target: ['web', 'es2020'],
     entry: { "ix-viewer" : "./src/ts/index.ts" },
 
     devServer: { devMiddleware: { writeToDisk: true } },
@@ -77,7 +77,7 @@ module.exports = (env = { copy: true, analyze: false }, argv = { mode: `producti
     ].filter(Boolean),
 
     output: {
-      clean: forProd,
+      clean: true, // automatically cleans the output directory (like dist/) before emitting new build files.
       filename:
         forProd
           ? `[name].bundle.[contenthash].min.js`
@@ -100,6 +100,7 @@ module.exports = (env = { copy: true, analyze: false }, argv = { mode: `producti
           options: {
             configFile: path.resolve(__dirname, `tsconfig.json`),
             transpileOnly: true,
+            compilerOptions: { sourceMap: true }
           },
           exclude: [
             path.resolve(__dirname, `../node_modules`),
@@ -165,7 +166,9 @@ module.exports = (env = { copy: true, analyze: false }, argv = { mode: `producti
     },
 
     // devtool: forProd ? `source-map` : `eval-source-map`,
-    devtool: forProd ? `source-map` : `eval-cheap-source-map`,
+    devtool: forProd ? `source-map` : `source-map`,
+    // eval-cheap-source-map doesn't work well when runtime error in web worker
+    // inline-source-map doesn't work well when runtime error in web worker, but it will open source in new tab
 
     devServer: {
       compress: false, // false helps with breakpoints

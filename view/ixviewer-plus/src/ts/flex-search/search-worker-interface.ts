@@ -9,7 +9,6 @@ import { Constants } from "../constants/constants";
 let worker: Worker;
 
 export const initSearch = (factMap: any) => {
-    console.log('initSearch')
     if (typeof window !== 'undefined' && window.Worker) {
         const searchStart = performance.now();
         worker = new Worker(
@@ -29,7 +28,7 @@ export const initSearch = (factMap: any) => {
                 if (e.data.type === 'initComplete') {
                     worker.removeEventListener('message', listener);
                     hideSearchingHourglass();
-                    if (LOGPERFORMANCE || Constants.logPerfParam ) {
+                    if (LOGPERFORMANCE || Constants.logPerfParam) {
                         const endPerformance = performance.now();
                         addToJsPerfTable('initSearch() complete', searchStart, endPerformance);
                     }
@@ -42,7 +41,7 @@ export const initSearch = (factMap: any) => {
     }
 }
 
-export const callSearch = (query: { value: string[]; options: any[]; }, suggest = false) => {
+export const callSearch = (query: { clauses: string[][]; options: any[]; }) => {
     return new Promise<void>((resolve) => {
         const listener = (e: MessageEvent) => {
             if (e.data.type === 'searchComplete') {
@@ -51,7 +50,7 @@ export const callSearch = (query: { value: string[]; options: any[]; }, suggest 
             }
         }
         worker.addEventListener('message', listener);
-        worker.postMessage({ type: 'search', data: { query, suggest } })
+        worker.postMessage({ type: 'search', data: { query } })
     })
 }
 

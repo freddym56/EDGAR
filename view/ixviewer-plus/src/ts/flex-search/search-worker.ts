@@ -10,16 +10,16 @@ self.onmessage = (e) => {
 
     if (type === 'init') {
         FlexSearch.init(data.factMap);
-        self.postMessage({type: 'initComplete'});
+        self.postMessage({ type: 'initComplete' });
     }
 
     if (type === 'search') {
-        const results = FlexSearch.searchFacts(data.query, data.suggest);
-        self.postMessage({type: 'searchComplete', results});
+        const results = FlexSearch.searchFacts(data.query);
+        self.postMessage({ type: 'searchComplete', results });
     }
 
     if (type === 'filter') {
         const filteredArray = FlexSearch.filterFacts(data.dataFields, data.filterState);
-        self.postMessage({type: 'filterComplete', filteredArray});
+        self.postMessage({ type: 'filterComplete', filteredArray });
     }
 }

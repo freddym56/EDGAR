@@ -50,10 +50,10 @@ export const Tabs = {
 					instanceFile.current ? a2.classList.add('active') : null;
 					const aText = document.createTextNode(labels.join(', '));
 					a2.addEventListener('click', (event: MouseEvent) => {
-						Tabs.clickEventInstance(event, instanceFile.instance);
+						Tabs.clickEventInstance(event, instanceFile.instanceIndex);
 					});
 					a2.addEventListener('keyup', (event: KeyboardEvent) => {
-						Tabs.clickEventInstance(event, instanceFile.instance);
+						Tabs.clickEventInstance(event, instanceFile.instanceIndex);
 					});
 					a2.append(aText);
 					li.append(a2);

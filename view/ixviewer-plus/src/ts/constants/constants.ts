@@ -12,7 +12,7 @@ import { Section } from "../interface/meta";
 type MetaDocument = any;
 
 export const Constants = {
-	version: "26.1",
+	version: "26.3",
 	featureSet: "plus",
 	appStart: 0,
 	loadPhaseComplete: 0,
@@ -57,6 +57,8 @@ export const Constants = {
 	scrollPosition: typeof window !== 'undefined' && window.localStorage.getItem("scrollPosition") || "start",
 
 	hoverOption: typeof window !== 'undefined' && window.localStorage.getItem("hoverOption") === "true" || false,
+
+	openSidebarOption: typeof window !== 'undefined' && (window.localStorage.getItem("openSidebarOption") ?? "true") ===  "true",
 
 	getHTMLAttributes: {} as Record<any, unknown>,
 

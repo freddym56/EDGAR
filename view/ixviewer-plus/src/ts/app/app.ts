@@ -19,6 +19,8 @@ import { addToJsPerfTable, timeUiCheckpoints } from "../helpers/ixPerformance";
 import { FactMap } from "../facts/map";
 import { XhtmlFileMeta } from "../interface/instance-file";
 
+import { initSearch } from "../flex-search/search-worker-interface";
+
 
 /* Created by staff of the U.S. Securities and Exchange Commission.
  * Data and content created by government employees within the scope of their employment
@@ -73,10 +75,12 @@ export const App = {
             return new Promise<boolean>((resolve) => {
                 if (typeof window !== 'undefined' && window.Worker) {
                     incrementProgress();
-                    const worker = new Worker(new URL('../workers/workers.ts', import.meta.url), { name: 'fetch-merge' });
+                    const worker = new Worker(new URL('../workers/workers.ts', import.meta.url), { name: 'fetch-merge', type: 'module' });
                     worker.postMessage(fetchAndMergeArgs);
-                    worker.onmessage = (event: MessageEvent<FMResponse>) => {
-                        if ("xhtml" in event.data) {
+                    worker.onmessage = (message: MessageEvent<FMResponse>) => {
+                        const {data} = message.data
+                        switch(message.data.type) {
+                            case "FETCH": {
                             // 1 hanlding return of fetchAndMerge.fetch()
                             // xhtml returned from .fetch()
                             const moduleStart = performance.now();
@@ -88,15 +92,15 @@ export const App = {
                             // Leave sidebars alone if this is not the initial load
                             if (!changeInstance) closeSidebars();
 
-                            Constants.isNcsr = event.data.isNcsr
-                            Constants.sumOfDocsSizes = event.data.sumOfDocsSizes
-                            progressiveLoadDoc(event.data.xhtml);
+                            Constants.isNcsr = data.isNcsr
+                            Constants.sumOfDocsSizes = data.sumOfDocsSizes
+                            progressiveLoadDoc(data.xhtml);
 
-                            if (Constants.sumOfDocsSizes > Constants.docSizeFallbackLimit && event.data.docs) {
+                            if (Constants.sumOfDocsSizes > Constants.docSizeFallbackLimit && data.docs) {
                                 console.warn(`Docs size of ${Constants.sumOfDocsSizes} exceeds limit of ${Constants.docSizeFallbackLimit}`)
                                 incrementProgress();
-                                ConstantsFunctions.setInlineFiles(event.data.docs);
-                                addAdditionalDocsToDom(event.data.docs);
+                                ConstantsFunctions.setInlineFiles(data.docs);
+                                addAdditionalDocsToDom(data.docs);
                                 Tabs.init(true);
                                 App.liteNavMode();
                                 incrementProgress(true);
@@ -114,43 +118,57 @@ export const App = {
                                 const modEnd = performance.now();
                                 addToJsPerfTable('Worker 1 - xhtml', moduleStart, modEnd)
                             }
-                        } else if ("facts" in event.data) {
+
+                                break;
+                            }
+                            case "FACTS": {
                             // 2 hanlding return of fetchAndMerge.facts()
                             // purpose: make facts get attributes like highlights during load
                             const moduleStart = performance.now();
-                            addAttributesToInlineFacts(event.data.facts);
+                            addAttributesToInlineFacts(data.facts);
                             incrementProgress(true);
 
                             if (LOGPERFORMANCE || Constants.logPerfParam ) {
                                 const workerStageDone = performance.now();
                                 addToJsPerfTable('Worker 2 - facts', moduleStart, workerStageDone);
                             }
-                        } else if ("all" in event.data) {
+                                break;
+                            }
+                            case "MERGE": {
                             // 3 handling fetchAndMerge.merge())
                             const moduleStart = performance.now();
                             worker.terminate();
 
-                            const instance = event.data.all.instance.find(i => i.current);
-                            const stdRef = !changeInstance ? event.data.all.std_ref : undefined;
-                            storeData(instance || null, event.data.all.sections, event.data.all.instance, stdRef);
+                            const instance = data.all.instance.find(i => i.current);
+                            const stdRef = !changeInstance ? data.all.std_ref : undefined;
+                            storeData(instance || null, data.all.sections, data.all.instance, stdRef);
                             handleFetchAndMerge(instance || null);
+
+                            initSearch(FactMap.map)
 
                             resolve(true);
                             if (LOGPERFORMANCE || Constants.logPerfParam ) {
                                 const workerStageDone = performance.now();
                                 addToJsPerfTable('Worker 3 - all', moduleStart, workerStageDone);
                             }
+                                break;
+                            }
+                            case "ERROR": {
+                                handleFetchError({ error: true, messages: [...data.all.messages] });
+                                hideLoadingUi();
+                                worker.terminate();
+                                resolve(false);
+                                break;
+                            }
+
+                            default: {
+                                handleFetchError({ error: true, messages: [DEFAULT_ERROR_MSG] });
+                                hideLoadingUi();
+                                worker.terminate();
+                                resolve(false);
+                            }
+                                
                         }
-                    };
-    
-                    worker.onerror = (errorEvent) => {
-                        const errLoc = `${errorEvent.filename} ${errorEvent.lineno}:${errorEvent.colno}`;
-                        console.error(errLoc, errorEvent.message);
-    
-                        handleFetchError({ error: true, messages: [DEFAULT_ERROR_MSG] });
-                        hideLoadingUi();
-                        worker.terminate();
-                        resolve(false);
                     };
                 }
             })
@@ -160,12 +178,12 @@ export const App = {
     /** perform all the steps run post-load, using data that's been loaded already */
     loadFromMemory(activeInstance: InstanceFile) {
         const xhtml = activeInstance.docs.filter(doc => doc.current)[0].xhtml;
-
         progressiveLoadDoc(xhtml);
         addAttributesToInlineFacts(activeInstance.map, true);
         storeData(activeInstance);
         handleFetchAndMerge(activeInstance);
         App.additionalSetup();
+        initSearch(FactMap.map)
     },
 
     initialSetup: () => {
@@ -286,6 +304,7 @@ function closeSidebars(): void {
     // The sidebars are open (but empty); close them so the XBRL doc content becomes visible
     document.getElementById('sections-menu')?.classList.remove('show');
     document.getElementById('facts-menu')?.classList.remove('show');
+    document.getElementById('help-menu')?.classList.remove('show');
 }
 
 function progressiveLoadDoc(xhtml: string): void {

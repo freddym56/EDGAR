@@ -253,13 +253,13 @@ class PresentationGroup(object):
         if depth <= len(visited):  # you can't go deeper than the number of unique relationships you've already visited.
             for childNode in node.childrenList:
                 if parentAxis is not None:  # collect more of this axis' descendants
-                    self.doPreorderTraversal(childNode, giveMemGetPositionDictPrimary, giveMemGetPositionDictAxis, parentAxis, setOfConcepts, visited, visitCounter, depth)
+                    self.doPreorderTraversal(childNode, giveMemGetPositionDictPrimary, giveMemGetPositionDictAxis, parentAxis, setOfConcepts, visited, visitCounter, depth + 1)
                 else:
-                    self.doPreorderTraversal(childNode, giveMemGetPositionDictPrimary, {}, parentAxis, setOfConcepts, visited, visitCounter, depth)
+                    self.doPreorderTraversal(childNode, giveMemGetPositionDictPrimary, {}, parentAxis, setOfConcepts, visited, visitCounter, depth + 1)
         else:
             self.filing.modelXbrl.debug("info",
-                                              ("Presentation group '%{linkRoleName} a an invalid directed cycle"),
-                                              linkrole=self.cube.linkroleUri)
+                                              ("Presentation group \"%(linkRoleName)s\" has an invalid directed cycle"),
+                                              linkRoleName=self.cube.linkroleUri)
 
         if nodeIsAnAxis:
             if concept.isTypedDimension:  # designate this as a typed dimension axis
