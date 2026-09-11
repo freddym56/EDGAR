@@ -1895,6 +1895,12 @@ def edgarRendererGuiRun(cntlr, modelXbrl, *args, **kwargs):
         isNonEFMorGFMinline = (not getattr(cntlr.modelManager.disclosureSystem, "EFMplugin", False) and
                                modelXbrl.modelDocument.type in (ModelDocument.Type.INLINEXBRL, ModelDocument.Type.INLINEXBRLDOCUMENTSET))
         showViewer = cntlr.showFilingData.get() or cntlr.showiXBRLViewer.get()
+        # an RSS feed scan validates many filings in batch: it only needs the EFM filing
+        # context for validation, never per-filing rendered output (which would also try to
+        # write to an uninitialized reports folder since processInstance is not run for it)
+        isRssFeed = modelXbrl.modelDocument.type == ModelDocument.Type.RSSFEED
+        if isRssFeed:
+            showViewer = False
         # may use GUI mode to process a single instance or test suite
         options = PythonUtil.attrdict(# simulate options that CntlrCmdLine provides
             configFile=os.path.join(os.path.dirname(__file__), 'conf', 'config_for_instance.xml'),
@@ -1940,11 +1946,12 @@ def edgarRendererGuiRun(cntlr, modelXbrl, *args, **kwargs):
             logFile=None,  # from cntlrCmdLine but need to simulate for GUI operation
             labelLang=cntlr.labelLang,  # emulate cmd line labelLang
             keepFilingOpen=True,  # closed by CntrlWinMain
-            iXBRLViewerStub=cntlr.showiXBRLViewer.get(),  # generates iXBRLViewerStub
+            iXBRLViewerStub=cntlr.showiXBRLViewer.get() and not isRssFeed,  # generates iXBRLViewerStub
             confidentialityDocList=parameters.get("confidentialityDocList", [None, None])[1],
         )
-        if modelXbrl.modelDocument.type in ModelDocument.Type.TESTCASETYPES:
-            modelXbrl.efmOptions = options  # save options in testcase's modelXbrl
+        if (modelXbrl.modelDocument.type in ModelDocument.Type.TESTCASETYPES
+                or modelXbrl.modelDocument.type == ModelDocument.Type.RSSFEED):
+            modelXbrl.efmOptions = options  # save options in testcase's or RSS feed's modelXbrl
         if modelXbrl.modelDocument.type not in (ModelDocument.Type.INLINEXBRL, ModelDocument.Type.INSTANCE, ModelDocument.Type.INLINEXBRLDOCUMENTSET):
             return
         reports = []

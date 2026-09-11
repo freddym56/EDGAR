@@ -597,7 +597,7 @@ def filingEnd(cntlr, options, filesource, entrypointFiles, sourceZipStream=None,
 
 def rssItemXbrlLoaded(modelXbrl, rssWatchOptions, rssItem, *args, **kwargs):
     # Validate of RSS feed item (simulates filing & cmd line load events
-    if not hasattr(rssItem.modelXbrl, "efmOptions"): # may have already been set by EdgarRenderer in gui startup
+    if not hasattr(rssItem.modelXbrl, "efmOptions") and rssWatchOptions: # may have already been set by EdgarRenderer in gui startup
         rssItem.modelXbrl.efmOptions = rssWatchOptions  # save options in rss's modelXbrl
     testcaseVariationXbrlLoaded(rssItem.modelXbrl, modelXbrl, None)
 
@@ -654,7 +654,7 @@ def testcaseVariationValidated(testcaseModelXbrl, instanceModelXbrl, errors=None
         if isinstance(errors, list):
             errors.extend(efmFiling.errors)
         # simulate filingEnd
-        filingEnd(modelManager.cntlr, efmFiling.options, modelManager.filesource, [])
+        filingEnd(modelManager.cntlr, efmFiling.options, efmFiling.filesource, [])
         # flush logfile (assumed to be buffered, empty the buffer for next filing)
         testcaseModelXbrl.modelManager.cntlr.logHandler.flush()
         xuleClose(modelManager.cntlr)

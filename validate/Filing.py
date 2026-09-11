@@ -186,10 +186,23 @@ def validateFiling(val, modelXbrl, isEFM=False, isGFM=False):
                         if not attachmentDocumentType: # infer attachmentDocumentType parameter from dei:DocumentType
                             attachmentDocumentType = docTypesAttachmentDocumentType.get(f.xValue, f.xValue)
                         if not hasSubmissionType: # infer submissionType parameter from dei:DocumentType
-                            # The primary document will be processed first and the efmSubmissionType
-                            # would have been set based on the primary document.
+                            # If this instance is a secondary report within the same filing, the
+                            # primary report is processed first and its efmSubmissionType can be
+                            # reused here. Scope the lookup to this filing's own reports
+                            # (efmFiling.reports) rather than modelManager.modelXbrl, which is a
+                            # single session-wide "most recently loaded" pointer - using it here
+                            # would leak the submissionType of an unrelated filing left open (or a
+                            # different RSS/testcase item) into this one.
                             # otherwise we fallback to docTypesSubType or the dei:DocumentType value
-                            submissionType = getattr(modelXbrl.modelManager.modelXbrl,'efmSubmissionType', docTypesSubType.get(f.xValue, f.xValue))
+                            primarySubmissionType = None
+                            efmFiling = getattr(modelXbrl.modelManager, "efmFiling", None)
+                            if efmFiling is not None:
+                                for report in efmFiling.reports:
+                                    if report.modelXbrl is not modelXbrl:
+                                        primarySubmissionType = getattr(report.modelXbrl, "efmSubmissionType", None)
+                                        if primarySubmissionType:
+                                            break
+                            submissionType = primarySubmissionType or docTypesSubType.get(f.xValue, f.xValue)
                         break
         matchResult = attachmentDocumentTypeReqSubDocTypePattern.match(attachmentDocumentType)
         if matchResult and "§" not in submissionType: # ensure we haven't already added it. eg. before revalidating
