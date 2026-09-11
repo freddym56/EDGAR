@@ -22,13 +22,19 @@ from metaAndSummary
 - this.activeInstance = metalinks.instance;
 */
 
-self.onmessage = ({ data }) => {
-    const fetchAndMerge = new FetchAndMerge(data);
-    fetchAndMerge.fetch()
-        .then((data) => self.postMessage(data))
-        .then(() => fetchAndMerge.facts())
-        .then((data) => self.postMessage(data))
-        .then(() => fetchAndMerge.merge())
-        .then((data) => self.postMessage(data))
-        .catch((e) => setTimeout(() => { throw new Error(JSON.stringify(e)) }));
+self.onmessage = async ({ data }) => {
+    try {
+        const fetchAndMerge = new FetchAndMerge(data);
+        const fetchData = await fetchAndMerge.fetch()
+        self.postMessage({type: "FETCH", data: fetchData})
+
+        const factsData = await fetchAndMerge.facts()
+        self.postMessage({type: "FACTS", data: factsData})
+
+        const mergeData = await fetchAndMerge.merge()
+        self.postMessage({type: "MERGE", data: mergeData})
+        
+    } catch (error) {        
+        self.postMessage({type: "ERROR", data: error})
+    }
 };

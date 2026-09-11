@@ -7,8 +7,8 @@ describe(`Fact Attrs: Sign`, () => {
         cy.get('a[data-cy="inlineDocTab-1"]').click()
         cy.get('#fact-identifier-112').click()
 
-        cy.get('#fact-modal-carousel-page-1 > tbody > tr:nth-child(8) > th').should('contain.text', 'Sign')
-        cy.get('#fact-modal-carousel-page-1 > tbody > tr:nth-child(8) > td > div').should('contain.text', 'Negative')
+        cy.get('#fact-details-attributes > tbody > tr:nth-child(8) > th').should('contain.text', 'Sign')
+        cy.get('#fact-details-attributes > tbody > tr:nth-child(8) > td > div').should('contain.text', 'Negative')
     })
 })
 
@@ -120,8 +120,8 @@ describe('Fact Attrs: Implicit Members', () => {
         // */
         cy.get('#fact-identifier-6').click();
 
-        // cy.get('#fact-modal-carousel-page-1 > tbody > tr:nth-child(6) > th').should('contain.text', 'Typed Member');
-        // cy.get('#fact-modal-carousel-page-1 > tbody > tr:nth-child(6) > td > div').should('contain.text', '2025-07-01');
+        // cy.get('#fact-details-attributes > tbody > tr:nth-child(6) > th').should('contain.text', 'Typed Member');
+        // cy.get('#fact-details-attributes > tbody > tr:nth-child(6) > td > div').should('contain.text', '2025-07-01');
         cy.get('[data-cy="Offering [Axis]"]').should('contain.text', 'Offering [Axis]');
         cy.get('[data-cy="Offering [Axis]-value"]').should('contain.text', '1');
     })
@@ -189,10 +189,10 @@ describe('Fact Attrs: More/Less Expansion', () => {
         cy.loadByAccessionNum('000121390021056659');
         cy.get(selectors.docTab1).click();
         cy.get('#fact-identifier-572').click();
+        cy.get(selectors.factDetailDisplayBtn).click()
         cy.get('[data-cy="Fact-value"]').invoke('height').should('be.lessThan', 50);
         cy.get(selectors.factExpandMoreLess).click();
         cy.get('[data-cy="Fact-value"]').invoke('height').should('be.greaterThan', 50);
-        cy.get(selectors.factModalClose).click();
     })
 })
 
@@ -221,5 +221,15 @@ describe('Member class should have all chars', () => {
         cy.get('th[data-cy="Class of Stock [Axis]"]').should('contain.text', 'Class of Stock [Axis]')
         cy.get('div[data-cy="Class of Stock [Axis]-value"]').should('contain.text', 'Units Each consisting of One Class A Ordinary Share [Member]')
 
+    })
+})
+
+describe('Label fields', () => {
+    it('should decode hmtl chars like &amp;', () => {
+        // /Archives/edgar/data/200406/000020040626000153/jnj-20260628.htm#fact-identifier-2253
+        cy.loadByAccessionNum('000020040626000153');
+        cy.get(selectors.factDetailDisplayBtn).click();
+        cy.get(selectors.labelsHeader).click();
+        cy.get('#fact-details-labels > tbody').should('contain.text', 'Additions to Property, Plant & Equipment');
     })
 })

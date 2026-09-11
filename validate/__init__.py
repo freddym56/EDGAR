@@ -124,7 +124,9 @@ The parameters with array values are entered to the GUI as blank-separated strin
 For GUI mode there are two ways to set rendering output, (1) by formula parameter and (2) by GUI view menu.
   If both formula parameters summaryXslt and reportXslt are provided they override use of the GUI menu setting
   ("view/Workstation Redline Mode"):
-     summaryXslt (use EdgarWorkstationSummarize.xslt to emulate EDGAR workstation)
+     summaryXslt (use EdgarWorkstationSummarize.xslt to emulate EDGAR workstation,
+                  use Summary.xslt to use prior xslt for FilingSummary.htm transformation
+                  use RFileViewer for node.js transform (default for GUI now) or RFileViewerSECWS for node.js workstation transform)
      reportXslt (use EdgarWorkstationInstanceReport.xslt to emulate EDGAR workstation)
      ixRedline (when emulating EDGAR workstation, true specifies showing workstation inline XBRL redlines)
   Otherwise menu entry view/Workstation Redline Mode, when checked, selects Edgar Workstation xslt's and ixRedline as above.
@@ -805,12 +807,12 @@ class Filing:
     def hasInlineReport(self):
         return any(getattr(report, "isInline", False) for report in self.reports)
 
-    def writeFile(self, filepath, data):
+    def writeFile(self, filepath, data, encoding=None):
         # write the data (string or binary)
         for pluginXbrlMethod in pluginClassMethods("Security.Crypt.Write"):
             if pluginXbrlMethod(self, filepath, data):
                 return
-        with io.open(filepath, "wt" if isinstance(data, str) else "wb") as fh:
+        with io.open(filepath, "wt" if isinstance(data, str) else "wb", encoding=encoding) as fh:
             fh.write(data)
 
 REPORT_ATTRS = {"DocumentType", "DocumentPeriodEndDate", "EntityRegistrantName",
@@ -891,7 +893,7 @@ class Report:
 __pluginInfo__ = {
     # Do not use _( ) in pluginInfo itself (it is applied later, after loading
     'name': 'Validate EFM',
-    'version': '1.26.1', # SEC EDGAR release 26.1
+    'version': '1.26.3', # SEC EDGAR release 26.3
     'description': '''EFM Validation.''',
     'license': 'Apache-2',
     'import': ('EDGAR/transform', 'xule'), # SEC inline can use SEC transformations

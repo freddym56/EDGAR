@@ -7,7 +7,7 @@ describe(`Instance request on peculiar file.htm.htm`, () => {
 		cy.loadByAccessionNum('000117625625000090');
 		// https://www.sec.gov/ix?doc=/Archives/edgar/data/1011509/000117625625000090/aumn-20250930.htm.htm
 
-		cy.get('[data-test="error-container"]').should('not.be.visible');
+		cy.get('[id="error-container"]').children().should('have.length', 0)
 
 		// sections should populate (dependent on instance load)
 		cy.get(selectors.sectionsHeader).click();

@@ -12,6 +12,7 @@ export const cleanSubstring = (orig: string, from: string, to: string) => {
 }
 
 export const convertToSelector = (input: string, sanitize = true) => {
+    if (!input) return '';
     const normalizedSelector = input.replaceAll('/', '-')
         .replaceAll(' ', '-')
         .replaceAll('#', '-')

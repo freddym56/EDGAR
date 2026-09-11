@@ -6,6 +6,37 @@ let filingsSample = getFilingsSample(Cypress.env).slice(0, Cypress.env('limitOfF
 
 let singleFiling = { "accessionNum": "000121390021056659-991", "timeout": "15000", "docPath": "/Archives/edgar/data/1517396/000121390021056659/stratasys-991.htm" }
 
+const isBreakMarker = (el) => {
+    const style = (el.getAttribute('style') || '').toLowerCase();
+    return style.includes('break-after') || style.includes('break-before');
+};
+
+
+// Computes offsetTop relative to the container
+function offsetTopRelativeToContainer(el, container) {
+    let top = 0;
+    let node = el;
+    // Sum offsetTop until we reach the container
+    while (node && node !== container) {
+        top += node.offsetTop;
+        node = node.offsetParent;
+    }
+    return top;
+}
+
+function getPageBreakMarkers($container) {
+    const container = $container[0];
+    const candidates = Array.from(container.querySelectorAll('[style]'));
+    const markers = candidates.filter(isBreakMarker).map((el) => ({
+        el,
+        offsetTop: offsetTopRelativeToContainer(el, container),
+    }));
+    markers.sort((a, b) => a.offsetTop - b.offsetTop);
+    return markers;
+}
+
+const TOL = 2;
+
 describe("UI Basic checkup", () => {
 
     /*
@@ -308,15 +339,8 @@ describe("UI Basic checkup", () => {
                     cy.get(selectors.factSidebar).should('be.visible')
 
                     // Element that has the word "Facts", followed by the fact count
-                    cy.get(selectors.factSidebar + ' > div > span > h5').should("have.text", 'Facts')
-                    cy.get(selectors.factSidebar + ' > div > span > span').should("have.text", fullCount)
-
-                    // Prev/Next fact buttons
-                    cy.get(selectors.prevFact).should('be.visible').contains('Previous Fact')
-                    cy.get(selectors.nextFact).should('be.visible').contains('Next Fact')
-
-                    // Page Select Dropdown
-                    cy.get(selectors.sidebarPaginationSelect).contains('Page 1')
+                    cy.get(selectors.factSidebar + ' > div > div > h5').should("have.text", 'Facts')
+                    cy.get(selectors.factListDisplayBtn + ' > span').should("have.text", fullCount)
 
                     // Page Navigation buttons (First, Prev, Next, Last)
                     cy.get(selectors.sidebarPaginationFirst).should('be.visible')
@@ -325,9 +349,18 @@ describe("UI Basic checkup", () => {
                     cy.get(selectors.sidebarPaginationLast).should('be.visible')
 
                     // Facts List
-                    cy.get('div[id="facts-menu-list-pagination"] > div[class*="facts-scrollable"]').should('be.visible')
+                    cy.get('div[id="facts-menu-list-pagination"] > div[class="fact-list-wrapper"] > div[class*="list-group"]').should('be.visible')
                     // Fact List should have at least one fact in it
-                    cy.get('div[id="facts-menu-list-pagination"] > div[class*="facts-scrollable"] > a')
+                    cy.get('div[id="facts-menu-list-pagination"] > div[class="fact-list-wrapper"] > div[class*="list-group"] > a')
+
+                    cy.get(selectors.factDetailDisplayBtn).click()
+
+                    // Prev/Next fact buttons
+                    cy.get(selectors.prevFact).should('be.visible').contains('Previous Fact')
+                    cy.get(selectors.nextFact).should('be.visible').contains('Next Fact')
+
+                    // Page Select Dropdown
+                    cy.get(selectors.sidebarPaginationSelect).contains('Page 1') 
 
                     // Close Sidebar button should be functional
                     cy.get(selectors.factSideBarClose).should('be.visible').then(($closeBtn) => {
@@ -360,11 +393,140 @@ describe("UI Basic checkup", () => {
     also could just be me blaming all my woes on iFrames.
     Good luck! <3 - Mason
     */
-    it.skip("First Page Button Thing", () => {
+    // it.skip("First Page Button Thing", () => {
+    //     cy.viewport(1920, 1080);
+    //     cy.loadFiling(singleFiling)
+    //     cy.get(selectors.xbrlForm).scrollTo('bottom').then(() => {
+    //         cy.get(selectors.goToTopOfDoc).click()
+    //     })
+    // })
+})
+
+
+describe('Doc Pagination', () => {
+    beforeEach(() => {
         cy.viewport(1920, 1080);
         cy.loadFiling(singleFiling)
-        cy.get(selectors.xbrlForm).scrollTo('bottom').then(() => {
-            cy.get(selectors.goToTopOfDoc).click()
-        })
-    })
+
+        cy.get('#xbrl-section-current').as('doc');
+        cy.get('#dynamic-xbrl-form').as('container');
+
+        // Ensures container exists and is scrollable
+        cy.get('@container').should($doc => {
+            const el = $doc[0];
+            expect(el).to.exist;
+            expect(el.scrollHeight).to.be.greaterThan(el.clientHeight);
+        });
+    });
+
+    it('To Next scrollsIntoView the next page break marker', () => {
+        cy.get('@container').then($c => {
+            const container = $c[0];
+            const { scrollTop } = container;
+
+            const markers = getPageBreakMarkers($c);
+            const nextMarker = markers.find(m => m.offsetTop > scrollTop + 1);
+
+            expect(nextMarker).to.not.be.null;
+
+            cy.get(selectors.goToNextInlinePage)
+                .click({ scrollBehavior: false });
+
+            cy.get('@container').should($c2 => {
+                const el = $c2[0];
+                expect(el.scrollTop).to.be.closeTo(nextMarker.offsetTop, TOL);
+
+                const top = el.scrollTop;
+                const bottom = top + el.clientHeight;
+                expect(nextMarker.offsetTop).to.be.gte(top);
+                expect(nextMarker.offsetTop).to.be.lte(bottom);
+
+            });
+        });
+    });
+
+
+    it('To Prev scrollsIntoView the previous page break marker', () => {
+        cy.get('@container').scrollTo('0%', '50%');
+        cy.get('@container').then($c => {
+            const container = $c[0];
+            const { scrollTop } = container;
+
+            const markers = getPageBreakMarkers($c);
+            const prevMarkers = markers.filter(m => m.offsetTop < scrollTop - 1);
+            const prevMarker = prevMarkers.length ? prevMarkers[prevMarkers.length - 1] : null;
+
+            expect(prevMarker).to.not.be.null;
+
+            cy.get(selectors.goToPrevInlinePage).click({ scrollBehavior: false });
+
+            cy.get('@container').should($c2 => {
+                const el = $c2[0];
+
+                expect(el.scrollTop).to.be.closeTo(prevMarker.offsetTop, TOL);
+
+                const top = el.scrollTop;
+                const bottom = top + el.clientHeight;
+                expect(prevMarker.offsetTop).to.be.gte(top);
+                expect(prevMarker.offsetTop).to.be.lte(bottom);
+
+            });
+        });
+    });
+
+    it('To Next falls back to bottom when there is no next page marker', () => {
+        cy.get('@container').scrollTo('bottom');
+        cy.get('@container').then(($el) => {
+            const currentScrollTop = $el[0].scrollTop;
+            cy.get('@container').scrollTo(0, currentScrollTop - 100);
+        });
+        cy.get(selectors.goToNextInlinePage)
+            .click({ scrollBehavior: false });
+        cy.get('@container').should($c => {
+            const el = $c[0];
+            const maxScroll = el.scrollHeight - el.clientHeight;
+            expect(el.scrollTop).to.be.closeTo(maxScroll, TOL);
+        });
+    });
+
+    it('To Prev falls back to top when there is no previous page marker', () => {
+        cy.get('@container').scrollTo('top');
+        cy.get('@container').then(($c) => {
+            const container = $c[0];
+            const { scrollTop } = container;
+
+            const currentScrollTop = $c[0].scrollTop;
+            cy.get('@container').scrollTo(0, currentScrollTop + 100);
+
+            const markers = getPageBreakMarkers($c);
+            const prevMarkers = markers.filter(m => m.offsetTop < scrollTop - 1);
+            const prevMarker = prevMarkers.length ? prevMarkers[prevMarkers.length - 1] : null;
+
+            expect(prevMarker).to.be.null;
+
+            cy.get(selectors.goToPrevInlinePage).click({ scrollBehavior: false });
+            cy.get('@container').should($c => {
+                expect($c[0].scrollTop).to.equal(0);
+            });
+        });
+
+
+    });
+
+    it('To Top scrolls to the top of container', () => {
+        cy.get('@container').scrollTo('bottom');
+        cy.get(selectors.goToTopOfDoc).click({ scrollBehavior: false });
+        cy.get('@container').should($c => {
+            expect($c[0].scrollTop).to.equal(0);
+        });
+    });
+
+    it('To Bottom scrolls to the bottom of container', () => {
+        cy.get(selectors.goToBtnOfDoc).click({ scrollBehavior: false });
+        cy.get('@container').should($c => {
+            const el = $c[0];
+            const maxScroll = el.scrollHeight - el.clientHeight;
+            expect(el.scrollTop).to.be.closeTo(maxScroll, TOL);
+        });
+    });
 })

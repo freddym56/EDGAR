@@ -353,7 +353,7 @@ class Embedding(object):
                     for typedMember in sorted((getMemberOnAxisForFactDict[pseudoAxis]
                                                for fact, getMemberOnAxisForFactDict, periodStartEndLabel in self.cube.factMemberships
                                                if pseudoAxis in getMemberOnAxisForFactDict),
-                                              key=lambda member: member.typedMemberSortKey):
+                                              key=lambda member: member.typedMemberSortKey if isinstance(member,Filing.Member) else str(member)):
                         if typedMember not in giveMemGetPositionDict:
                             giveMemGetPositionDict[typedMember] = len(giveMemGetPositionDict)
 
@@ -361,7 +361,7 @@ class Embedding(object):
                     for typedMember in sorted((getMemberOnAxisForFactDict[pseudoAxis]
                                                for fact, getMemberOnAxisForFactDict, periodStartEndLabel in self.cube.factMemberships
                                                if pseudoAxis in getMemberOnAxisForFactDict),
-                                              key=lambda member: str(member.typedMemberSortKey)):
+                                              key=lambda member: str(member.typedMemberSortKey) if isinstance(member,Filing.Member) else str(member)):
                         if typedMember not in giveMemGetPositionDict:
                             giveMemGetPositionDict[typedMember] = len(giveMemGetPositionDict)
 

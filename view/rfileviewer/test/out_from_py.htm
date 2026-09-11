@@ -1,0 +1,149 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8"/>
+    <title>View Filing Data</title>
+    <script type="text/javascript" src="/include/jquery-3.7.1.min.js"/>
+    <script type="text/javascript" src="/include/accordionMenu.js"/>
+    <script type="text/javascript" src="/include/Show.js"/>
+    <link rel="stylesheet" type="text/css" href="/include/interactive.css"/>
+    <link rel="stylesheet" type="text/css" href="/include/report.css"/>
+    <link rel="stylesheet" type="text/css" href="/include/print.css" media="print"/>
+    <script type="text/javascript">
+    $(document).ready(function() {
+        // Accordion expand/collapse (accordionMenu.js should handle this)
+        // AJAX report loading for individual reports
+        $('#menu').on('click', '.xbrlviewer', function(e) {
+            e.preventDefault();
+            var alias_path = $(this).data('alias_path');
+            var report_file = $(this).data('report_file');
+            if (report_file) {
+                $('#reportDiv').html('&lt;div style="text-align:center;"&gt;Loading...&lt;/div&gt;');
+                $.ajax({
+                    url: alias_path ? (alias_path + '/' + report_file) : report_file,
+                    type: 'GET',
+                    dataType: 'html',
+                    success: function(data) {
+                      // Strip out everything between the "TEXT" elements
+                      var idx = data.indexOf('&lt;TEXT&gt;');
+                      if (idx &gt; -1) {
+                         data = data.substring(idx+6,data.length);
+                         idx = data.indexOf('&lt;/TEXT&gt;');
+                         if ( idx &gt; -1) {
+                            data = data.substring(0,idx);
+                         }
+                      }
+                      jQuery('#reportDiv').html(data)
+                        .find('img').attr('src', function(i, val) { return fixSrcAttr(val,alias_path);}).end();
+                    },
+                    error: function() {
+                        $('#reportDiv').html('&lt;div style="color:red;"&gt;Failed to load report.&lt;/div&gt;');
+                    }
+                });
+            }
+            $('.xbrlviewer').css('background', '#F5F5EB');
+            $('.all_reports').css('background', '#0C213A');
+            $(this).css('background', '#C1CDCD');
+        });
+        // AJAX loading for All Reports
+        $('#menu').on('click', '.all_reports', function(e) {
+            e.preventDefault();
+            var alias_path = $(this).data('alias_path');
+            var report_files = $(this).data('report_files');
+            if (report_files) {
+                var report_files_list = report_files.split(',');
+                $('#reportDiv').html('&lt;div style="text-align:center;"&gt;Loading all reports...&lt;/div&gt;');
+                var allHtml = '';
+                var loaded = 0;
+                report_files_list.forEach(function(report_file) {
+                    $.ajax({
+                        url: alias_path ? (alias_path + '/' + report_file) : report_file,
+                        type: 'GET',
+                        dataType: 'html',
+                        success: function(data) {
+                            // Strip out everything between the "TEXT" elements
+                            var idx = data.indexOf('&lt;TEXT&gt;');
+                            if (idx &gt; -1) {
+                              data = data.substring(idx+6,data.length);
+                              idx = data.indexOf('&lt;/TEXT&gt;');
+                              if ( idx &gt; -1) {
+                                data = data.substring(0,idx);
+                              }
+                            }
+                            allHtml += data + '&lt;hr&gt;';
+                            loaded++;
+                            if (loaded === report_files_list.length) {
+                                $('#reportDiv').html(allHtml)
+                                   .find('img').attr('src', function(i, val) { return fixSrcAttr(val,alias_path);}).end()
+                            }
+                        },
+                        error: function() {
+                            allHtml += '&lt;div style="color:red;"&gt;Failed to load report: ' + url + '&lt;/div&gt;&lt;hr&gt;';
+                            loaded++;
+                            if (loaded === urlList.length) {
+                                $('#reportDiv').html(allHtml);
+                            }
+                        }
+                    });
+                });
+            }
+            $('.xbrlviewer').css('background', '#F5F5EB');
+            $(this).css('background', '#818D8D');
+        });
+        // On page load, trigger click on the first report
+        var firstReportFile = "R1.htm";
+        if (firstReportFile) {
+            var firstLink = $('.xbrlviewer[data-report_file="' + firstReportFile + '"]');
+            if (firstLink.length) {
+                firstLink.trigger('click');
+            }
+        }
+    });
+
+
+   function fixSrcAttr(src, alias_path) {
+      var uri = src.substr(0,5);
+      // No change is needed if the 'src' attribute contains an embedded image
+      if (uri == 'data:') {
+         return src;
+      }
+      // Absolute URL on EDGAR website is unchanged
+      var idx = src.lastIndexOf('https://s3.amazonaws.com/archives.sec.gov/edgar/data/')
+      if (idx &gt; -1) {
+        return src;
+      } // For all other URLs use only basename component
+      var idx = src.lastIndexOf('/');
+      if (idx &gt; -1) {
+         src = src.substring(idx+1,src.length);
+      }
+      return alias_path ? (alias_path + '/' + src) : src;
+   }
+
+    </script>
+    <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    .companyInfo, .filerDiv { margin-bottom: 20px; }
+    .menu { background: #f5f5f5; padding: 10px; margin-bottom: 20px; }
+    .report { border-bottom: 1px solid #ccc; margin-bottom: 10px; padding-bottom: 10px; }
+    .companyHeader { margin-bottom: 10px; font-size: 1.2em; font-weight: bold; }
+    </style>
+  </head>
+  <body>
+    <a class="xbrlviewer" style="color: black; font-weight: bold; " href="javascript:window.print()">Print Document</a>
+    <table>
+      <tr>
+        <td style="vertical-align: top;">
+          <div style="width: 170px; margin-right: 5px;"><ul id="menu">
+<li class="accordion">
+<a id="menu_cat_Reports" href="#">Reports</a><ul><li><a class="xbrlviewer" href="#" data-alias_path="" data-report_file="R1.htm">Cover Page</a></li></ul>
+</li>
+<li><a class="all_reports" href="#" data-alias_path="" data-report_files="R1.htm" style="font-weight: bold; background-color: #0C213A;"><img src="/images/reports.gif" border="0" height="12" width="9" alt="Reports"/>All Reports</a></li>
+</ul>
+</div>
+        </td>
+        <td style="vertical-align: top;">
+          <div id="reportDiv"/>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

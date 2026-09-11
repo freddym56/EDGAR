@@ -45,7 +45,7 @@
         "stx-core-2025": ["dei/2025", "country/2025", "currency/2025", "exch/2025", "naics/2025", "sic/2025", "stpr/2025"],
         "stx-extended-2025": ["@stx-core-2025", "cyd/2025", "oef/2025", "snj/2025", "rxp/2025", "ecd/2025", "fnd/2025", "sro/2025", "sbs/2025", "spac/2025", "spac/2025q3"],
         "stx-core-2026": ["dei/2026", "country/2026", "currency/2026", "exch/2026", "naics/2026", "sic/2026", "stpr/2026"],
-        "stx-extended-2026": ["@stx-core-2026", "cyd/2026", "oef/2026", "snj/2026", "rxp/2026", "ecd/2026", "fnd/2026", "sro/2026", "sbs/2026", "spac/2026"]
+        "stx-extended-2026": ["@stx-core-2026", "cyd/2026", "oef/2026", "snj/2026", "rxp/2026", "ecd/2026", "fnd/2026", "fnd/2026q3", "sro/2026", "sbs/2026", "spac/2026"]
     },
     "compatible-classes": {
         "comment1": "entries for previously-supported taxonomies, such as disclosure mode efm-pragmatic-all-years",

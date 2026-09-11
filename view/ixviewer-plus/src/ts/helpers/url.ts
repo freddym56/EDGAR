@@ -103,7 +103,7 @@ export const HelpersUrl = {
 
     isWorkstation: (): boolean => {
         const url = Constants.appWindow.location.href;
-        let isWorkstation = url.includes("DisplayDocument.do?");
+        let isWorkstation = url.includes("DisplayDocument.do");
         isWorkstation ||= Constants.appWindow.location.host.indexOf("edgar.sec.gov") > 0; // originally used in form-information
 
         // an old implementation:
@@ -120,7 +120,7 @@ export const HelpersUrl = {
         return !!urlParamsAsObject[param];
     },
 
-    isMockWorkstation: () => {
+    isMockWorkstation: (): boolean  => {
         // designed to be used for cypress testing when passing '&ws=true' in url params.
         return HelpersUrl.urlParamTrue('ws');
     },
@@ -131,6 +131,7 @@ export const HelpersUrl = {
         const objToReturn = {} as UrlParams;
         const urlParamsAsObject = Object.fromEntries(urlParams);
         const isWorkStation = HelpersUrl.isWorkstation();
+        const isMockWorkStation = HelpersUrl.isMockWorkstation();
         const isFEPT = urlParamsAsObject.doc ? urlParamsAsObject.doc.includes('view.html') : false;
 
         for (const urlParam of urlParams.entries()) {
@@ -142,13 +143,21 @@ export const HelpersUrl = {
                 metalinks: '{metalinks path}'
               }
             */
-            if (isWorkStation) {
+            if (isWorkStation || isMockWorkStation) {
                 const fileUrl = `${urlParamsAsObject['doc']}&accessionNumber=${urlParamsAsObject['accessionNumber']}&interpretedFormat=${urlParamsAsObject['interpretedFormat']}&redline=${urlParamsAsObject['redline']}`;
 
                 if (paramVal.endsWith('.htm') || paramVal.endsWith('.html') || paramVal.endsWith('.xhtml')) {
+                    // if (!paramVal.includes('DisplayDocument.do') && url.includes('&metalinks=')) {
+                    //    paramVal = url.split('?doc=')[1]?.split('&metalinks=')[0] || '';
+                    //    paramVal = (paramVal.match(/filename=([^&]*)/)||[])[1] || '';
+                    // }
                     objToReturn['doc'] = `${fileUrl}&filename=${paramVal}`;
                     objToReturn['doc-file'] = paramVal;
+                    console.log(objToReturn);
+                    console.log(JSON.stringify(objToReturn));
                 } else if (paramKey === 'metalinks') {
+                    if (!paramVal.includes('DisplayDocument.do') && url.includes('&metalinks='))
+                        paramVal = url.split('&metalinks=')[1] || '';
                     objToReturn['metalinks'] = `${fileUrl.replace('interpretedFormat=true', 'interpretedFormat=false')}&filename=MetaLinks.json`;
                     objToReturn['metalinks-file'] = 'MetaLinks.json';
                     objToReturn['summary'] = `${fileUrl.replace('interpretedFormat=true', 'interpretedFormat=false')}&filename=FilingSummary.xml`;

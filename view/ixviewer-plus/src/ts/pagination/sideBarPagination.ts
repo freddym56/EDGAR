@@ -95,6 +95,7 @@ export const Pagination = {
 	},
 
 	previousPage: (calledFromPrevFact = false) => {
+		if (Constants.sideBarPaginationState.pageNumber === 1) return
 		Constants.sideBarPaginationState.pageNumber = Constants.sideBarPaginationState.pageNumber - 1;
 		Pagination.renderPage(Constants.sideBarPaginationState.pageNumber);
 		if (calledFromPrevFact) {
@@ -105,6 +106,7 @@ export const Pagination = {
 	},
 
 	nextPage: (calledFromNextFact = false) => {
+		if (Constants.sideBarPaginationState.pageNumber === Constants.sideBarPaginationState.totalPages) return
 		Constants.sideBarPaginationState.pageNumber = Constants.sideBarPaginationState.pageNumber + 1;
 		Pagination.renderPage(Constants.sideBarPaginationState.pageNumber);
 		if (calledFromNextFact) {
@@ -173,7 +175,7 @@ export const Pagination = {
 		// 			</li>
 		// 		</ul>
 		// 	</nav>`
-		
+
 		// first page
 		const firstPageLiElement = document.createElement('li');
 		firstPageLiElement.setAttribute('class', `page-item ${firstPageDisabled}`);
@@ -227,6 +229,9 @@ export const Pagination = {
 		nextPageAElement.addEventListener('click', () => { Pagination.nextPage(); });
 		nextPageAElement.addEventListener('keyup', (event: KeyboardEvent) => {
 			if (!actionKeyHandler(event)) return;
+			if (Pagination.getCurrentPage === Pagination.getTotalPages) return
+
+
 			Pagination.nextPage();
 		});
 
@@ -284,7 +289,7 @@ export const Pagination = {
 		}
 		if (!select?.hasAttribute('listener')) {
 			select.setAttribute('listener', 'true');
-			select.addEventListener('change', () => 
+			select.addEventListener('change', () =>
 				Pagination.goToPage(+select.value));
 		}
 		return select;
@@ -322,7 +327,7 @@ export const Pagination = {
 		}
 	},
 
-	findFactAndGoTo: (elementID: string) => {
+	findFactAndGoTo: (elementID: string, showNotFoundError = true) => {
 		let index = -1;
 		for (let i = 0; i < Pagination.getArray.length; i++) {
 			if (Pagination.getArray[i] === elementID) {
@@ -336,7 +341,12 @@ export const Pagination = {
 			Pagination.renderPage(pageToGoTo);
 			Pagination.scrollToSelectedFactInSidebar();
 		} else {
-			ErrorsMinor.factNotInSearch();
+			const display = document.getElementById('facts-menu')?.dataset.factMenuDisplay || '';
+
+			if(showNotFoundError && ['fact-split-display', 'fact-list-display'].includes(display)) {
+				ErrorsMinor.factNotInSearch()
+			}
+			Pagination.clearSidebarSelectedFact()
 		}
 	},
 
@@ -356,7 +366,7 @@ export const Pagination = {
 				factElem.setAttribute('selected-fact', 'false');
 			}
 		})
-	
+
 		selectedFactElem?.setAttribute('selected-fact', 'true');
 		selectedFactElem?.scrollIntoView({
 			behavior: 'smooth',
@@ -386,6 +396,8 @@ export const Pagination = {
 				}
 			});
 		})
+	},
+	clearSidebarSelectedFact: () => {
+		document.querySelector(Pagination.getPaginationSelector)?.querySelectorAll('a.sidebar-fact').forEach((a) => a.setAttribute('selected-fact', 'false'));
 	}
-
 };

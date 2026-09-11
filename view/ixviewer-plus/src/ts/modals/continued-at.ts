@@ -57,17 +57,17 @@ export const ModalsContinuedAt = {
 	carouselData: (element: Array<HTMLElement>) => {
 
 		Modals.renderCarouselIndicators(
-			"fact-modal-carousel",
-			"fact-modal-carousel-indicators",
+			"fact-details-panel",
+			"fact-details-panel-indicators",
 			ModalsContinuedAt.carouselInformation
 		);
 
 		const factInfo = FactMap.getByID(element[0].getAttribute('id') as string);
 		// we now render one slide at a time!
-		FactPages.firstPage(factInfo, 'fact-modal-carousel-page-1');
-		FactPages.secondPage(factInfo, 'fact-modal-carousel-page-2');
-		FactPages.thirdPage(factInfo, 'fact-modal-carousel-page-3');
-		FactPages.fourthPage(factInfo, 'fact-modal-carousel-page-4');
+		FactPages.firstPage(factInfo, 'fact-details-attributes');
+		FactPages.secondPage(factInfo, 'fact-details-labels');
+		FactPages.thirdPage(factInfo, 'fact-details-references');
+		FactPages.fourthPage(factInfo, 'fact-details-calculations');
 
 
 	}

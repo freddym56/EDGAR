@@ -24,9 +24,7 @@
 #fact-table-container,
 #facts-breakdown-container,
 #form-information-modal,
-#settings-modal,
-#fact-modal,
-#fact-nested-modal {
+#settings-modal {
   *,
   *::before,
   *::after {
@@ -149,9 +147,7 @@ h6 {
 #fact-table-container,
 #facts-breakdown-container,
 #form-information-modal,
-#settings-modal,
-#fact-modal,
-#fact-nested-modal {
+#settings-modal {
   p {
     margin-top: 0;
     margin-bottom: $paragraph-margin-bottom;
@@ -376,9 +372,7 @@ figure {
 #fact-table-container,
 #facts-breakdown-container,
 #form-information-modal,
-#settings-modal,
-#fact-modal,
-#fact-nested-modal {
+#settings-modal {
   table {
     caption-side: bottom;
     border-collapse: collapse;

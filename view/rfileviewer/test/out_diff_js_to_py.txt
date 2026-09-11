@@ -1,0 +1,365 @@
+--- html_from_JS
++++ html_from_Py
+@@ -1,226 +1,149 @@
+-<!DOCTYPE html>
+ <html lang="en">
+   <head>
+-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
++    <meta charset="UTF-8"/>
+     <title>View Filing Data</title>
+-    <script type="text/javascript" src="/js/third-party/jquery-3.7.1.min.js"></script>
+-    <script type="text/javascript" src="/include/accordionMenu.js"></script>
+-    <script type="text/javascript" src="/include/Show.js"></script>
+-    <link rel="stylesheet", type=text/css, href=/include/interactive.css>
+-    <link rel="stylesheet", type=text/css, href=/include/report.css>
+-    <link rel="stylesheet", type=text/css, href=/include/print.css media=print>
+-          <style type="text/css">
+-          #menu{
+-            font-family: "Segoe UI", Frutiger, "Frutiger Linotype", "Dejavu Sans", "Helvetica Neue", Arial, sans-serif; /* was Arial, Helvetia, sans-serif */
+-            font-size:11px;
+-          }
+-          
+-          ul#menu {
+-          list-style-type:none;
+-          margin:0;
+-          padding:0;
+-          width:15em;
+-          border:1px solid #333;
+-          background-color:#FFFFFF; /* was light gray #F5F5EB; */
+-          }
+-          
+-          ul#menu ul{
+-            list-style-type:none;
+-            margin:0;
+-            padding:0;
+-            width:15em;
+-            background-color:#FFFFFF; /* was light gray #F5F5EB; */
+-          }
+-          
+-          ul#menu a{
+-            display:block;
+-            text-decoration:none;
+-          }
+-          
+-          ul#menu li{
+-            margin-top:1px;
+-          }
+-          
+-          ul#menu li a{
+-            background:#F7F7F7; /* was mustard #F3D673; */
+-            color:black;
+-            padding:0.5em;
+-          }
+-          
+-          ul#menu li a:hover{
+-            background:#aaa;
+-          }
+-          
+-          ul#menu li ul li a{
+-            background:#FFFFFF; /* was light gray #F5F5EB; */
+-            color: #0071EB; /* was brick red #BF0023; */
+-            padding-left:20px;
+-          }
+-          
+-          ul#menu li ul li a:hover{
+-            background:#aaa;
+-            border-left:5px #000 solid;
+-            padding-left:15px;
+-            text-decoration: underline;
+-          }
+-          ul#menu li a.all_reports, ul#menu li a.rendering_logs {
+-		  		background-color: #0C213A; color: #FFFFFF;
+-		   }
+-		   ul#menu li a.all_reports:hover,  ul#menu li a.rendering_logs:hover  {
+-		  		background-color: #12659C; color: #0C213A;
+-		   }
+-          li.octave {border-top: 1px solid black;}
+-          ul#menu li.ix > a {background-color: #0C213A; color: #FFFFFF;} /* was wasabi #afd77f} */
+-          button {
+-		   	color: #212529;
+-		    border-radius: 1rem;
+-		    background-color: #FFC107;
+-		    border-color: #FFC107;
+-		    white-space: nowrap;
+-		   }
+-		   button:hover {
+-		   		background-color: #EEA800;
+-		    	border-color: #EEA800;
+-		   }
+-        </style>
++    <script type="text/javascript" src="/include/jquery-3.7.1.min.js"/>
++    <script type="text/javascript" src="/include/accordionMenu.js"/>
++    <script type="text/javascript" src="/include/Show.js"/>
++    <link rel="stylesheet" type="text/css" href="/include/interactive.css"/>
++    <link rel="stylesheet" type="text/css" href="/include/report.css"/>
++    <link rel="stylesheet" type="text/css" href="/include/print.css" media="print"/>
++    <script type="text/javascript">
++    $(document).ready(function() {
++        // Accordion expand/collapse (accordionMenu.js should handle this)
++        // AJAX report loading for individual reports
++        $('#menu').on('click', '.xbrlviewer', function(e) {
++            e.preventDefault();
++            var alias_path = $(this).data('alias_path');
++            var report_file = $(this).data('report_file');
++            if (report_file) {
++                $('#reportDiv').html('&lt;div style="text-align:center;"&gt;Loading...&lt;/div&gt;');
++                $.ajax({
++                    url: alias_path ? (alias_path + '/' + report_file) : report_file,
++                    type: 'GET',
++                    dataType: 'html',
++                    success: function(data) {
++                      // Strip out everything between the "TEXT" elements
++                      var idx = data.indexOf('&lt;TEXT&gt;');
++                      if (idx &gt; -1) {
++                         data = data.substring(idx+6,data.length);
++                         idx = data.indexOf('&lt;/TEXT&gt;');
++                         if ( idx &gt; -1) {
++                            data = data.substring(0,idx);
++                         }
++                      }
++                      jQuery('#reportDiv').html(data)
++                        .find('img').attr('src', function(i, val) { return fixSrcAttr(val,alias_path);}).end();
++                    },
++                    error: function() {
++                        $('#reportDiv').html('&lt;div style="color:red;"&gt;Failed to load report.&lt;/div&gt;');
++                    }
++                });
++            }
++            $('.xbrlviewer').css('background', '#F5F5EB');
++            $('.all_reports').css('background', '#0C213A');
++            $(this).css('background', '#C1CDCD');
++        });
++        // AJAX loading for All Reports
++        $('#menu').on('click', '.all_reports', function(e) {
++            e.preventDefault();
++            var alias_path = $(this).data('alias_path');
++            var report_files = $(this).data('report_files');
++            if (report_files) {
++                var report_files_list = report_files.split(',');
++                $('#reportDiv').html('&lt;div style="text-align:center;"&gt;Loading all reports...&lt;/div&gt;');
++                var allHtml = '';
++                var loaded = 0;
++                report_files_list.forEach(function(report_file) {
++                    $.ajax({
++                        url: alias_path ? (alias_path + '/' + report_file) : report_file,
++                        type: 'GET',
++                        dataType: 'html',
++                        success: function(data) {
++                            // Strip out everything between the "TEXT" elements
++                            var idx = data.indexOf('&lt;TEXT&gt;');
++                            if (idx &gt; -1) {
++                              data = data.substring(idx+6,data.length);
++                              idx = data.indexOf('&lt;/TEXT&gt;');
++                              if ( idx &gt; -1) {
++                                data = data.substring(0,idx);
++                              }
++                            }
++                            allHtml += data + '&lt;hr&gt;';
++                            loaded++;
++                            if (loaded === report_files_list.length) {
++                                $('#reportDiv').html(allHtml)
++                                   .find('img').attr('src', function(i, val) { return fixSrcAttr(val,alias_path);}).end()
++                            }
++                        },
++                        error: function() {
++                            allHtml += '&lt;div style="color:red;"&gt;Failed to load report: ' + url + '&lt;/div&gt;&lt;hr&gt;';
++                            loaded++;
++                            if (loaded === urlList.length) {
++                                $('#reportDiv').html(allHtml);
++                            }
++                        }
++                    });
++                });
++            }
++            $('.xbrlviewer').css('background', '#F5F5EB');
++            $(this).css('background', '#818D8D');
++        });
++        // On page load, trigger click on the first report
++        var firstReportFile = "R1.htm";
++        if (firstReportFile) {
++            var firstLink = $('.xbrlviewer[data-report_file="' + firstReportFile + '"]');
++            if (firstLink.length) {
++                firstLink.trigger('click');
++            }
++        }
++    });
+ 
++
++   function fixSrcAttr(src, alias_path) {
++      var uri = src.substr(0,5);
++      // No change is needed if the 'src' attribute contains an embedded image
++      if (uri == 'data:') {
++         return src;
++      }
++      // Absolute URL on EDGAR website is unchanged
++      var idx = src.lastIndexOf('https://s3.amazonaws.com/archives.sec.gov/edgar/data/')
++      if (idx &gt; -1) {
++        return src;
++      } // For all other URLs use only basename component
++      var idx = src.lastIndexOf('/');
++      if (idx &gt; -1) {
++         src = src.substring(idx+1,src.length);
++      }
++      return alias_path ? (alias_path + '/' + src) : src;
++   }
++
++    </script>
++    <style>
++    body { font-family: Arial, sans-serif; margin: 20px; }
++    .companyInfo, .filerDiv { margin-bottom: 20px; }
++    .menu { background: #f5f5f5; padding: 10px; margin-bottom: 20px; }
++    .report { border-bottom: 1px solid #ccc; margin-bottom: 10px; padding-bottom: 10px; }
++    .companyHeader { margin-bottom: 10px; font-size: 1.2em; font-weight: bold; }
++    </style>
+   </head>
+-  <body style="margin: 0">
+-    
+-    
+-    
++  <body>
++    <a class="xbrlviewer" style="color: black; font-weight: bold; " href="javascript:window.print()">Print Document</a>
+     <table>
+       <tr>
+-        <td colspan="2" style="font-size: 11px; font-weight: 500; font-family: 'Segoe UI', Frutiger, 'Frutiger Linotype', 'Dejavu Sans', 'Helvetica Neue', Arial, sans-serif;">
+-          <a class="xbrlviewer" style="color: black; font-weight: bold;" href="javascript:window.print();">Print Document</a>
++        <td style="vertical-align: top;">
++          <div style="width: 170px; margin-right: 5px;"><ul id="menu">
++<li class="accordion">
++<a id="menu_cat_Reports" href="#">Reports</a><ul><li><a class="xbrlviewer" href="#" data-alias_path="" data-report_file="R1.htm">Cover Page</a></li></ul>
++</li>
++<li><a class="all_reports" href="#" data-alias_path="" data-report_files="R1.htm" style="font-weight: bold; background-color: #0C213A;"><img src="/images/reports.gif" border="0" height="12" width="9" alt="Reports"/>All Reports</a></li>
++</ul>
++</div>
++        </td>
++        <td style="vertical-align: top;">
++          <div id="reportDiv"/>
+         </td>
+       </tr>
+-      <tr>
+-        <td style="vertical-align: top;">
+-
+-         <div style="width: 170px; margin-right: 5px;">
+-          <ul id="menu">
+-            <li class="accordion">
+-              <a id="menu_cat1" href="#">Cover</a>
+-              <ul>
+-                <li class="accordion" id="r1" ><a class="xbrlviewer" onClick="javascript:highlight(this);" href="javascript:loadReport(1);">Cover Page</a></li>
+-              </ul>
+-            </li>
+-            <li class="accordion">
+-              <a class="all_reports" href="javascript:loadReport(2);">
+-                <img src="/images/reports.gif" border="0" height="12" width="9" alt="Reports" />All Reports</a>
+-            </li>
+-            <li class="accordion">
+-              <a class="rendering_logs" href="javascript:showRenderingLog();">
+-                <img src="/images/reports.gif" border="0" height="12" width="9" alt="Logs" />Rendering Log</a>
+-            </li>
+-          </ul>
+-         </div>
+-        </td>
+-        <td style="vertical-align: top;"><div id="reportDiv"></div>
+-</td>
+-      </tr>
+     </table>
+-  
+-    
+-    <script>
+-      // Globals used by SEC loader (Show.js)
+-      window.SEC_ALIAS_PATH = "";
+-      window.SEC_FILES_BY_POS = {"1":"R1.htm","2":"ALL_REPORTS_SYNTHETIC"};
+-      window.SEC_RENDERING_LOG = [{"type":"Error","text":"[cp-0303-Valid-File-Extension] The document type and naming of \"DTC_instance_FY_2023_2025.xml\" naming is not consistent with one or more of the following:\\n\\nEX-101.INS - XBRL Instance document (Required) *.xml\\nEX-101.SCH - XBRL Taxonomy Extension Schema document *.xsd\\nEX-101.REF - XBRL Taxonomy Extension Reference Linkbase document *.xml\\nEX-101.CAL - XBRL Taxonomy Extension Calculation Linkbase document *.xml\\nEX-101.DEF - XBRL Taxonomy Extension Definition Linkbase document *.xml\\nEX-101.LAB - XBRL Taxonomy Extension Labels Linkbase document *.xml\\nEX-101.PRE - XBRL Taxonomy Extension Presentation Linkbase document *.xml\\n\\nPlease ensure that you comply with the document type and naming provided."},{"type":"Warning","text":"[dq-60521-EntityFilerCategory-Missing] Submission type 10-Q should have a non-empty value for EntityFilerCategory in the Required Context. DTC_instance_FY_2023_2025.xml"},{"type":"Warning","text":"[dq-60521-EntityVoluntaryFilers-Unexpected] Submission type 10-Q should not have a value for EntityVoluntaryFilers in the context c. DTC_instance_FY_2023_2025.xml 74"},{"type":"Warning","text":"[dq-60521-EntityWellKnownSeasonedIssuer-Unexpected] Submission type 10-Q should not have a value for EntityWellKnownSeasonedIssuer in the context c. DTC_instance_FY_2023_2025.xml 77"},{"type":"Warning","text":"[dq-60521-EntityPublicFloat-Unexpected] Submission type 10-Q should not have a value for EntityPublicFloat in the context c3. DTC_instance_FY_2023_2025.xml 81"},{"type":"Warning","text":"[dq-60549-DocumentAnnualReport-Unexpected] Submission type 10-Q should not have a value for DocumentAnnualReport in the context c. DTC_instance_FY_2023_2025.xml 80"},{"type":"Warning","text":"[dq-60521-IcfrAuditorAttestationFlag-Unexpected] Submission type 10-Q should not have a value for IcfrAuditorAttestationFlag in the context c. DTC_instance_FY_2023_2025.xml 65"},{"type":"Error","text":"[cp-0501-File-Name] Document file name DTC-20251231_lab.xml must start with a-z or 0-9, contain lower case letters, ., -, _, and end with .xsd or .xml."},{"type":"Error","text":"[cp-0501-File-Name] Document file name DTC-20251231.xsd must start with a-z or 0-9, contain lower case letters, ., -, _, and end with .xsd or .xml."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:AccountingStandardsUpdate201609Member.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:AccountsReceivableCreditLossExpense.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:AccruedAdvertisingNoncurrent.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:AccruedInventoryCurrent.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:AccruedLiabilitiesAndOtherLiabilitiesCurrent.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:AccruedShippingCostsCurrent.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:AdjustmentsToAdditionalPaidInCapitalIncomeTaxDeficiencyFromShareBasedCompensation.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:AgreementNameAxis.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:AgreementNameDomain.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:AssetsAndLiabilitiesLesseeTableTextBlock.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:AuditorInformationAbstract.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:BarterArrangementsTextBlock.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:BrandMember.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:BusinessAcquisitionPurchaseOptionPercentageOfVotingInterestsAcquired.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:BusinessCombinationContingentConsiderationArrangementsChangeInAmountOfContingentConsiderationPostClosingPaymentLiability.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:CampStovesAndFirePitsMember.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:CashFlowLesseeAbstract.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:ChubbiesIncMember.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:ChubbiesMember.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:CommonUnitAuthorizedPricePerUnit.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:CommonUnitClassAAndClassBMember.  Please recheck your submission."},{"type":"Warning-Semantic","text":"[EFM.6.08.05.LC3] Concept solobrands.com:CommonUnitClassAAndClassBMember should match expected LC3 composition CommonUnitClassAndClassBMember - DTC_taxonomy_FY_2023_2025.zip/DTC_taxonomy_FY_2023_2025/DTC-20251231.xsd 7987 - DTC_taxonomy_FY_2023_2025.zip/DTC_taxonomy_FY_2023_2025/DTC-20251231.xsd 7987"},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:CommonUnitClassAMember.  Please recheck your submission."},{"type":"Warning-Semantic","text":"[EFM.6.08.05.LC3] Concept solobrands.com:CommonUnitClassAMember should match expected LC3 composition CommonUnitClassMember - DTC_taxonomy_FY_2023_2025.zip/DTC_taxonomy_FY_2023_2025/DTC-20251231.xsd 7988 - DTC_taxonomy_FY_2023_2025.zip/DTC_taxonomy_FY_2023_2025/DTC-20251231.xsd 7988"},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:CommonUnitClassBMember.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:CommonUnitMaximumAdditionalAuthorizationThreshold.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:CommonUnitVotes.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:CommonUnitsMember.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:ComprehensiveIncomeLossNetOfTaxAttributableToNoncontrollingInterestExcludingOtherComprehensiveIncomeLossAttributableToNoncontrollingInterests.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:ComprehensiveIncomeLossNetOfTaxIncludingNetIncomeFromNoncontrollingInterests.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:ComputerSoftwareAndOtherEquipmentMember.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:ContingentConsiderationLiabilityMember.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:ContingentConsiderationNoncurrent.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:ContractWithCustomerSalesRebateLiabilityCurrent.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:CostcoMember.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:CumulativeEffectOfNewAccountingPrincipleInPeriodOfAdoption.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:DefaultsTable.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:DeferredTaxAssetsLiabilitiesNetAbstract.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:DeferredTaxAssetsLiabilitiesNetNoncurrent.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:DicksSportingGoodsMember.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:EarningsPerShareBasicAndDilutedAbstract.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:EffectOfExchangeRateOnCashAndCashEquivalents.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:EffectiveIncomeTaxRateReconciliationChangeInStateTaxReservesAmount.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:EffectiveIncomeTaxRateReconciliationChangeInStateTaxReservesPercent.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:EffectiveIncomeTaxRateReconciliationPermanentDifferencesNetAmount.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:EffectiveIncomeTaxRateReconciliationPermanentDifferencesNetPercent.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:EffectiveIncomeTaxRateReconciliationTaxCutsAndJobsActOf2017TransitionTaxOnAccumulatedForeignEarningsPercent.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:ExcessTaxBenefitFromShareBasedCompensationFinancingActivities.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:ExcessTaxBenefitFromShareBasedCompensationOperatingActivities.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:ExchangeOfTradeCredits.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:FairValueAdjustmentOfEarnoutLiabilities.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:FairValueOfThePostClosingPaymentLiability.  Please recheck your submission."},{"type":"Warning-Semantic","text":"[EFM.6.08.05.LC3] Concept solobrands.com:FairValueOfThePostClosingPaymentLiability should match expected LC3 composition FairValueOfPostClosingPaymentLiability - DTC_taxonomy_FY_2023_2025.zip/DTC_taxonomy_FY_2023_2025/DTC-20251231.xsd 8016 - DTC_taxonomy_FY_2023_2025.zip/DTC_taxonomy_FY_2023_2025/DTC-20251231.xsd 8016"},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:FinanceLeaseCost.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:FirePitsMember.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:GoodwillMeasurementInput.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:ISLEMember.  Please recheck your submission."},{"type":"Warning-Semantic","text":"[EFM.6.08.05.LC3] Concept solobrands.com:ISLEMember should match expected LC3 composition IsleMember - DTC_taxonomy_FY_2023_2025.zip/DTC_taxonomy_FY_2023_2025/DTC-20251231.xsd 8020 - DTC_taxonomy_FY_2023_2025.zip/DTC_taxonomy_FY_2023_2025/DTC-20251231.xsd 8020"},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:IcyBreezeMember.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:IncentiveAwardPlanMember.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:IncentiveUnitMember.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:IncreaseDecreaseInBarterCredits.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:IncreaseDecreaseInOperatingLeases.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:IncreaseDecreaseInWarrantyProvision.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:IndoorFireAndDecorProductsMember.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:InventoryFinishedProductsInTransitNetOfReserves.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:InventoryFinishedProductsOnHandNetOfReserves.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:KayaksAndKayakAccessoriesMember.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:LeaseLiability.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:LeaseLiabilityCurrent.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:LeaseRightOfUseAsset.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:LeasesWeightedAverageDiscountRateAbstract.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:LesseeOperatingLeaseLeaseNotYetCommencedEstimatedRightOfUseAsset.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:NetDeferredTaxAdjustmentsResultingFromReorganizationTransactions.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:NetIncomeLossEarnedByControllingMembersPriorToTheReorganizationTransactions.  Please recheck your submission."},{"type":"Warning-Semantic","text":"[EFM.6.08.05.LC3] Concept solobrands.com:NetIncomeLossEarnedByControllingMembersPriorToTheReorganizationTransactions should match expected LC3 composition NetIncomeLossEarnedByControllingMembersPriorToReorganizationTransactions - DTC_taxonomy_FY_2023_2025.zip/DTC_taxonomy_FY_2023_2025/DTC-20251231.xsd 8037 - DTC_taxonomy_FY_2023_2025.zip/DTC_taxonomy_FY_2023_2025/DTC-20251231.xsd 8037"},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:NetIncomePriorToTheReorganizationTransactions.  Please recheck your submission."},{"type":"Warning-Semantic","text":"[EFM.6.08.05.LC3] Concept solobrands.com:NetIncomePriorToTheReorganizationTransactions should match expected LC3 composition NetIncomePriorToReorganizationTransactions - DTC_taxonomy_FY_2023_2025.zip/DTC_taxonomy_FY_2023_2025/DTC-20251231.xsd 8038 - DTC_taxonomy_FY_2023_2025.zip/DTC_taxonomy_FY_2023_2025/DTC-20251231.xsd 8038"},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:NewAccountingPronouncementMember.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:NewAccountingPronouncementOrChangeInAccountingPrincipleEffectOfAdoptionQuantification.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:NoncontrollingInterestHoldersTaxBenefitPercentage.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:NoncontrollingInterestIncreaseDecreaseFromBusinessCombinationAndPurchaseOfInterests.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:NoncontrollingInterestIncreaseDecreaseFromBusinessCombinationAndPurchaseOfInterestsShares.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:NumberOfAdditionalManufacturers.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:NumberOfManufacturers.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:NumberOfOwners.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:OruKayakIncMember.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:OruMember.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:OtherComprehensiveIncomeLossForeignCurrencyTransactionAndTranslationAdjustmentNetOfTaxIncludingPortionAttributableToNoncontrollingInterest.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:OtherLiabilitiesNoncurrentMiscellaneous.  Please recheck your submission."},{"type":"Error","text":"[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:OtherOperatingExpensesPolicyPolicyTextBlock.  Please recheck your submission."},{"type":"Info","text":"There are more than 100 warnings or errors, only 100 will be displayed."}];
+-
+-      
+-  // Log viewer—renders selected log into #reportDiv
+-  window.showRenderingLog = function() {
+-    var pane = document.getElementById('reportDiv');
+-    if (!pane) return;
+-    var logs = window.SEC_RENDERING_LOG || [];
+-    var rows = logs.map(function (entry) {
+-      var type = escapeHtml(entry?.type || 'Info');
+-      var text = escapeHtml(entry?.text || '').replace(/
+-|-|
+-/g, '<br>');
+-      return ('<tr class="ro"><td class="text ' + type.slice(0,4).toLowerCase() +
+-              '">' + type + ': ' + text + '</td></tr>'
+-              );
+-    }).join('');
+-
+-    pane.innerHTML = 
+-      '<title>Rendering Log</title>' +
+-      '<style>
+-.info{ }
+-.erro{ background-color:pink; }
+-.inco{ background-color:peachpuff; }
+-.warn{ background-color:lemonchiffon; }
+-</style>' +
+-      '<link rel="stylesheet" type="text/css" href="report.css"></link>' +
+-      '<table class="report" border="0" cellspacing="2">' +
+-      '<tbody>' +
+-      '<tr><th class="Info">The rendering log information below will not appear on the EDGAR web site.</th></tr>' +
+-      rows +
+-      '</tbody>' +
+-      '</table>';
+-  };
+-
+-
+-      // Fallbacks if Show.js isn't present (offline harness):
+-      if (typeof window.clearReportDiv !== 'function') {
+-        window.clearReportDiv = function() {
+-          var pane = document.getElementById('reportDiv');
+-          if (pane) pane.innerHTML = '';
+-        };
+-      }
+-      if (typeof window.loadReport !== 'function') {
+-        window.loadReport = function(n) {
+-          var file = window.SEC_FILES_BY_POS && window.SEC_FILES_BY_POS[n];
+-          var pane = document.getElementById('reportDiv');
+-          if (!pane) return;
+-
+-          if (!file) {
+-            pane.innerHTML = '<div style="color:red;">Missing file for position ' + n + '</div>';
+-            return;
+-          }
+-
+-          // Synthetic "All Reports": load every report sequentially
+-          if (file === 'ALL_REPORTS_SYNTHETIC') {
+-            var out = '';
+-            var keys = Object.keys(window.SEC_FILES_BY_POS).map(Number).sort((a,b)=>a-b);
+-            var base = window.SEC_ALIAS_PATH || '';
+-            var fetchOne = function(i) {
+-              if (i >= keys.length) {
+-                pane.innerHTML = out;
+-                return;
+-              }
+-              var k = keys[i], f2 = window.SEC_FILES_BY_POS[k];
+-              if (f2 === 'ALL_REPORTS_SYNTHETIC') { fetchOne(i+1); return; }
+-              var url = base ? (base + '/' + f2) : f2;
+-              window.clearReportDiv();
+-              fetch(url).then(r => r.text()).then(html => { out += html + '<hr>'; fetchOne(i+1); })
+-                .catch(() => { out += '<div style="color:red;">Failed to load ' + url + '</div><hr>'; fetchOne(i+1); });
+-            };
+-            fetchOne(0);
+-            return;
+-          }
+-
+-          var url = (window.SEC_ALIAS_PATH ? (window.SEC_ALIAS_PATH + '/' + file) : file);
+-          window.clearReportDiv();
+-          fetch(url).then(r => r.text()).then(html => {
+-            pane.innerHTML = html;
+-          }).catch(() => {
+-            pane.innerHTML = '<div style="color:red;">Failed to load report.</div>';
+-          });
+-        };
+-      }
+-
+-      // Auto-load the first report if available (SEC site behavior)
+-      (function() {
+-        var n = 1;
+-        if (typeof n === 'number') {
+-          try { window.loadReport(n); } catch (e) { /* ignore */ }
+-        }
+-      }());
+-    </script>
+-  
+   </body>
+-</html>+</html>

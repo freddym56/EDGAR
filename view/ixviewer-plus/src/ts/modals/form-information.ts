@@ -33,9 +33,12 @@ export const ModalsFormInformation = {
 			return;
 		}
 			
-		Modals.close(event);
+		const modal = document.getElementById('form-information-modal')
+		if (modal) {
+			modal.classList.remove('d-none');
+			Modals.bringToFront(modal)
 
-		document.getElementById('form-information-modal')?.classList.remove('d-none');
+		}
 
 		document.getElementById('form-information-modal-drag')?.focus();
 
@@ -87,14 +90,14 @@ export const ModalsFormInformation = {
 			Modals.copyContent(event, 'form-information-modal-carousel', 'form-information-copy-paste');
 		});
 
-		document.getElementById('dialog-box-close')?.addEventListener('click', (event: MouseEvent) => {
-			Modals.close(event);
-		});
-		document.getElementById('dialog-box-close')?.addEventListener('keyup', (event: KeyboardEvent) => {
-			if (!actionKeyHandler(event)) return;
-			Modals.close(event);
-		});
-
+		const closeBtn = document.getElementById('form-information-modal-close');
+		if(closeBtn) {
+			closeBtn.onclick = () => Modals.hide('form-information-modal');
+			closeBtn.onkeyup = (event: KeyboardEvent) => {
+				if (!actionKeyHandler(event)) return;
+				Modals.hide('form-information-modal');
+			}
+		}
 	},
 
 	focusOnContent: () => {

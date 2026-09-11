@@ -8,18 +8,21 @@ import { Constants } from "../constants/constants";
 
 export const ModalsSettings = {
 
-	clickEvent: (event: MouseEvent | KeyboardEvent) => {
-/*
-		if (
-			Object.prototype.hasOwnProperty.call(event, 'key') &&
-			!((event as KeyboardEvent).key === 'Enter' || (event as KeyboardEvent).key === 'Space')
-		) {
-			return;
-		}
-*/
-		Modals.close(event);
+	clickEvent: () => {
+		/*
+			if (
+				Object.prototype.hasOwnProperty.call(event, 'key') &&
+				!((event as KeyboardEvent).key === 'Enter' || (event as KeyboardEvent).key === 'Space')
+			) {
+				return;
+			}
+		*/
 
-		document.getElementById('settings-modal')?.classList.remove('d-none');
+		const modal = document.getElementById('settings-modal')
+		if (modal) {
+			modal.classList.remove('d-none');
+			Modals.bringToFront(modal)
+		}
 
 		document.getElementById('settings-modal-drag')?.focus();
 
@@ -29,21 +32,22 @@ export const ModalsSettings = {
 		(document.getElementById('scroll-position-select') as HTMLInputElement).value = Constants.scrollPosition;
 		// set correct hover value
 		(document.getElementById('hover-option-select') as HTMLInputElement).value = Constants.hoverOption.toString();
+		// set correct open sidebar option value
+		(document.getElementById('open-sidebar-option-select') as HTMLInputElement).value = Constants.openSidebarOption.toString();
 	},
 
 	listeners: () => {
-		// we add draggable
 		Modals.initDrag(document.getElementById('settings-modal-drag') as HTMLElement);
 
-		document.getElementById('settings-modal-close')?.addEventListener('click', (event: MouseEvent) => {
-			Modals.close(event);
-		});
-		document.getElementById('settings-modal-close')?.addEventListener('keyup', (event: KeyboardEvent) => {
-			if (event.key == " " || event.key == "Space" || event.key == "Enter") {
-				Modals.close(event);
+		const closeBtn = document.getElementById('settings-modal-close');
+		if(closeBtn) {
+			closeBtn.onclick = () => Modals.hide('settings-modal');
+			closeBtn.onkeyup = (event: KeyboardEvent) => {
+				if (event.key == " " || event.key == "Space" || event.key == "Enter") {
+					Modals.hide('settings-modal');
+				}
 			}
-		});
-
+		}
 	},
 
 	scrollPosition: (event: Event) => {
@@ -61,5 +65,18 @@ export const ModalsSettings = {
 			localStorage.setItem('hoverOption', 'false');
 			Constants.hoverOption = false;
 		}
-	}
+	},
+	openSidebarOption: (event: Event) => {
+		console.log(event)
+		if (event?.target?.value === 'true') {
+
+			localStorage.setItem('openSidebarOption', 'true');
+			Constants.openSidebarOption = true;
+		} else {
+
+			localStorage.setItem('openSidebarOption', 'false');
+			Constants.openSidebarOption = false;
+		}
+	},
+
 };

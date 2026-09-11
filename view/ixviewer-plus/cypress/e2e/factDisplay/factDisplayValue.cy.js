@@ -8,7 +8,8 @@ describe(`Fact Display`, () => {
         cy.get(selectors.sidebarPaginationNext).click()
         cy.get(selectors.sidebarPaginationNext).click()
         cy.get('a[data-id="fact-identifier-0"]').click()
-        cy.get('#fact-modal-carousel-page-1 > tbody > tr:nth-child(2) > td > div')
+        cy.get(selectors.factDetailDisplayBtn).click()
+        cy.get('#fact-details-attributes > tbody > tr:nth-child(2) > td > div')
             .should('have.text', '0000014693') // not 14,693
     })
     
@@ -57,7 +58,7 @@ describe(`Fact Display`, () => {
         cy.get(selectors.factCountClock).should('not.exist')
         cy.get('#fact-identifier-315').click() // hundreths fact
         cy.get(selectors.factValueInModal).should('have.text', '0.70') // not 0.7
-        cy.get(selectors.factModalJump).click();
+        cy.get(selectors.factDetailDisplayBtn).click()
         cy.get('a.sidebar-fact[selected-fact="true"] [data-cy="factVal"]').should('have.text', '0.70') // not 0.7
     })
 
@@ -68,49 +69,42 @@ describe(`Fact Display`, () => {
         //should not round a high-precision amount (preserve 999,999,999,999.9999999)
         cy.get('#fact-identifier-40').click() // 999,999,999,999.9999999 fact
         cy.get(selectors.factValueInModal).should('have.text', '999,999,999,999.9999999') // not rounded 1,000,000,000,000.0000000
-        cy.get(selectors.factModalJump).click();
+        cy.get(selectors.factDetailDisplayBtn).click()
         cy.get('a.sidebar-fact[selected-fact="true"] [data-cy="factVal"]').should('have.text', '999,999,999,999.9999999') // not rounded 
 
         // Decimal is 3 factValue is 54,615.00  
         cy.get('#fact-identifier-37').click() // 54,615.00  
         cy.get(selectors.factValueInModal).should('have.text', '54,615.000') // 54,615.000
-        cy.get(selectors.factModalJump).click();
         cy.get('a.sidebar-fact[selected-fact="true"] [data-cy="factVal"]').should('have.text', '54,615.000')
 
           // Decimal 2 factValue=99.9045
         cy.get('#fact-identifier-41').click() // 99.9045 
         cy.get(selectors.factValueInModal).should('have.text', '99.90') // 99.90
-        cy.get(selectors.factModalJump).click();
         cy.get('a.sidebar-fact[selected-fact="true"] [data-cy="factVal"]').should('have.text', '99.90') //99.90
 
         //Decimal is 'abs' factValue=16,262.99
         cy.get('#fact-identifier-43').click() // 16,262.99
         cy.get(selectors.factValueInModal).should('have.text', '16,262.99') // 16,262.99
-        cy.get(selectors.factModalJump).click();
         cy.get('a.sidebar-fact[selected-fact="true"] [data-cy="factVal"]').should('have.text', '16,262.99') //16,262.99
 
          //Decimal is '0' factValue=242678436.99
          cy.get('#fact-identifier-20').click() 
          cy.get(selectors.factValueInModal).should('have.text', '242,678,437') 	
-         cy.get(selectors.factModalJump).click();
          cy.get('a.sidebar-fact[selected-fact="true"] [data-cy="factVal"]').should('have.text', '242,678,437') 
 
            //Decimal is '0' factValue=242678436.00
         cy.get('#fact-identifier-22').click() 
         cy.get(selectors.factValueInModal).should('have.text', '242,678,436') 	
-        cy.get(selectors.factModalJump).click();
         cy.get('a.sidebar-fact[selected-fact="true"] [data-cy="factVal"]').should('have.text', '242,678,436') 
 
          //Decimal is '1' factValue=33513.89
          cy.get('#fact-identifier-21').click() 
          cy.get(selectors.factValueInModal).should('have.text', '33,513.9') 	
-         cy.get(selectors.factModalJump).click();
          cy.get('a.sidebar-fact[selected-fact="true"] [data-cy="factVal"]').should('have.text', '33,513.9') 
 
         cy.loadByAccessionNum('000143774923034166')
         cy.get('#fact-identifier-79').click() // 3,391,341 neg sign and commas fact no decimal
         cy.get(selectors.factValueInModal).should('have.text', '-3,391,341') // not rounded 3,391,341 kept neg sign and commas
-        cy.get(selectors.factModalJump).click();
         cy.get('a.sidebar-fact[selected-fact="true"] [data-cy="factVal"]').should('have.text', '-3,391,341') // not rounded 3,391,341 kept neg sign and commas
 
     })

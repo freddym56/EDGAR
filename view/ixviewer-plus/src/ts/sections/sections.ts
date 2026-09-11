@@ -317,7 +317,6 @@ export const Sections = {
         if (numOfInstancesWithSections <= 1) {
             document.getElementById("sections-settings-btn")?.classList.add('d-none');
         }
-
         sections.forEach((section: Section) => {
             // dom ids
             const sectionSelector = convertToSelector(section.domId);
@@ -325,12 +324,12 @@ export const Sections = {
             section.instanceSectionId = sectionSelector;
             section.instanceSectionHeaderId = (`instance-header-${sectionSelector}`);
             section.instanceSectionBodyId = (`instance-body-${sectionSelector}`);
-            section.menuCatClean = (`${section.instanceSectionId}--${convertToSelector(section.menuCatMapped)}`)
-            section.menuCatHeaderId = (`cat-header-${convertToSelector(section.menuCatMapped)}-${sectionSelector}`);
-            section.menuCatBodyId = (`cat-body-${convertToSelector(section.menuCatMapped)}-${sectionSelector}`);
+            section.menuCatClean = (`${section.instanceSectionId}--${convertToSelector(section.normalizedCategory)}`)
+            section.menuCatHeaderId = (`cat-header-${convertToSelector(section.normalizedCategory)}-${sectionSelector}`);
+            section.menuCatBodyId = (`cat-body-${convertToSelector(section.normalizedCategory)}-${sectionSelector}`);
 
             const newDoc = section.instanceDocName !== prevDocName;
-
+            
             if (newDoc) {
                 const sectionsInInstanceCount = sections.filter(sect => {
                     return sect.instanceDocName === section.instanceDocName
@@ -342,11 +341,10 @@ export const Sections = {
             const menuCatElem = document.querySelector(`div[id="${section.menuCatClean}"]`);
             if (!menuCatElem) {
                 const linksInMenuCatCount = sections.filter(sect => {
-                    return sect.menuCatMapped === section.menuCatMapped && sect.instanceDocName === section.instanceDocName
+                    return sect.normalizedCategory === section.normalizedCategory && sect.instanceDocName === section.instanceDocName
                 }).length;
                 Sections.createMenuCatCollapsable(section, linksInMenuCatCount);
             }
-
             Sections.createSectionItemLink(section);
         });
 
@@ -412,7 +410,7 @@ export const Sections = {
                 <div class="menu-cat-header ">
                     <h6 class="mb-0 h6-override">
                         <button 
-                            id="section-header-${sectionItem.menuCatMapped}"
+                            id="section-header-${sectionItem.normalizedCategory}"
                             class="btn d-flex justify-content-between align-items-center ix-focus-inset"
                             type="button"
                             tabindex="2"
@@ -420,7 +418,7 @@ export const Sections = {
                             aria-expanded="true"
                             data-bs-target="#${sectionItem.menuCatBodyId}"
                         >
-                            <span class="font-size-1 menu-cat-name">${sectionItem.menuCatMapped}</span>
+                            <span class="font-size-1 menu-cat-name">${sectionItem.normalizedCategory}</span>
                             <span class="fa-solid open-indicator fa-chevron-${expandMenuCat ? 'down' : 'right'}"></span>
                         </button>
                     </h6>
@@ -441,7 +439,10 @@ export const Sections = {
     },
 
     createSectionItemLink: (sectionItem: Section) => {
-        const sectionLinkElem =
+        let sectionLinkElem = ''
+        if (sectionItem.inlineFactSelector) {
+            // report has valid link to inline location
+            sectionLinkElem =
             `<a 
                 xmlns="http://www.w3.org/1999/xhtml"
                 order="${sectionItem.order}"
@@ -453,20 +454,42 @@ export const Sections = {
                 selected-fact="false"
                 tabindex="2"
                 contextRef="${sectionItem.fact?.contextRef}"
-                fact-instance-index="${sectionItem.instanceIndex}"
+                fact-instance-index="${sectionItem.meta?.instanceIndex}"
             >
                 ${sectionItem.shortName}
             </a>`;
+        } else {
+            // report LACKS valid link to inline location
+            sectionLinkElem =
+            `<div 
+                xmlns="http://www.w3.org/1999/xhtml"
+                order="${sectionItem.order}"
+                position="${sectionItem.position}"
+                class="section-link list-group-item list-group-item-action ix-focus" 
+                selected-fact="false"
+                tabindex="2"
+                contextRef="${sectionItem.fact?.contextRef}"
+                fact-instance-index="${sectionItem.meta?.instanceIndex}"
+                data-toggle="tooltip" 
+                data-placement="left" 
+                title="Report contents are not visible except as Additional Facts"
+            >
+                ${sectionItem.shortName}
+            </div>`;
+        }
+        
         const parser = new DOMParser();
         const doc = parser.parseFromString(sectionLinkElem, 'text/html')
-        const sectionFactLink = doc.querySelector('a') as HTMLElement
+        const sectionFactLink = doc.querySelector(sectionItem.inlineFactSelector ? 'a' : 'div') as HTMLElement
 
-        for (const eType of ["click", "keyup"] as const) {
-            sectionFactLink.addEventListener(eType, (eventElem) => {
-                if (eventElem instanceof KeyboardEvent && !actionKeyHandler(eventElem))
-                    return;
-                Sections.handleSectionLinkClick(eventElem);
-            });
+        if (sectionItem.inlineFactSelector) {
+            for (const eType of ["click", "keyup"] as const) {
+                sectionFactLink.addEventListener(eType, (eventElem) => {
+                    if (eventElem instanceof KeyboardEvent && !actionKeyHandler(eventElem))
+                        return;
+                    Sections.handleSectionLinkClick(eventElem);
+                });
+            }
         }
 
         document.getElementById(sectionItem.menuCatBodyId)?.appendChild(sectionFactLink);

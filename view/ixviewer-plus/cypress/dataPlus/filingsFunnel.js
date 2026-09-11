@@ -1,6 +1,6 @@
 import { filings as standardFilings } from './standardFilings.js'
 // Todo: import experimentalFilings
-import { filings as set200 } from './enrichedFilingsPlus.mjs'
+import { filings as enrichedFilings } from './enrichedFilingsPlus.mjs'
 // import addendum from './addendum.json'
 
 /*
@@ -14,7 +14,7 @@ import { filings as set200 } from './enrichedFilingsPlus.mjs'
     then you can dowload it, dress it up a bit, and run a script against it to generate a new standardFilings.js doc.
 */
 
-const filings = [...standardFilings, ...set200];
+const filings = [...standardFilings, ...enrichedFilings];
 
 const getBaseSet = (setName) => {
     let filingSet = [];
@@ -28,7 +28,7 @@ const getBaseSet = (setName) => {
             break;
         }
         case "set200": {
-            filingSet = set200;
+            filingSet = enrichedFilings;
             break;
         }
         case "all": {

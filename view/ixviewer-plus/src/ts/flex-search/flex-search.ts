@@ -3,6 +3,7 @@ import { FactMap } from "../facts/map";
 import { SingleFact, SegmentClass } from "../interface/fact";
 import { Logger, ILogObj } from "tslog";
 import { Constants } from "../constants/constants";
+import { ReferenceAsArray } from "../interface/facts"
 
 /*
     Flex Search version: 0.7.31
@@ -16,25 +17,19 @@ interface SearchObject {
     limit: number,
     key?: string
 }
-
 interface SearchResult {
     field: string,
     result: string[],
     resultSet?: Set<string>,
 }
 interface SearchParams {
-    options: (number|null)[],
-    value: string,
+    options: (number | null)[],
+    clauses: string[][],
 }
-
-interface SearchFacts { // eslint-disable-line
-    (searchParams:SearchParams): void
-}
-
-interface index {
+interface Index {
     id: string,
     field: string | undefined,
-    search?: (searchObject:SearchObject) => SearchResult[]
+    search?: (searchObject: SearchObject) => SearchResult[]
 }
 
 // interface filterState {
@@ -49,6 +44,17 @@ interface index {
 //     type?: string[],
 // };
 
+function intersect(sets: Set<string>[]) {
+    if (sets.length === 0) return new Set()
+    const sorted = [...sets].sort((a, b) => a.size - b.size)
+
+    return sorted.slice(1).reduce((acc, curr) => {
+        const next: Set<string> = new Set()
+        acc.forEach(id => { if (curr.has(id)) next.add(id) })
+        return next
+    }, new Set(sorted[0]))
+}
+
 function getDimensionCounts(): void {
     const axis = FactMap.getAllAxis();
     Constants.axesCount = axis.length;
@@ -61,7 +67,7 @@ export class FlexSearch { // maybe this should be ixFlexSearch and we need to us
     // We have added a LOT of our own code to make filters work as expected.  Might be easier not to use a library at all...
     // Maybe look into https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API
 
-    static index:index = {
+    static index: Index = {
         id: '',
         field: undefined,
     }
@@ -71,9 +77,9 @@ export class FlexSearch { // maybe this should be ixFlexSearch and we need to us
         'measure', 'axis', 'member', 'scale', 'balance', 'custom', 'amount',
         'text', 'calculation', 'negative', 'additional', 'dimensions'
     ];
-    // static referenceProps = [
-    //     'refTopic', 'refSubtopic', 'refParagraph', 'refPublisher', 'refSection', 'refNumber'
-    // ];
+    static referenceProps = [
+        'refTopic', 'refSubtopic', 'refParagraph', 'refPublisher', 'refSection', 'refNumber'
+    ];
 
     public static init(mapOfFacts: Map<string, SingleFact>): Promise<any> {
         this.index = new FlexSearchDocument({
@@ -82,8 +88,7 @@ export class FlexSearch { // maybe this should be ixFlexSearch and we need to us
             // depth: 1,
             document: {
                 id: 'id',
-                // index: [...FlexSearch.standardProps, ...FlexSearch.referenceProps],
-                index: [...FlexSearch.standardProps],
+                index: [...FlexSearch.standardProps, ...FlexSearch.referenceProps],
             },
         });
 
@@ -91,18 +96,18 @@ export class FlexSearch { // maybe this should be ixFlexSearch and we need to us
         FactMap.init(mapOfFacts); // not totally sure why we have to run this, but if we don't some filters tests break.
         getDimensionCounts();
 
-        // const getSearchableRefDataByProp = (refs: ReferenceAsArray[], propName: string) => {
-        //     // could improve perf by iterating through fact refs just once... instead of for each propName
-        //     if (refs) {
-        //         const combinedValsPerRefProp = refs.reduce((combinedVals, ref) => {
-        //             return ref.reduce((combinedVals: string, refPropObject:{string: string}) => {
-        //                 return (`${combinedVals} ${(refPropObject && refPropObject[propName]) ? refPropObject[propName] : ''}`).trim()
-        //             }, combinedVals)
-        //         }, '')
-        //         return combinedValsPerRefProp.length === 0 ? null : combinedValsPerRefProp;
-        //     }
-        //     return null;
-        // };
+        const getSearchableRefDataByProp = (refs: ReferenceAsArray[] | null, propName: string) => {
+            // could improve perf by iterating through fact refs just once... instead of for each propName
+            if (refs) {
+                const combinedValsPerRefProp = refs.reduce((combinedVals, ref) => {
+                    return ref.reduce((combinedVals: string, refPropObject:{string: string}) => {
+                        return (`${combinedVals} ${(refPropObject && refPropObject[propName]) ? refPropObject[propName] : ''}`).trim()
+                    }, combinedVals)
+                }, '')
+                return combinedValsPerRefProp.length === 0 ? null : combinedValsPerRefProp;
+            }
+            return null;
+        };
 
         const getAxes = (segments: Array<SegmentClass[] | SegmentClass>) => {
             if (!segments) return;
@@ -150,17 +155,17 @@ export class FlexSearch { // maybe this should be ixFlexSearch and we need to us
                 'negative': fact.isNegativeOnly ? fact.isNegativeOnly.toString() : null,
                 'additional': fact.isAdditional ? fact.isAdditional.toString() : null,
                 // references
-                // 'refTopic': getSearchableRefDataByProp(fact.references, 'Topic'),
-                // 'refSubtopic': getSearchableRefDataByProp(fact.references, 'SubTopic'),
-                // 'refParagraph': getSearchableRefDataByProp(fact.references, 'Paragraph'),
-                // 'refPublisher': getSearchableRefDataByProp(fact.references, 'Publisher'),
-                // 'refSection': getSearchableRefDataByProp(fact.references, 'Section'),
-                // 'refNumber': getSearchableRefDataByProp(fact.references, 'Number'),
+                'refTopic': getSearchableRefDataByProp(fact.references, 'Topic'),
+                'refSubtopic': getSearchableRefDataByProp(fact.references, 'SubTopic'),
+                'refParagraph': getSearchableRefDataByProp(fact.references, 'Paragraph'),
+                'refPublisher': getSearchableRefDataByProp(fact.references, 'Publisher'),
+                'refSection': getSearchableRefDataByProp(fact.references, 'Section'),
+                'refNumber': getSearchableRefDataByProp(fact.references, 'Number'),
             };
             this.index.add(searchable);
         });
         return new Promise(resolve => {
-            resolve({msg: "search init complete"});
+            resolve({ msg: "search init complete" });
         })
     }
 
@@ -168,42 +173,41 @@ export class FlexSearch { // maybe this should be ixFlexSearch and we need to us
      * Description
      * @param {any} searchParams.options -> {} array of numbers corresponding to search fields checkboxes (name, conent, labels, definitions, dimensions, references) 
      * @param {any} searchParams.value -> text search value
-     * @param {any} suggest=false
      * @returns {any}
      */
     // { options, value }
-    static searchFacts(searchParams: SearchParams, suggest = false) {
-        const optionFields: (string|null)[] = [
+
+    static searchTerm(term: string, options: (number | null)[]) {
+        const optionFields: (string | null)[] = [
             null,
             'factname',
             'content',
             'labels',
             'definitions',
             'dimensions',
-            // 'references',
+            'references',
         ];
-
-        const searchObject = searchParams.options?.reduce((acc: Array<SearchObject>, current) => {
-            if (optionFields[current]) {
-                if (optionFields[current] === 'content') {
+        const searchObject: SearchObject[] = options?.reduce((acc: Array<SearchObject>, curr) => {
+            if (curr === null) return acc
+            if (optionFields[curr]) {
+                if (optionFields[curr] === 'content') {
                     acc.push({
                         field: 'raw',
-                        query: searchParams.value as string,
+                        query: term,
                         bool: 'or',
                         limit: FlexSearch.indexCount,
-                    });
-                    acc.push({
+                    }, {
                         field: 'content',
-                        query: searchParams.value as string,
+                        query: term,
                         bool: 'or',
                         limit: FlexSearch.indexCount,
                     });
-                } else if (optionFields[current] === 'references') {
+                } else if (optionFields[curr] === 'references') {
                     // we add multiple
                     FlexSearch.referenceProps.forEach(refProp => {
                         acc.push({
                             field: refProp,
-                            query: searchParams.value as string,
+                            query: term,
                             bool: 'or',
                             limit: FlexSearch.indexCount,
                         });
@@ -211,8 +215,8 @@ export class FlexSearch { // maybe this should be ixFlexSearch and we need to us
                 } else {
                     // we add just oneuuu
                     acc.push({
-                        field: optionFields[current] as string,
-                        query: searchParams.value as string,
+                        field: optionFields[curr],
+                        query: term,
                         bool: 'or',
                         limit: FlexSearch.indexCount,
                     });
@@ -221,12 +225,24 @@ export class FlexSearch { // maybe this should be ixFlexSearch and we need to us
             return acc;
         }, []);
 
-        const ids = this.index.search(searchObject);
-        const uniqueArray = [...new Set([].concat(...ids.map(current => current.result)))];
-        if (suggest) {
-            return uniqueArray;
-        }
-        return uniqueArray;
+        const ids: Set<string> = new Set()
+        this.index.search?.(searchObject).forEach(({ result }) => result.forEach((id) => ids.add(id)))
+        return ids
+    }
+
+    static searchFacts(searchParams: SearchParams) {
+        const finalIds = new Set();
+
+        // "cat and dog or mouse and sheep" -> [["cat", "dog"],["mouse","sheep"]] -> (clauses)
+        // ["cat", "dog"]     => clause 1
+        // ["mouse","sheep"]  => clause 2
+        searchParams.clauses?.forEach((clause: string[]) => {
+            const termSets: Set<string>[] = clause.map((term: string) => this.searchTerm(term, searchParams.options))
+            // termSet = [{set of fact ids for facts containg "cat"}, {set of fact ids for facts containg "cat"}]
+            intersect(termSets).forEach(id => finalIds.add(id))
+        })
+
+        return finalIds
     }
 
     static filterFacts(dataFields: any, filterState: any) {
@@ -236,7 +252,7 @@ export class FlexSearch { // maybe this should be ixFlexSearch and we need to us
         let dataFilterActive = null;
         let tagFilterActive = null;
 
-        const filterObject = Object.keys(filterState).reduce((accumulator: Array<SearchObject>, filterKey: string|number|string[]) => {
+        const filterObject = Object.keys(filterState).reduce((accumulator: Array<SearchObject>, filterKey: string | number | string[]) => {
             if (filterKey === 'data') {
                 if (filterState[filterKey]) {
                     dataFilterActive = true;
@@ -261,15 +277,15 @@ export class FlexSearch { // maybe this should be ixFlexSearch and we need to us
                     });
                 }
             } else {
-                accumulator.push(filterState[filterKey].map((currentFilterVal:string|number|string[]) => {
+                accumulator.push(filterState[filterKey].map((currentFilterVal: string | number | string[]) => {
 
                     // have to manually figure out how many facts have the prop / val to set the limit of the search, which flexsearch is 
                     // smart enough to choose the most correct matches.
                     // On it's own flexsearch returns too many results due to partial matches.
-                    
+
                     const matchCount = FactMap.asArray().filter(fact => fact[filterKey] == currentFilterVal).length
                     // const matchCount = [...mapOfFacts.values()].filter(fact => fact[filterKey] == currentFilterVal).length
-                    
+
                     // seems to increase filter time by only ~5%
 
                     return {
@@ -285,9 +301,9 @@ export class FlexSearch { // maybe this should be ixFlexSearch and we need to us
             }
             return accumulator;
         }, []).flat();
-        
+
         if (filterObject.length > 0) {
-            
+
             // APPLY FILTER
             const queryResultObjs = this.index.search(filterObject);
 
@@ -331,7 +347,7 @@ export class FlexSearch { // maybe this should be ixFlexSearch and we need to us
                     return a.union(c);
                 }
             }, null);
-            
+
             // find intersection of data/tags & more
             let finalSet: string[] | null = null;
             if ((dataFilterActive || tagFilterActive) && !dataTagsIntersection) {
@@ -342,7 +358,7 @@ export class FlexSearch { // maybe this should be ixFlexSearch and we need to us
                 finalSet = dataTagsIntersection.intersection(moreDataCombined);
             }
 
-            if (LOGPERFORMANCE || Constants.logPerfParam ) {
+            if (LOGPERFORMANCE || Constants.logPerfParam) {
                 const endPerf = performance.now();
                 const log: Logger<ILogObj> = new Logger();
                 log.debug(`FlexSearch Filter completed in: ${(endPerf - startPerf).toFixed(2)}ms`);

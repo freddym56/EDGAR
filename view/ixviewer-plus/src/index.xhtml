@@ -17,18 +17,14 @@
         This application relies heavily on JavaScript -- you
         will need to allow JavaScript to use this application.
     </noscript>
-    
-    <div id="loading-animation"
-         class="d-flex justify-content-center align-items-center"
-         style="position: absolute; height: 100vh; width: 100vw; background-color: #EEEB; z-index: 20000;">
-         
+
+    <div id="loading-animation" class="d-flex justify-content-center align-items-center"
+        style="position: absolute; height: 100vh; width: 100vw; background-color: #EEEB; z-index: 20000;">
+
         <div class="d-flex justify-content-center align-items-center"
-             style="background-color: #DDDD; border-radius: 200px; box-shadow: 1px 5px 20px #777;">
-            <svg xmlns="http://www.w3.org/2000/svg"
-                 id="loading"
-                 width="250" height="250"
-                 viewBox="0 0 250 250"
-                 class="circular-progress">
+            style="background-color: #DDDD; border-radius: 200px; box-shadow: 1px 5px 20px #777;">
+            <svg xmlns="http://www.w3.org/2000/svg" id="loading" width="250" height="250" viewBox="0 0 250 250"
+                class="circular-progress">
 
                 <circle class="bg"></circle>
                 <circle class="fg"></circle>
@@ -38,39 +34,41 @@
             </svg>
         </div>
     </div>
-
     <div id="topNavs" class="w-100 border-bottom">
         <nav class="navbar navbar-expand-md navbar-dark navbar-height bg-sec pl-0">
             <button class="navbar-toggler ml-1" type="button" data-test="" data-bs-toggle="collapse"
                 data-bs-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false"
                 aria-label="Toggle navigation">Inline Viewer</button>
-            <div class="navbar-height main-navbar collapse navbar-collapse bg-sec w-100" data-test="main-navbar" id="main-navbar">
+            <div class="navbar-height main-navbar collapse navbar-collapse bg-sec w-100" data-test="main-navbar"
+                id="main-navbar">
                 <ul class="navbar-nav mr-auto bg-inherit">
                     <li class="nav-item dropdown my-auto ml-1">
-                        <button id="menu-dropdown-link" data-test="menu-dropdown-link" class="nav-link dropdown-toggle click disabled"
-                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" tabindex="1" accesskey="1">
+                        <button id="menu-dropdown-link" data-test="menu-dropdown-link"
+                            class="nav-link dropdown-toggle click disabled" data-bs-toggle="dropdown"
+                            aria-haspopup="true" aria-expanded="false" tabindex="1" accesskey="1">
                             <i class="nav-loading fas fa-bars" title="Menu"></i>
                             <span class="d-md-none d-lg-inline">Menu</span>
-                        <span class="sr-only sr-only-focusable">Menu</span>
+                            <span class="sr-only sr-only-focusable">Menu</span>
                         </button>
                         <div class="dropdown-menu" id="menuContents">
                             <a id="menu-dropdown-information" data-test="menu-dropdown-information"
                                 class="dropdown-item click text-body ix-focus-inset" tabindex="1">Information</a>
                             <a id="form-information-instance" data-test="form-information-instance"
-                                class="dropdown-item click text-body ix-focus-inset" target="_blank" rel="noopener noreferrer"
-                                tabindex="1">Open XBRL Instance</a>
+                                class="dropdown-item click text-body ix-focus-inset" target="_blank"
+                                rel="noopener noreferrer" tabindex="1">Open XBRL Instance</a>
                             <a id="form-information-zip" data-test="form-information-zip"
                                 class="dropdown-item click text-body ix-focus-inset" rel="noopener noreferrer"
                                 tabindex="1">Save XBRL Zip File</a>
                             <a id="form-information-html" data-test="form-information-html"
-                                class="dropdown-item click text-body ix-focus-inset" target="_blank" rel="noopener noreferrer"
-                                tabindex="1">Open as HTML</a>
+                                class="dropdown-item click text-body ix-focus-inset" target="_blank"
+                                rel="noopener noreferrer" tabindex="1">Open as HTML</a>
                             <a id="menu-dropdown-settings" data-test="menu-dropdown-settings"
                                 class="dropdown-item click text-body ix-focus-inset" tabindex="1">Settings</a>
                             <a id="form-information-help" data-bs-toggle="collapse" data-bs-target="#help-menu"
                                 class="dropdown-item click text-body ix-focus-inset" tabindex="1">Help</a>
 
-                            <span id="form-information-version" class="dropdown-item-text lighter-text not-click"></span>
+                            <span id="form-information-version"
+                                class="dropdown-item-text lighter-text not-click"></span>
                         </div>
                     </li>
                     <li class="nav-item my-auto ml-1">
@@ -82,39 +80,40 @@
                         </button>
                     </li>
                     <li class="nav-item my-auto mx-1">
-                        <form id="global-search-form" data-test="global-search-form"
-                            class="input-group disabled" novalidate="true">
+                        <form id="global-search-form" data-test="global-search-form" class="input-group disabled"
+                            novalidate="true">
                             <div class="input-group">
                                 <div class="dropdown">
-                                    <button id="global-search-options"
-                                        data-name="global-search-options"
-                                        class="dropdown-toggle btn btn-outline-light disabled nav-search-btn" type="button"
-                                        aria-expanded="false"
-                                        data-bs-toggle="dropdown" tabindex="3"
-                                    >
+                                    <button id="global-search-options" data-name="global-search-options"
+                                        class="dropdown-toggle btn btn-outline-light disabled nav-search-btn"
+                                        type="button" aria-expanded="false" data-bs-toggle="dropdown" tabindex="3">
                                         <i class="nav-loading fas fa-cog" title="Additional Search Options">
                                             <span class="sr-only sr-only-focusable">Additional Search Options</span>
                                         </i>
                                     </button>
-                                    <div id="searchOptionsContainer" class="dropdown-menu px-2" style="top: 37px; width: 176px">
+                                    <div id="searchOptionsContainer" class="dropdown-menu px-2"
+                                        style="top: 37px; width: 176px">
                                         <div class="form-check">
                                             <label class="form-check-label mb-0 dropdown-option">
                                                 <input disabled="true" class="form-check-input meta-required"
-                                                    type="checkbox" name="search-options" value="1" checked="true" tabindex="3" />
+                                                    type="checkbox" name="search-options" value="1" checked="true"
+                                                    tabindex="3" />
                                                 <span>Include Fact Name</span>
                                             </label>
                                         </div>
                                         <div class="form-check">
                                             <label class="form-check-label mb-0">
                                                 <input disabled="true" class="form-check-input meta-required"
-                                                    type="checkbox" name="search-options" value="2" checked="true" tabindex="3" />
+                                                    type="checkbox" name="search-options" value="2" checked="true"
+                                                    tabindex="3" />
                                                 <span>Include Fact Content</span>
                                             </label>
                                         </div>
                                         <div class="form-check">
                                             <label class="form-check-label mb-0">
                                                 <input disabled="true" class="form-check-input meta-required"
-                                                    type="checkbox" name="search-options" value="3" checked="true" tabindex="3" />
+                                                    type="checkbox" name="search-options" value="3" checked="true"
+                                                    tabindex="3" />
                                                 <span>Include Labels</span>
                                             </label>
                                         </div>
@@ -132,28 +131,31 @@
                                                 <span>Include Dimensions</span>
                                             </label>
                                         </div>
-                                        <!-- <div class="form-check">
+                                        <div class="form-check">
                                             <label class="form-check-label mb-0">
                                                 <input disabled="true" class="form-check-input meta-required"
                                                     type="checkbox" name="search-options" value="6" tabindex="3" />
                                                 <span>Include References</span>
                                             </label>
-                                        </div> -->
+                                        </div>
                                     </div>
                                 </div>
-                                
+
 
                                 <input type="text" class="form-control disabled focus-inner" id="global-search"
                                     data-test="global-search" placeholder="Search Facts" disabled="true"
-                                    aria-label="Search all Facts and highlight them accordingly." tabindex="4" autocomplete="off" />
+                                    aria-label="Search all Facts and highlight them accordingly." tabindex="4"
+                                    autocomplete="off" />
                                 <button id="search-btn-clear" data-name="global-search-clear"
                                     class="btn btn-outline-light nav-search-btn disabled" type="button" tabindex="5">
                                     <i class="nav-loading fas fa-times-circle" title="Clear Search"></i>
                                     <span class="sr-only sr-only-focusable">
                                         Clear Search</span>
                                 </button>
-                                <button id="submit-search" class="btn btn-outline-light nav-search-btn disabled" type="submit" tabindex="6">
-                                    <i id="search-submit-icon" class="d-none nav-loading fas fa-search" title="Submit Search"></i>
+                                <button id="submit-search" class="btn btn-outline-light nav-search-btn disabled"
+                                    type="submit" tabindex="6">
+                                    <i id="search-submit-icon" class="d-none nav-loading fas fa-search"
+                                        title="Submit Search"></i>
                                     <i id="search-hourglass" class="fa-hourglass fas fa-regular fa-fade"></i>
                                     <span class="sr-only sr-only-focusable">
                                         Submit Search</span>
@@ -202,8 +204,8 @@
                                 </div>
                                 <div class="form-check">
                                     <label class="form-check-label mb-0">
-                                        <input class="form-check-input" type="radio" name="data-radios" value="4" data-cy="negatives-only"
-                                            tabindex="7" />
+                                        <input class="form-check-input" type="radio" name="data-radios" value="4"
+                                            data-cy="negatives-only" tabindex="7" />
                                         <span>Negatives Only</span>
                                     </label>
                                 </div>
@@ -218,8 +220,9 @@
                         </div>
                     </li>
                     <li class="nav-item dropdown my-auto ml-1">
-                        <button id="nav-filter-tags" data-test="nav-filter-tags" class="nav-link dropdown-toggle not-ready click"
-                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" tabindex="8" accesskey="4">
+                        <button id="nav-filter-tags" data-test="nav-filter-tags"
+                            class="nav-link dropdown-toggle not-ready click" data-bs-toggle="dropdown"
+                            aria-haspopup="true" aria-expanded="false" tabindex="8" accesskey="4">
                             <i class="nav-loading fas fa-tags" title="Tags"></i>
                             <span class="d-md-none d-lg-inline">Tags</span>
                             <span class="sr-only sr-only-focusable">Tags</span>
@@ -254,27 +257,24 @@
                         </div>
                     </li>
                     <li class="nav-item dropdown my-auto ml-1">
-                        <button id="nav-filter-more" class="nav-link dropdown-toggle not-ready click" data-bs-toggle="dropdown"
-                            data-bs-auto-close="outside" aria-haspopup="true" aria-expanded="false" tabindex="9" accesskey="5">
+                        <button id="nav-filter-more" class="nav-link dropdown-toggle not-ready click"
+                            data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-haspopup="true"
+                            aria-expanded="false" tabindex="9" accesskey="5">
                             <i id="loading-more-filters" class="nav-loading fas fa-filter" title="More Filters"></i>
                             <span class="d-md-none d-lg-inline">More Filters</span>
                             <span class="sr-only sr-only-focusable">More Filters</span>
                             <span title="Total active filters." class="badge text-bg-secondary"></span>
                         </button>
-                        <div class="dropdown-menu more-filters-dropdown-menu-width" style="max-height: 90vh; overflow: auto">
+                        <div class="dropdown-menu more-filters-dropdown-menu-width"
+                            style="max-height: 90vh; overflow: auto">
                             <div class="accordion" id="more-filters-accordion">
                                 <form class="mb-0" data-test="more-filters-form">
                                     <div class="mx-1">
                                         <div class="px-0 py-0">
-                                            <button
-                                                id="more-filters-menu-periods"
-                                                data-test="Period"
-                                                data-bs-target="#user-filters-periods"
-                                                data-bs-toggle="collapse"
-                                                tabindex="9"
-                                                type="button"
-                                                class="d-flex justify-content-between align-items-center w-100 click btn ix-btn-link btn-link btn-sm p-0 no-border collapsed"
-                                            >
+                                            <button id="more-filters-menu-periods" data-test="Period"
+                                                data-bs-target="#user-filters-periods" data-bs-toggle="collapse"
+                                                tabindex="9" type="button"
+                                                class="d-flex justify-content-between align-items-center w-100 click btn ix-btn-link btn-link btn-sm p-0 no-border collapsed">
                                                 <span>Periods</span>
                                                 <span data-test="Period-count" id="filters-periods-count"
                                                     class="badge text-bg-secondary">
@@ -292,15 +292,10 @@
                                 <form class="mb-0">
                                     <div class="mx-1">
                                         <div class="px-0 py-0">
-                                            <button
-                                                id="more-filters-menu-measures"
-                                                data-test="Measures"
-                                                data-bs-target="#user-filters-measures"
-                                                data-bs-toggle="collapse"
-                                                tabindex="9"
-                                                type="button"
-                                                class="d-flex justify-content-between align-items-center w-100 click btn ix-btn-link btn-link btn-sm p-0 no-border collapsed"
-                                            >
+                                            <button id="more-filters-menu-measures" data-test="Measures"
+                                                data-bs-target="#user-filters-measures" data-bs-toggle="collapse"
+                                                tabindex="9" type="button"
+                                                class="d-flex justify-content-between align-items-center w-100 click btn ix-btn-link btn-link btn-sm p-0 no-border collapsed">
                                                 <span>Measures</span>
                                                 <span data-test="Measures-count" id="filters-measures-count"
                                                     class="badge text-bg-secondary">
@@ -317,34 +312,29 @@
                                 </form>
                                 <form class="mb-0 mx-1">
                                     <div class="px-0 py-0">
-                                        <button
-                                            id="more-filters-menu-axis"
-                                            data-test="Axis"
-                                            data-bs-target="#user-filters-axis"
-                                            data-bs-toggle="collapse"
-                                            tabindex="9"
+                                        <button id="more-filters-menu-axis" data-test="Axis"
+                                            data-bs-target="#user-filters-axis" data-bs-toggle="collapse" tabindex="9"
                                             type="button"
-                                            class="d-flex justify-content-between align-items-center w-100 click btn ix-btn-link btn-link btn-sm p-0 no-border collapsed"
-                                        >
+                                            class="d-flex justify-content-between align-items-center w-100 click btn ix-btn-link btn-link btn-sm p-0 no-border collapsed">
                                             <span>Axis</span>
-                                            <span data-test="Axis-count" id="filters-axis-count" class="badge text-bg-secondary">
+                                            <span data-test="Axis-count" id="filters-axis-count"
+                                                class="badge text-bg-secondary">
                                                 <i class="fa fa-regular fa-clock"></i>
                                             </span>
                                         </button>
                                     </div>
-                                    <div id="user-filters-axis" class="collapse overflow-y-auto" data-parent="#more-filters-accordion">
+                                    <div id="user-filters-axis" class="collapse overflow-y-auto"
+                                        data-parent="#more-filters-accordion">
                                         <div class="list-group list-group-flush d-none">
                                             <div class="d-flex justify-content-between align-items-center w-100 px-1">
                                                 <div class="form-check">
                                                     <label for="axes-all-0" class="form-check-label mb-0">
-                                                        <input id="axes-all-0" title="Select/Deselect all options below." class="form-check-input" type="checkbox" tabindex="9"/>
-                                                        <button 
-                                                            data-bs-target="#axes-filters-accordion-0"
-                                                            data-bs-toggle="collapse"
-                                                            tabindex="9"
-                                                            type="button"
-                                                            class="click btn btn-link ix-btn-link btn-sm p-0 no-border collapsed"
-                                                        >
+                                                        <input id="axes-all-0"
+                                                            title="Select/Deselect all options below."
+                                                            class="form-check-input" type="checkbox" tabindex="9" />
+                                                        <button data-bs-target="#axes-filters-accordion-0"
+                                                            data-bs-toggle="collapse" tabindex="9" type="button"
+                                                            class="click btn btn-link ix-btn-link btn-sm p-0 no-border collapsed">
                                                             Explicit
                                                         </button>
                                                     </label>
@@ -360,15 +350,10 @@
                                                         <input id="axes-all-1"
                                                             title="Select/Deselect all options below."
                                                             class="form-check-input" type="checkbox" tabindex="9" />
-                                                        <button
-                                                            id="axes-typed"
-                                                            data-test="axes-typed"
+                                                        <button id="axes-typed" data-test="axes-typed"
                                                             data-bs-target="#axes-filters-accordion-1"
-                                                            data-bs-toggle="collapse"
-                                                            tabindex="9"
-                                                            type="button"
-                                                            class="d-flex justify-content-between align-items-center w-100 click btn ix-btn-link btn-link btn-sm p-0 no-border collapsed"
-                                                        >
+                                                            data-bs-toggle="collapse" tabindex="9" type="button"
+                                                            class="d-flex justify-content-between align-items-center w-100 click btn ix-btn-link btn-link btn-sm p-0 no-border collapsed">
                                                             Typed
                                                         </button>
                                                     </label>
@@ -380,15 +365,10 @@
                                 </form>
                                 <form class="mb-0 mx-1">
                                     <div class="px-0 py-0">
-                                        <button
-                                            id="more-filters-menu-members"
-                                            data-test="Members"
-                                            data-bs-target="#user-filters-members"
-                                            data-bs-toggle="collapse"
-                                            tabindex="9"
-                                            type="button"
-                                            class="d-flex justify-content-between align-items-center w-100 click btn ix-btn-link btn-link btn-sm p-0 no-border collapsed"
-                                        >
+                                        <button id="more-filters-menu-members" data-test="Members"
+                                            data-bs-target="#user-filters-members" data-bs-toggle="collapse"
+                                            tabindex="9" type="button"
+                                            class="d-flex justify-content-between align-items-center w-100 click btn ix-btn-link btn-link btn-sm p-0 no-border collapsed">
                                             <span>Members</span>
                                             <span data-test="Members-count" id="filters-members-count"
                                                 class="badge text-bg-secondary">
@@ -399,21 +379,15 @@
                                     <div id="user-filters-members" class="collapse overflow-y-auto"
                                         data-parent="#more-filters-accordion">
                                         <div class="list-group list-group-flush d-none">
-                                            <div
-                                                class="d-flex justify-content-between align-items-center w-100 px-1">
+                                            <div class="d-flex justify-content-between align-items-center w-100 px-1">
                                                 <div class="form-check">
                                                     <label class="form-check-label mb-0">
                                                         <input id="members-all-0"
                                                             title="Select/Deselect all options below."
-                                                            class="form-check-input" type="checkbox" tabindex="9"
-                                                        />
-                                                        <button 
-                                                            data-bs-target="#members-filters-accordion-0"
-                                                            data-bs-toggle="collapse"
-                                                            tabindex="9"
-                                                            type="button"
-                                                            class="click btn btn-link ix-btn-link btn-sm p-0 no-border collapsed"
-                                                        >
+                                                            class="form-check-input" type="checkbox" tabindex="9" />
+                                                        <button data-bs-target="#members-filters-accordion-0"
+                                                            data-bs-toggle="collapse" tabindex="9" type="button"
+                                                            class="click btn btn-link ix-btn-link btn-sm p-0 no-border collapsed">
                                                             Explicit
                                                         </button>
                                                     </label>
@@ -424,28 +398,21 @@
                                         </div>
                                         <!-- Below is populated dynamically VIA JS -->
                                         <div class="list-group list-group-flush d-none">
-                                            <div
-                                                class="d-flex justify-content-between align-items-center w-100 px-1">
+                                            <div class="d-flex justify-content-between align-items-center w-100 px-1">
                                                 <div class="form-check">
                                                     <label class="form-check-label mb-0">
                                                         <input id="members-all-1"
                                                             title="Select/Deselect all options below."
                                                             class="form-check-input" type="checkbox" tabindex="9" />
-                                                        <button
-                                                            id="members-typed"
-                                                            data-test="members-typed"
+                                                        <button id="members-typed" data-test="members-typed"
                                                             data-bs-target="#members-filters-accordion-1"
-                                                            data-bs-toggle="collapse"
-                                                            tabindex="9"
-                                                            type="button"
-                                                            class="d-flex justify-content-between align-items-center w-100 click btn ix-btn-link btn-link btn-sm p-0 no-border collapsed"
-                                                        >
+                                                            data-bs-toggle="collapse" tabindex="9" type="button"
+                                                            class="d-flex justify-content-between align-items-center w-100 click btn ix-btn-link btn-link btn-sm p-0 no-border collapsed">
                                                             Typed
                                                         </button>
                                                     </label>
                                                 </div>
-                                                <span class="badge text-bg-secondary"
-                                                    id="members-typed-count"></span>
+                                                <span class="badge text-bg-secondary" id="members-typed-count"></span>
                                             </div>
                                         </div>
                                     </div>
@@ -453,15 +420,10 @@
                                 <form class="mb-0">
                                     <div class="mx-1">
                                         <div class="px-0 py-0">
-                                            <button
-                                                id="more-filters-menu-scale"
-                                                data-test="Scale"
-                                                data-bs-target="#user-filters-scales"
-                                                data-bs-toggle="collapse"
-                                                tabindex="9"
-                                                type="button"
-                                                class="d-flex justify-content-between align-items-center w-100 click btn ix-btn-link btn-link btn-sm p-0 no-border collapsed"
-                                            >
+                                            <button id="more-filters-menu-scale" data-test="Scale"
+                                                data-bs-target="#user-filters-scales" data-bs-toggle="collapse"
+                                                tabindex="9" type="button"
+                                                class="d-flex justify-content-between align-items-center w-100 click btn ix-btn-link btn-link btn-sm p-0 no-border collapsed">
                                                 <span>Scale</span>
                                                 <span data-test="Scale-count" id="filters-scales-count"
                                                     class="badge text-bg-secondary">
@@ -479,17 +441,13 @@
                                 <form class="mb-0">
                                     <div class="mx-1">
                                         <div class="px-0 py-0">
-                                            <button
-                                                id="more-filters-menu-balance"
-                                                data-test="Balance"
-                                                data-bs-target="#user-filters-balances"
-                                                data-bs-toggle="collapse"
-                                                tabindex="9"
-                                                type="button"
-                                                class="d-flex justify-content-between align-items-center w-100 click btn ix-btn-link btn-link btn-sm p-0 no-border collapsed"
-                                            >
+                                            <button id="more-filters-menu-balance" data-test="Balance"
+                                                data-bs-target="#user-filters-balances" data-bs-toggle="collapse"
+                                                tabindex="9" type="button"
+                                                class="d-flex justify-content-between align-items-center w-100 click btn ix-btn-link btn-link btn-sm p-0 no-border collapsed">
                                                 <span>Balance</span>
-                                                <span data-test="Balance-count" id="filters-balances-count" class="badge text-bg-secondary">2</span>
+                                                <span data-test="Balance-count" id="filters-balances-count"
+                                                    class="badge text-bg-secondary">2</span>
                                             </button>
                                         </div>
                                         <div id="user-filters-balances" class="collapse overflow-y-auto"
@@ -529,9 +487,9 @@
                         </a>
                     </li>
                     <li id="links-dropdown" data-test="links-dropdown" class="nav-item dropdown d-none my-auto ml-1">
-                        <a id="additional-links-dropdown" class="nav-link dropdown-toggle disabled click"
-                            role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
-                            tabindex="12" accesskey="8">
+                        <a id="additional-links-dropdown" class="nav-link dropdown-toggle disabled click" role="button"
+                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" tabindex="12"
+                            accesskey="8">
                             <i class="nav-loading fas fa-link"></i>
                             <span class="d-md-none d-lg-inline">Links</span>
                         </a>
@@ -540,8 +498,8 @@
                 </ul>
                 <ul class="navbar-nav bg-inherit">
                     <li class="nav-item my-auto ml-1">
-                        <a id="facts-menu-button" data-bs-toggle="collapse" data-bs-target="#facts-menu" tabindex="13" role="button"
-                            class="nav-link click disabled" accessKey="9" data-test="facts-menu-button">
+                        <a id="facts-menu-button" data-bs-toggle="collapse" data-bs-target="#facts-menu" tabindex="13"
+                            role="button" class="nav-link click disabled" accessKey="9" data-test="facts-menu-button" data-cy="facts-menu-button">
                             Facts
                             <span class="fact-total-count badge text-bg-light">
                                 <i id="factClock" data-cy="fact-clock" class="fa fa-regular fa-clock fa-fade"></i>
@@ -551,7 +509,8 @@
                 </ul>
             </div>
         </nav>
-        <ul id="tabs-container" class="nav nav-pills tabs-container position-relative nav-underline justify-content-center">
+        <ul id="tabs-container"
+            class="nav nav-pills tabs-container position-relative nav-underline justify-content-center">
             <!-- tabs are dynamically loaded by JS.  See src\ts\links\index.ts -->
         </ul>
     </div>
@@ -560,13 +519,15 @@
         <div class="main-container row overflow-hidden">
 
             <!-- Sections Sidebar -->
-            <div class="col-auto px-0 sidebar-container sidebar-container-left sections-sidebar hide">
-                <div id="sections-menu" class="sidebar sidebar-scrollable show collapse collapse-horizontal" data-bs-scroll="true">
+            <div class="col-auto px-0 sidebar-container sidebar-container-left sections-sidebar hide d-flex">
+                <div id="sections-menu" class="sidebar sidebar-scrollable show collapse collapse-horizontal"
+                    data-bs-scroll="true">
                     <div class="offcanvas-header sections-header space-between">
                         <div class="d-flex align-items-center">
                             <h5 class="sections-header-label ix-medium-heading h5-override">Tagged Sections</h5>
                             <span id="sections-search-additional" class="input-group-prepend">
-                                <button id="sections-settings-btn" class="dropdown btn sections-settings-btn" type="button" data-bs-toggle="dropdown" tabindex="2" data-cy="sections-filter-btn">
+                                <button id="sections-settings-btn" class="dropdown btn sections-settings-btn"
+                                    type="button" data-bs-toggle="dropdown" tabindex="2" data-cy="sections-filter-btn">
                                     <i class="nav-loading fas fa-filter"></i>
                                 </button>
                                 <div class="dropdown-menu px-2" id="sections-filters" data-cy="sections-filters">
@@ -587,14 +548,17 @@
                                 </div>
                             </span>
                         </div>
-                        <button id="closeSectionsX" type="button" class="btn-close" data-bs-target="#sections-menu" data-bs-toggle="collapse" aria-label="Close" tabindex="2"></button>
+                        <button id="closeSectionsX" type="button" class="btn-close" data-bs-target="#sections-menu"
+                            data-bs-toggle="collapse" aria-label="Close" tabindex="2"></button>
                     </div>
                     <div class="offcanvas-body">
-                        <form id="sections-menu-search-submit" data-name="sections-menu-search" class="my-2 my-lg-0 input-group" novalidate="true">
+                        <form id="sections-menu-search-submit" data-name="sections-menu-search"
+                            class="my-2 my-lg-0 input-group" novalidate="true">
                             <div class="input-group">
                                 <input type="text" class="form-control" id="sections-search" data-test="sections-search"
-                                    placeholder="Search Sections" aria-label="Search all Sections by their associated label."
-                                    name="search-sections" tabindex="2" required="true" />
+                                    placeholder="Search Sections"
+                                    aria-label="Search all Sections by their associated label." name="search-sections"
+                                    tabindex="2" required="true" />
 
                                 <button id="section-menu-search-btn-clear" data-name="sections-menu-search-clear"
                                     class="btn btn-sec" type="reset" tabindex="2">
@@ -615,22 +579,26 @@
                         </div>
                     </div>
                 </div>
+                <div class="sidebar-resizer" role="separator" aria-orientation="vertical"></div>
             </div>
 
             <!-- Help sidebar -->
-            <div class="col-auto px-0 sidebar-container sidebar-container-left help-sidebar hide">
-                <div id="help-menu" class="sidebar sidebar-scrollable left-sidebar collapse collapse-horizontal">
+            <div class="col-auto px-0 sidebar-container sidebar-container-left help-sidebar hide d-flex">
+                <div id="help-menu" class="sidebar sidebar-scrollable show left-sidebar collapse collapse-horizontal">
                     <div class="offcanvas-header space-between">
                         <h5 class="h5-override">Help</h5>
-                        <button type="button" class="btn-close" data-bs-target="#help-menu" data-bs-toggle="collapse" aria-label="Close" tabindex="1"></button>
+                        <button type="button" class="btn-close" data-bs-target="#help-menu" data-bs-toggle="collapse"
+                            aria-label="Close" tabindex="1"></button>
                     </div>
                     <div class="offcanvas-body">
                         <div class="accordion" id="help-sections">
                             <div class="card">
                                 <div class="card-header px-0 py-0">
                                     <h5 class="mb-0 h5-override">
-                                        <button class="btn btn-link d-flex justify-content-between align-items-center w-100 ix-focus-inset"
-                                            type="button" data-bs-toggle="collapse" data-bs-target="#help-getting-started" tabindex="1">
+                                        <button
+                                            class="btn btn-link d-flex justify-content-between align-items-center w-100 ix-focus-inset"
+                                            type="button" data-bs-toggle="collapse"
+                                            data-bs-target="#help-getting-started" tabindex="1">
                                             <span class="font-size-1">Getting Started</span>
                                         </button>
                                     </h5>
@@ -651,8 +619,10 @@
                             <div class="card">
                                 <div class="card-header px-0 py-0">
                                     <h5 class="mb-0 h5-override">
-                                        <button class="btn btn-link d-flex justify-content-between align-items-center w-100 ix-focus-inset"
-                                            type="button" data-bs-toggle="collapse" data-bs-target="#help-fact-review-window" tabindex="1">
+                                        <button
+                                            class="btn btn-link d-flex justify-content-between align-items-center w-100 ix-focus-inset"
+                                            type="button" data-bs-toggle="collapse"
+                                            data-bs-target="#help-fact-review-window" tabindex="1">
                                             <span class="font-size-1">Fact Review Window</span>
                                         </button>
                                     </h5>
@@ -680,14 +650,17 @@
                             <div class="card">
                                 <div class="card-header px-0 py-0">
                                     <h5 class="mb-0 h5-override">
-                                        <button class="btn btn-link d-flex justify-content-between align-items-center w-100 ix-focus-inset"
-                                            type="button" data-bs-toggle="collapse" data-bs-target="#help-search" tabindex="1">
+                                        <button
+                                            class="btn btn-link d-flex justify-content-between align-items-center w-100 ix-focus-inset"
+                                            type="button" data-bs-toggle="collapse" data-bs-target="#help-search"
+                                            tabindex="1">
                                             <span class="font-size-1">Searching</span>
                                         </button>
                                     </h5>
                                 </div>
                                 <div id="help-search" class="collapse" data-parent="#help-sections">
-                                    <p class="m-2">The search input in the menu bar can be used to search facts. To search information, enter a
+                                    <p class="m-2">The search input in the menu bar can be used to search facts. To
+                                        search information, enter a
                                         keyword in a search box and select the magnifying glass icon to
                                         return matching results. Search operators "and" (via "AND" or
                                         "&amp;") and "or" (via "OR" or "|") are available to further refine a
@@ -705,14 +678,20 @@
                                     <p class="m-2">The content included in Search can be increased to
                                         included tag definitions, dimensions, and authoritative
                                         references by selecting the cog / wheel icon to the left of the
-                                        search box. See Settings for more information.</p>
+                                        search box. When authoritative references is included, search results
+                                        will inculded matches for topic, subtopic, paragraph, publisher, section, or
+                                        number.
+                                        See Settings for more information.</p>
+
                                 </div>
                             </div>
                             <div class="card">
                                 <div class="card-header px-0 py-0">
                                     <h5 class="mb-0 h5-override">
-                                        <button class="btn btn-link d-flex justify-content-between align-items-center w-100 ix-focus-inset"
-                                            type="button" data-bs-toggle="collapse" data-bs-target="#help-filter" tabindex="1">
+                                        <button
+                                            class="btn btn-link d-flex justify-content-between align-items-center w-100 ix-focus-inset"
+                                            type="button" data-bs-toggle="collapse" data-bs-target="#help-filter"
+                                            tabindex="1">
                                             <span class="font-size-1">Filters</span>
                                         </button>
                                     </h5>
@@ -780,8 +759,10 @@
                             <div class="card">
                                 <div class="card-header px-0 py-0">
                                     <h5 class="mb-0 h5-override">
-                                        <button class="btn btn-link d-flex justify-content-between align-items-center w-100 ix-focus-inset"
-                                            type="button" data-bs-toggle="collapse" data-bs-target="#help-facts-results-list" tabindex="1">
+                                        <button
+                                            class="btn btn-link d-flex justify-content-between align-items-center w-100 ix-focus-inset"
+                                            type="button" data-bs-toggle="collapse"
+                                            data-bs-target="#help-facts-results-list" tabindex="1">
                                             <span class="font-size-1">Facts List (Results)</span>
                                         </button>
                                     </h5>
@@ -811,8 +792,10 @@
                             <div class="card">
                                 <div class="card-header px-0 py-0">
                                     <h5 class="mb-0 h5-override">
-                                        <button class="btn btn-link d-flex justify-content-between align-items-center w-100 ix-focus-inset"
-                                            type="button" data-bs-toggle="collapse" data-bs-target="#help-tagged-sections" tabindex="1">
+                                        <button
+                                            class="btn btn-link d-flex justify-content-between align-items-center w-100 ix-focus-inset"
+                                            type="button" data-bs-toggle="collapse"
+                                            data-bs-target="#help-tagged-sections" tabindex="1">
                                             <span class="font-size-1">Sections</span>
                                         </button>
                                     </h5>
@@ -834,8 +817,10 @@
                             <div class="card">
                                 <div class="card-header px-0 py-0">
                                     <h5 class="mb-0 h5-override">
-                                        <button class="btn btn-link d-flex justify-content-between align-items-center w-100 ix-focus-inset"
-                                            type="button" data-bs-toggle="collapse" data-bs-target="#help-tagged-menu" tabindex="1">
+                                        <button
+                                            class="btn btn-link d-flex justify-content-between align-items-center w-100 ix-focus-inset"
+                                            type="button" data-bs-toggle="collapse" data-bs-target="#help-tagged-menu"
+                                            tabindex="1">
                                             <span class="font-size-1">Menu</span>
                                         </button>
                                     </h5>
@@ -862,7 +847,8 @@
                                     </p>
                                     <p class="m-2">The Open XBRL Instance menu item allows
                                         an XBRL instance document (*.xml) that is extracted from the
-                                        Inline document to be opened in a new tab.  User can then save locally for use by software
+                                        Inline document to be opened in a new tab. User can then save locally for use by
+                                        software
                                         supporting the XBRL format.</p>
                                     <p class="m-2">
                                         <strong>Save XBRL Zip</strong>
@@ -942,13 +928,15 @@
                         </div>
                     </div>
                 </div>
+                <!-- style="display: none"  -->
+                <div class="sidebar-resizer" role="separator" aria-orientation="vertical"></div>
             </div>
 
             <!-- Middle pane: Main inline viewer pane for htm doc -->
-            <div class="col px-0 middle-pane-container overflow-hidden">
-            
-                <div id="error-container" data-test="error-container" class="px-0">
-                    <!-- Below is populated dynamically VIA JS (error messages) -->
+            <div class="col px-0 middle-pane-container overflow-hidden d-flex flex-column">
+
+                <div id="error-container" data-test="error-container" class="error-container px-0">
+
                 </div>
 
                 <div id="dynamic-xbrl-form" class="col position-relative">
@@ -957,7 +945,9 @@
 
                 </div>
 
-                <div id="fact-table-container" class="offcanvas offcanvas-bottom" data-bs-scroll="true" data-bs-backdrop="false">
+
+                <div id="fact-table-container" class="offcanvas offcanvas-bottom" data-bs-scroll="true"
+                    data-bs-backdrop="false">
                     <div class="offcanvas-header d-flex justify-content-between">
                         <h5 class="offcanvas-title h5-override">Fact Table</h5>
                         <span>
@@ -1004,8 +994,9 @@
                         </div>
                     </div>
                 </div>
-        
-                <div id="facts-breakdown-container" class="offcanvas offcanvas-bottom" data-bs-scroll="true" data-bs-backdrop="false">
+
+                <div id="facts-breakdown-container" class="offcanvas offcanvas-bottom" data-bs-scroll="true"
+                    data-bs-backdrop="false">
                     <div class="offcanvas-header d-flex justify-content-between">
                         <h5 class="offcanvas-title h5-override">Facts Chart</h5>
                     </div>
@@ -1024,33 +1015,160 @@
                         </div>
                     </div>
                 </div>
-                
+
             </div>
 
             <!-- Facts Sidebar -->
-            <div class="col-auto px-0 sidebar-container sidebar-container-right hide">
-                <div id="facts-menu" class="sidebar collapse collapse-horizontal show">
-                    <div class="offcanvas-header space-between">
-                        <span class="center-align-items">
-                            <h5 class="mb-0 me-2 ms-1 h5-override">Facts</h5>
-                            <span class="fact-total-count badge bg-sec"><i class="fa fa-regular fa-clock"></i></span>
-                            <div class="paginationprevnext d-sm-inline-block ms-3"></div>
-                        </span>
-
-                        <button id="factSidebarCloseX" type="button" class="btn-close up-15" 
-                            data-bs-target="#facts-menu" data-bs-toggle="collapse" aria-label="Close" tabindex="13"
-                        ></button>
-                    </div>
-                    <hr class="mx-3 my-1 opacity-10"></hr>
-                    <div class="offcanvas-body p-0">
-                        <div id="facts-menu-list-pagination" class="d-flex flex-column flex-fill h-100 w-100">
-                            <div class="pagination center-align-items">
-                            </div>
-                            <hr class="my-0"></hr>
-                            <!-- auto-scroll-y-facts -->
-                            <div class="list-group list-group-flush overflow-x-auto overflow-auto w-100 facts-scrollable px-3"></div>
+            <div class="col-auto px-0 sidebar-container sidebar-container-right hide d-flex">
+                <div class="sidebar-resizer" role="separator" aria-orientation="vertical"></div>
+                <div id="facts-menu" class="sidebar collapse collapse-horizontal show fact-menu-container"
+                    data-fact-menu-display="fact-list-display">
+                    <div class="offcanvas-header facts-header space-between">
+                        <div class="d-flex align-items-center">
+                            <h5 class="sections-header-label ix-medium-heading h5-override">Facts</h5>
                         </div>
-                        <div id="noFactsMsg" class="m-4 text-center">There are no facts in the selected instance that match the current search and filters.</div>
+                        <button id="closeFactsX" type="button" class="btn-close" data-bs-target="#facts-menu"
+                            data-bs-toggle="collapse" aria-label="Close" tabindex="2"></button>
+                        </div>
+                        <div class="offcanvas-body d-flex flex-column">
+                            
+                            <hr class="sections-hr" />
+                            <div id="fact-display-nav" class="tab-bar d-flex flex-grow-0 ">
+                                <button id="fact-list-display-btn" class="tab active" data-tab="list"><i
+                                        class="bi bi-list-ul"></i>List <span id="tab-count"
+                                        class="tab-badge fact-total-count"></span></button>
+                                <button id="fact-detail-display-btn" class="tab" data-tab="list"><i
+                                        class="bi bi-info-circle"></i>Details</button>
+                            </div>
+                        <!-- Fact Details View -->
+                        <div id="fact-details-panel-data" class="panel d-flex flex-column flex-grow-1 mode-detail">
+                            <div id="fact-details-panel-toolbar" class="details-toolbar flex-shrink-0">
+                                <div class="paginationprevnext"></div>
+                                <div class="d-flex gap-2">
+                                    <div class="view-toggle">
+                                        <button id="fact-modal-copy-content" class="view-btn"><i
+                                                class="fas fa-copy" title="Show Copy-able Fact Text"></i></button>
+                                    </div>
+                                    <div class="view-toggle">
+                                        <button class="view-btn active" data-view="detail"><i
+                                                class="fas fa-eye" title="Show Full Detail View"></i></button>
+                                        <button class="view-btn" data-view="split"><i
+                                                class="fas fa-columns" title="Show Split Detail-List View"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="px-3">
+                                <p id="fact-detail-label" class="text-center font-weight-bold mb-0"><span></span>
+                                </p>
+
+                                <div id="fact-copy-content" class="form-group d-none">
+                                    <label for="fact-copy-content-textarea">Copy and Paste Below Content.</label>
+                                    <textarea class="form-control" rows="5" tabindex="16" name="fact-copy-content"
+                                        id="fact-copy-content-textarea" readonly="readonly"></textarea>
+                                </div>
+                            </div>
+                            <div id="fact-details-panel" class="facts-scrollable px-2">
+                                <!-- Attributes -->
+                                <div class="detail-item accordion">
+                                    <div class="accordion-item">
+                                        <div class="accordion-header">
+                                            <h5 class="mb-0 h5-override">
+                                                <button class="fact-detail-header accordion-button btn"
+                                                    data-bs-toggle="collapse" data-bs-target="#attribute-body">
+                                                    <span>Attributes</span>
+                                                </button>
+                                            </h5>
+                                        </div>
+                                        <div id="attribute-body" class="accordion-collapse collapse show">
+                                            <table class="table table-striped table-sm" id="fact-details-attributes">
+                                                <tbody>
+                                                    <tr>
+                                                        <td class="text-center">
+                                                            Select Fact to see Details
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Labels Refferences Calculations -->
+                                <div class="detail-item accordion">
+                                    <div class="accordion-item">
+                                        <div id="labelsHeader" class="accordion-header">
+                                            <h5 class="mb-0 h5-override">
+                                                <button class="fact-detail-header accordion-button btn"
+                                                    data-bs-toggle="collapse" data-bs-target="#labels-body">
+                                                    <span>Labels</span>
+                                                </button>
+                                            </h5>
+                                        </div>
+                                        <div id="labels-body" class="accordion-collapse collapse">
+                                            <table class="table table-striped table-sm" id="fact-details-labels">
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="detail-item accordion">
+                                    <div class="accordion-item">
+                                        <div class="accordion-header">
+                                            <h5 class="mb-0 h5-override">
+                                                <button class="fact-detail-header accordion-button btn"
+                                                    data-bs-toggle="collapse" data-bs-target="#references-body">
+                                                    <span>References</span>
+                                                </button>
+                                            </h5>
+                                        </div>
+                                        <div id="references-body" class="accordion-collapse collapse">
+                                            <table class="table table-striped table-sm" id="fact-details-references">
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="detail-item accordion">
+                                    <div class="accordion-item">
+                                        <div class="accordion-header">
+                                            <h5 class="mb-0 h5-override">
+                                                <button class="fact-detail-header accordion-button btn"
+                                                    data-bs-toggle="collapse" data-bs-target="#calculations-body">
+                                                    <span>Calculations</span>
+                                                </button>
+                                            </h5>
+                                        </div>
+                                        <div id="calculations-body" class="accordion-collapse collapse">
+                                            <table class="table table-striped table-sm" id="fact-details-calculations">
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="split-divider"></div>
+                        <!-- Fact List View -->
+                        <div id="fact-list" class="panel d-flex flex-column">
+                            <div id="facts-menu-list-pagination"
+                                class="d-flex flex-column flex-fill h-100 w-100 facts-scrollable">
+                                <!-- auto-scroll-y-facts -->
+                                <div class="fact-list-wrapper">
+                                    <div class="list-group list-group-flush overflow-x-auto overflow-auto w-100 ">
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div id="noFactsMsg" class="m-4 text-center">There are no facts in the selected
+                                instance
+                                that
+                                match the current search and filters.
+                            </div>
+                            <div class="pagination-wrapper">
+                                <hr class="my-0">
+                                </hr>
+                                <div class="pagination center-align-items"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1058,7 +1176,17 @@
         </div>
     </div>
 
-    <div id="form-information-modal" data-test="form-information-modal" class="dialog-box fixed-dialog-box d-none bg-white">
+
+
+
+
+
+
+
+
+    <!-- Overlays -->
+    <div id="form-information-modal" data-test="form-information-modal"
+        class="dialog-box fixed-dialog-box d-none bg-white">
         <div class="dialog-header bg-sec text-white px-1 d-flex justify-content-between">
             <p id="form-information-modal-title" data-test="form-information-modal-title" class="lead mb-0">
                 <span></span>
@@ -1067,11 +1195,10 @@
                 <i id="form-information-modal-drag" title="Click and drag to move this Dialog Box."
                     class="fas fa-arrows-alt m-1 drag-icon d-none d-sm-inline-block" tabindex="14"></i>
 
-                <i id="dialog-box-copy-content"
-                    class="fas fa-copy m-1 click" tabindex="14"
+                <i id="dialog-box-copy-content" class="fas fa-copy m-1 click" tabindex="14"
                     title="Click to Copy all Dialog Box Content."></i>
-                <i id="dialog-box-close" data-name="Form Information Modal" title="Click to Close this Dialog Box."
-                    class="fas fa-times m-1 click" tabindex="14"></i>
+                <i id="form-information-modal-close" data-name="Form Information Modal"
+                    title="Click to Close this Dialog Box." class="fas fa-times m-1 click" tabindex="14"></i>
 
             </div>
         </div>
@@ -1159,7 +1286,8 @@
             <p id="settings-modal-title" data-test="settings-modal-title" class="lead mb-0">Settings</p>
             <div class="dialog-header-actions">
                 <i id="settings-modal-drag" title="Click and drag to move this Dialog Box."
-                    class="fas fa-arrows-alt drag-icon d-none d-sm-inline-block ix-focus modal-title-btn" tabindex="15"></i>
+                    class="fas fa-arrows-alt drag-icon d-none d-sm-inline-block ix-focus modal-title-btn"
+                    tabindex="15"></i>
                 <i id="settings-modal-close" data-name="Settings Modal" title="Click to Close this Dialog Box."
                     class="fas fa-times click ix-focus modal-title-btn" tabindex="15"></i>
             </div>
@@ -1192,6 +1320,24 @@
                             a fact from the Sections Menu or the Fact Menu will automatically
                             scroll that element to the (Top, or Middle) of the viewer window.
                             This setting will have no use on IE 10, or Safari.
+                        </small>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="col-sm-4 col-form-label" for="open-sidebar-option-select">
+                        Allow only one side panel to be open at a time
+                    </label>
+                    <div class="col-sm-4">
+                        <select id="open-sidebar-option-select" class="form-select" tabindex="15">
+                            <option value="true">Yes</option>
+                            <option value="false">No</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-4">
+                        <small class="form-text text-muted col-sm-12">When Yes, Main page will only 
+                            allow 1 side panel to be open. When No, Main page will allow Section and Fact panels
+                            to be open at the same time. 
                         </small>
                     </div>
                 </div>
@@ -1256,7 +1402,8 @@
                 <!-- hover / tag shading -->
                 <div class="form-group row">
                     <label class="col-sm-4 col-form-label" for="tag-shading-color-picker">
-                        <span class="tag-shading-example" enabled-fact="true" hover-fact="true">Tag Shading (hover)</span>
+                        <span class="tag-shading-example" enabled-fact="true" hover-fact="true">Tag Shading
+                            (hover)</span>
                         <div>Opacity:</div>
                     </label>
                     <div class="col-sm-4">
@@ -1264,7 +1411,8 @@
                             <input id="tag-shading-color-picker" class="form-control w-75 float-start settings-height"
                                 type="color" tabindex="15" />
                             <input id="tag-shading-color-picker-range"
-                                class="form-range w-75 float-start settings-height" type="range" min="0" max="10" tabindex="15" />
+                                class="form-range w-75 float-start settings-height" type="range" min="0" max="10"
+                                tabindex="15" />
                             <button id="tag-shading-color-picker-reset" type="button"
                                 class="btn btn-secondary btn-sm settings-height" tabindex="15">
                                 <i class="fa-solid fa-rotate-left"></i>
@@ -1276,224 +1424,6 @@
             </form>
         </div>
         <div class="dialog-footer d-flex justify-content-around"></div>
-    </div>
-
-    <div id="fact-modal" class="dialog-box fixed-dialog-box d-none bg-white">
-        <div class="dialog-header bg-sec text-white px-1 d-flex justify-content-between">
-            <p id="fact-modal-title" class="lead mb-0"><span></span></p>
-            <div class="dialog-header-actions">
-                <i id="fact-modal-drag" title="Click and drag to move this Dialog Box."
-                    class="fas fa-arrows-alt drag-icon d-none d-sm-inline-block ix-focus modal-title-btn" tabindex="16"></i>
-                <i id="fact-modal-jump" title="View in Facts Sidebar."
-                    class="fas fa-directions click ix-focus modal-title-btn" tabindex="16"></i>
-                <i id="fact-modal-copy-content" class="fas fa-copy click ix-focus modal-title-btn" tabindex="16" 
-                    title="Show Copy-able Fact Text"></i>
-                <i id="fact-modal-compress" class="fas fa-compress click d-none ix-focus modal-title-btn" tabindex="16"
-                    title="Contract Size"></i>
-                <i id="fact-modal-expand" class="fas fa-expand click ix-focus modal-title-btn" tabindex="16"
-                    title="Expand Size"></i>
-                <i id="fact-modal-close" class="fas fa-times click ix-focus modal-title-btn" tabindex="16"></i>
-            </div>
-        </div>
-        <div class="dialog-content">
-            <p id="fact-modal-subtitle" class="text-center font-weight-bold"><span></span></p>
-            <div id="fact-copy-content" class="form-group d-none">
-                <label for="fact-copy-content-textarea">Copy and Paste Below Content.</label>
-                <a id="fact-copy-content-close" class="float-end click color-inherit ix-focus" tabindex="16" type="button">
-                    <i class="fas fa-times-circle"></i>
-                </a>
-                <textarea class="form-control" rows="5" tabindex="16" name="fact-copy-content"
-                    id="fact-copy-content-textarea"></textarea>
-            </div>
-            <div id="fact-modal-carousel" class="carousel" data-interval="false" data-keyboard="false">
-                <div class="carousel-inner">
-                    <div class="carousel-item table-responsive active">
-                        <table class="table table-striped table-sm" id="fact-modal-carousel-page-1">
-                            <!-- Below is populated dynamically VIA JS -->
-                            <tbody>
-                                <tr>
-                                    <td class="text-center">
-                                        <i class="fa fa-regular fa-clock"></i>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="carousel-item table-responsive">
-                        <table class="table table-striped table-sm" id="fact-modal-carousel-page-2">
-                            <!-- Below is populated dynamically VIA JS -->
-                            <tbody>
-                                <tr>
-                                    <td class="text-center">
-                                        <i class="fa fa-regular fa-clock"></i>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="carousel-item table-responsive">
-                        <table class="table table-striped table-sm" id="fact-modal-carousel-page-3">
-                            <!-- Below is populated dynamically VIA JS -->
-                            <tbody>
-                                <tr>
-                                    <td class="text-center">
-                                        <i class="fa fa-regular fa-clock"></i>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="carousel-item table-responsive">
-                        <table class="table table-striped table-sm" id="fact-modal-carousel-page-4">
-                            <!-- Below is populated dynamically VIA JS -->
-                            <tbody>
-                                <tr>
-                                    <td class="text-center">
-                                        <i class="fa fa-regular fa-clock"></i>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="dialog-footer d-flex justify-content-around">
-            <button data-test="modal-fact-prev" class="btn btn-link text-dark ix-focus-inset" data-bs-target="#fact-modal-carousel"
-                data-bs-slide="prev" role="button" tabindex="16">
-                <i class="fas fa-chevron-left" title="Previous"></i>
-                <span class="sr-only">Previous</span>
-            </button>
-            <div id="fact-modal-carousel-indicators" class="carousel-indicators mx-0 my-3 p-initial"></div>
-
-            <button data-test="modal-fact-next" class="btn btn-link text-dark ix-focus-inset" data-bs-target="#fact-modal-carousel"
-                data-bs-slide="next" role="button" tabindex="16">
-                <i class="fas fa-chevron-right" title="Next"></i>
-                <span class="sr-only">Next</span>
-            </button>
-        </div>
-    </div>
-
-    <div id="fact-nested-modal" class="dialog-box fixed-dialog-box d-none bg-white">
-        <div class="dialog-header bg-sec text-white px-1 d-flex justify-content-between">
-            <p class="lead mb-0">
-                Nested Facts
-                <span id="nested-page"><span></span></span>
-                <span>/</span>
-                <span id="nested-count"><span></span></span>
-            </p>
-            <div class="dialog-header-actions">
-                <i id="fact-nested-modal-drag" title="Click and drag to move this Dialog Box."
-                    class="fas fa-arrows-alt m-1 drag-icon d-none d-sm-inline-block" tabindex="17"></i>
-
-                <i id="nested-fact-modal-jump" title="Click to see this in the Facts sidebar."
-                    class="fas fa-directions m-1 click" tabindex="17"></i>
-
-                <i id="fact-nested-modal-copy-content" class="fas fa-copy m-1 click" tabindex="17"></i>
-
-                <i id="fact-nested-modal-compress" class="fas fa-compress m-1 click d-none" tabindex="17"></i>
-
-                <i id="fact-nested-modal-expand" class="fas fa-expand m-1 click" tabindex="17"></i>
-
-                <i id="fact-nested-modal-close" class="fas fa-times m-1 click" tabindex="17"></i>
-            </div>
-        </div>
-        <div class="dialog-content pt-0">
-            <div id="modal-nested-fact-labels" class="carousel" data-bs-interval="false" data-bs-keyboard="false">
-                <div class="d-flex">
-                    <button data-test="modal-fact-nested-prev" class="btn btn-link text-dark"
-                        data-bs-target="#modal-nested-fact-labels" role="button" data-bs-slide="prev" tabindex="17">
-                        <i class="fas fa-chevron-left" title="Previous"></i>
-                        <span class="sr-only">Previous</span>
-                    </button>
-                    <div id="modal-fact-nested-label-carousel" class="carousel-inner">
-                        <!-- Below is populated dynamically VIA JS -->
-                    </div>
-                    <button data-test="modal-fact-nested-next" class="btn btn-link text-dark"
-                        data-bs-target="#modal-nested-fact-labels" role="button" data-bs-slide="next" tabindex="17">
-                        <i class="fas fa-chevron-right" title="Next"></i>
-                        <span class="sr-only">Next</span>
-                    </button>
-                </div>
-            </div>
-            <div id="fact-nested-copy-paste" class="form-group d-none">
-                <label for="fact-nested-copy-content-textarea">Copy and Paste Below Content.</label>
-                <a id="fact-nested-copy-content" class="float-end click color-inherit" tabindex="17">
-                    <i class="fas fa-times-circle mt-2"></i>
-                </a>
-                <textarea class="form-control" rows="5" tabindex="17" name="fact-nested-copy-content"
-                    id="fact-nested-copy-content-textarea"></textarea>
-            </div>
-            <div id="modal-fact-nested-content-carousel" class="carousel" data-bs-interval="false"
-                data-bs-keyboard="false">
-                <div class="carousel-inner">
-                    <div class="carousel-item table-responsive active">
-                        <table class="table table-striped table-sm" id="modal-fact-nested-content-carousel-page-1">
-                            <tbody tabindex="17">
-                                <!-- Below is populated dynamically VIA JS -->
-                                <tr>
-                                    <td class="text-center">
-                                        <i class="fas fa-spinner fas-spin"></i>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="carousel-item table-responsive">
-                        <table class="table table-striped table-bordered table-sm"
-                            id="modal-fact-nested-content-carousel-page-2">
-                            <tbody tabindex="17">
-                                <!-- Below is populated dynamically VIA JS -->
-                                <tr>
-                                    <td class="text-center">
-                                        <i class="fa fa-regular fa-clock"></i>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="carousel-item table-responsive">
-                        <table class="table table-striped table-sm" id="modal-fact-nested-content-carousel-page-3">
-                            <tbody tabindex="17">
-                                <!-- Below is populated dynamically VIA JS -->
-                                <tr>
-                                    <td class="text-center">
-                                        <i class="fa fa-regular fa-clock"></i>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="carousel-item table-responsive">
-                        <table class="table table-striped table-sm" id="modal-fact-nested-content-carousel-page-4">
-                            <tbody tabindex="17">
-                                <!-- Below is populated dynamically VIA JS -->
-                                <tr>
-                                    <td class="text-center">
-                                        <i class="fa fa-regular fa-clock"></i>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div id="fact-nested-nav-controls" class="dialog-footer d-flex justify-content-around">
-            <button data-test="modal-fact-prev" class="btn btn-link text-dark"
-                data-bs-target="#modal-fact-nested-content-carousel" role="button" data-bs-slide="prev" tabindex="17">
-                <i class="fas fa-chevron-left" title="Previous"></i>
-                <span class="sr-only">Previous</span>
-            </button>
-            <ol id="fact-nested-modal-carousel-indicators" class="carousel-indicators mx-0 my-3 p-initial">
-                <!-- Below is populated dynamically VIA JS -->
-            </ol>
-            <button data-test="modal-fact-next" class="btn btn-link text-dark"
-                data-bs-target="#modal-fact-nested-content-carousel" role="button" data-bs-slide="next" tabindex="17">
-                <i class="fas fa-chevron-right" title="Next"></i>
-                <span class="sr-only">Next</span>
-            </button>
-        </div>
     </div>
 </body>
 

@@ -7,7 +7,7 @@ import { Meta, MetalinksReport, Section } from "./meta";
 export interface InstanceFile {
     current: boolean;
     formInformation: FormInformation;
-    instance: number;
+    instanceIndex: number;
     instanceHtm: string;
     map: Map<string, SingleFact>;
     metaInstance: Meta;

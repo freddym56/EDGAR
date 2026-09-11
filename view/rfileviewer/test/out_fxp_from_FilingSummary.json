@@ -1,0 +1,468 @@
+{
+  "FilingSummary": {
+    "Version": "3.25.3",
+    "ProcessingTime": "",
+    "ReportFormat": "html",
+    "ContextCount": 4,
+    "ElementCount": 32,
+    "EntityCount": 1,
+    "FootnotesReported": false,
+    "SegmentCount": 2,
+    "ScenarioCount": 0,
+    "TuplesReported": false,
+    "UnitCount": 2,
+    "MyReports": {
+      "Report": [
+        {
+          "@_instance": "DTC_instance_FY_2023_2025.xml",
+          "IsDefault": false,
+          "HasEmbeddedReports": false,
+          "HtmlFileName": "R1.htm",
+          "LongName": "0000001 - Document - Cover Page",
+          "ReportType": "Sheet",
+          "Role": "http://solobrands.com/role/CoverPage",
+          "ShortName": "Cover Page",
+          "MenuCategory": "Cover",
+          "Position": 1
+        },
+        {
+          "IsDefault": false,
+          "HasEmbeddedReports": false,
+          "LongName": "All Reports",
+          "ReportType": "Book",
+          "ShortName": "All Reports"
+        }
+      ]
+    },
+    "Logs": {
+      "Log": [
+        {
+          "@_type": "Error",
+          "#text": "[cp-0303-Valid-File-Extension] The document type and naming of \"DTC_instance_FY_2023_2025.xml\" naming is not consistent with one or more of the following:\\n\\nEX-101.INS - XBRL Instance document (Required) *.xml\\nEX-101.SCH - XBRL Taxonomy Extension Schema document *.xsd\\nEX-101.REF - XBRL Taxonomy Extension Reference Linkbase document *.xml\\nEX-101.CAL - XBRL Taxonomy Extension Calculation Linkbase document *.xml\\nEX-101.DEF - XBRL Taxonomy Extension Definition Linkbase document *.xml\\nEX-101.LAB - XBRL Taxonomy Extension Labels Linkbase document *.xml\\nEX-101.PRE - XBRL Taxonomy Extension Presentation Linkbase document *.xml\\n\\nPlease ensure that you comply with the document type and naming provided."
+        },
+        {
+          "@_type": "Warning",
+          "#text": "[dq-60521-EntityFilerCategory-Missing] Submission type 10-Q should have a non-empty value for EntityFilerCategory in the Required Context. DTC_instance_FY_2023_2025.xml"
+        },
+        {
+          "@_type": "Warning",
+          "#text": "[dq-60521-EntityVoluntaryFilers-Unexpected] Submission type 10-Q should not have a value for EntityVoluntaryFilers in the context c. DTC_instance_FY_2023_2025.xml 74"
+        },
+        {
+          "@_type": "Warning",
+          "#text": "[dq-60521-EntityWellKnownSeasonedIssuer-Unexpected] Submission type 10-Q should not have a value for EntityWellKnownSeasonedIssuer in the context c. DTC_instance_FY_2023_2025.xml 77"
+        },
+        {
+          "@_type": "Warning",
+          "#text": "[dq-60521-EntityPublicFloat-Unexpected] Submission type 10-Q should not have a value for EntityPublicFloat in the context c3. DTC_instance_FY_2023_2025.xml 81"
+        },
+        {
+          "@_type": "Warning",
+          "#text": "[dq-60549-DocumentAnnualReport-Unexpected] Submission type 10-Q should not have a value for DocumentAnnualReport in the context c. DTC_instance_FY_2023_2025.xml 80"
+        },
+        {
+          "@_type": "Warning",
+          "#text": "[dq-60521-IcfrAuditorAttestationFlag-Unexpected] Submission type 10-Q should not have a value for IcfrAuditorAttestationFlag in the context c. DTC_instance_FY_2023_2025.xml 65"
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0501-File-Name] Document file name DTC-20251231_lab.xml must start with a-z or 0-9, contain lower case letters, ., -, _, and end with .xsd or .xml."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0501-File-Name] Document file name DTC-20251231.xsd must start with a-z or 0-9, contain lower case letters, ., -, _, and end with .xsd or .xml."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:AccountingStandardsUpdate201609Member.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:AccountsReceivableCreditLossExpense.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:AccruedAdvertisingNoncurrent.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:AccruedInventoryCurrent.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:AccruedLiabilitiesAndOtherLiabilitiesCurrent.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:AccruedShippingCostsCurrent.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:AdjustmentsToAdditionalPaidInCapitalIncomeTaxDeficiencyFromShareBasedCompensation.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:AgreementNameAxis.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:AgreementNameDomain.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:AssetsAndLiabilitiesLesseeTableTextBlock.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:AuditorInformationAbstract.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:BarterArrangementsTextBlock.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:BrandMember.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:BusinessAcquisitionPurchaseOptionPercentageOfVotingInterestsAcquired.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:BusinessCombinationContingentConsiderationArrangementsChangeInAmountOfContingentConsiderationPostClosingPaymentLiability.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:CampStovesAndFirePitsMember.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:CashFlowLesseeAbstract.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:ChubbiesIncMember.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:ChubbiesMember.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:CommonUnitAuthorizedPricePerUnit.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:CommonUnitClassAAndClassBMember.  Please recheck your submission."
+        },
+        {
+          "@_type": "Warning-Semantic",
+          "#text": "[EFM.6.08.05.LC3] Concept solobrands.com:CommonUnitClassAAndClassBMember should match expected LC3 composition CommonUnitClassAndClassBMember - DTC_taxonomy_FY_2023_2025.zip/DTC_taxonomy_FY_2023_2025/DTC-20251231.xsd 7987 - DTC_taxonomy_FY_2023_2025.zip/DTC_taxonomy_FY_2023_2025/DTC-20251231.xsd 7987"
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:CommonUnitClassAMember.  Please recheck your submission."
+        },
+        {
+          "@_type": "Warning-Semantic",
+          "#text": "[EFM.6.08.05.LC3] Concept solobrands.com:CommonUnitClassAMember should match expected LC3 composition CommonUnitClassMember - DTC_taxonomy_FY_2023_2025.zip/DTC_taxonomy_FY_2023_2025/DTC-20251231.xsd 7988 - DTC_taxonomy_FY_2023_2025.zip/DTC_taxonomy_FY_2023_2025/DTC-20251231.xsd 7988"
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:CommonUnitClassBMember.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:CommonUnitMaximumAdditionalAuthorizationThreshold.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:CommonUnitVotes.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:CommonUnitsMember.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:ComprehensiveIncomeLossNetOfTaxAttributableToNoncontrollingInterestExcludingOtherComprehensiveIncomeLossAttributableToNoncontrollingInterests.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:ComprehensiveIncomeLossNetOfTaxIncludingNetIncomeFromNoncontrollingInterests.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:ComputerSoftwareAndOtherEquipmentMember.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:ContingentConsiderationLiabilityMember.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:ContingentConsiderationNoncurrent.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:ContractWithCustomerSalesRebateLiabilityCurrent.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:CostcoMember.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:CumulativeEffectOfNewAccountingPrincipleInPeriodOfAdoption.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:DefaultsTable.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:DeferredTaxAssetsLiabilitiesNetAbstract.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:DeferredTaxAssetsLiabilitiesNetNoncurrent.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:DicksSportingGoodsMember.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:EarningsPerShareBasicAndDilutedAbstract.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:EffectOfExchangeRateOnCashAndCashEquivalents.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:EffectiveIncomeTaxRateReconciliationChangeInStateTaxReservesAmount.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:EffectiveIncomeTaxRateReconciliationChangeInStateTaxReservesPercent.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:EffectiveIncomeTaxRateReconciliationPermanentDifferencesNetAmount.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:EffectiveIncomeTaxRateReconciliationPermanentDifferencesNetPercent.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:EffectiveIncomeTaxRateReconciliationTaxCutsAndJobsActOf2017TransitionTaxOnAccumulatedForeignEarningsPercent.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:ExcessTaxBenefitFromShareBasedCompensationFinancingActivities.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:ExcessTaxBenefitFromShareBasedCompensationOperatingActivities.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:ExchangeOfTradeCredits.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:FairValueAdjustmentOfEarnoutLiabilities.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:FairValueOfThePostClosingPaymentLiability.  Please recheck your submission."
+        },
+        {
+          "@_type": "Warning-Semantic",
+          "#text": "[EFM.6.08.05.LC3] Concept solobrands.com:FairValueOfThePostClosingPaymentLiability should match expected LC3 composition FairValueOfPostClosingPaymentLiability - DTC_taxonomy_FY_2023_2025.zip/DTC_taxonomy_FY_2023_2025/DTC-20251231.xsd 8016 - DTC_taxonomy_FY_2023_2025.zip/DTC_taxonomy_FY_2023_2025/DTC-20251231.xsd 8016"
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:FinanceLeaseCost.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:FirePitsMember.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:GoodwillMeasurementInput.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:ISLEMember.  Please recheck your submission."
+        },
+        {
+          "@_type": "Warning-Semantic",
+          "#text": "[EFM.6.08.05.LC3] Concept solobrands.com:ISLEMember should match expected LC3 composition IsleMember - DTC_taxonomy_FY_2023_2025.zip/DTC_taxonomy_FY_2023_2025/DTC-20251231.xsd 8020 - DTC_taxonomy_FY_2023_2025.zip/DTC_taxonomy_FY_2023_2025/DTC-20251231.xsd 8020"
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:IcyBreezeMember.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:IncentiveAwardPlanMember.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:IncentiveUnitMember.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:IncreaseDecreaseInBarterCredits.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:IncreaseDecreaseInOperatingLeases.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:IncreaseDecreaseInWarrantyProvision.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:IndoorFireAndDecorProductsMember.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:InventoryFinishedProductsInTransitNetOfReserves.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:InventoryFinishedProductsOnHandNetOfReserves.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:KayaksAndKayakAccessoriesMember.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:LeaseLiability.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:LeaseLiabilityCurrent.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:LeaseRightOfUseAsset.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:LeasesWeightedAverageDiscountRateAbstract.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:LesseeOperatingLeaseLeaseNotYetCommencedEstimatedRightOfUseAsset.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:NetDeferredTaxAdjustmentsResultingFromReorganizationTransactions.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:NetIncomeLossEarnedByControllingMembersPriorToTheReorganizationTransactions.  Please recheck your submission."
+        },
+        {
+          "@_type": "Warning-Semantic",
+          "#text": "[EFM.6.08.05.LC3] Concept solobrands.com:NetIncomeLossEarnedByControllingMembersPriorToTheReorganizationTransactions should match expected LC3 composition NetIncomeLossEarnedByControllingMembersPriorToReorganizationTransactions - DTC_taxonomy_FY_2023_2025.zip/DTC_taxonomy_FY_2023_2025/DTC-20251231.xsd 8037 - DTC_taxonomy_FY_2023_2025.zip/DTC_taxonomy_FY_2023_2025/DTC-20251231.xsd 8037"
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:NetIncomePriorToTheReorganizationTransactions.  Please recheck your submission."
+        },
+        {
+          "@_type": "Warning-Semantic",
+          "#text": "[EFM.6.08.05.LC3] Concept solobrands.com:NetIncomePriorToTheReorganizationTransactions should match expected LC3 composition NetIncomePriorToReorganizationTransactions - DTC_taxonomy_FY_2023_2025.zip/DTC_taxonomy_FY_2023_2025/DTC-20251231.xsd 8038 - DTC_taxonomy_FY_2023_2025.zip/DTC_taxonomy_FY_2023_2025/DTC-20251231.xsd 8038"
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:NewAccountingPronouncementMember.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:NewAccountingPronouncementOrChangeInAccountingPrincipleEffectOfAdoptionQuantification.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:NoncontrollingInterestHoldersTaxBenefitPercentage.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:NoncontrollingInterestIncreaseDecreaseFromBusinessCombinationAndPurchaseOfInterests.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:NoncontrollingInterestIncreaseDecreaseFromBusinessCombinationAndPurchaseOfInterestsShares.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:NumberOfAdditionalManufacturers.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:NumberOfManufacturers.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:NumberOfOwners.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:OruKayakIncMember.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:OruMember.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:OtherComprehensiveIncomeLossForeignCurrencyTransactionAndTranslationAdjustmentNetOfTaxIncludingPortionAttributableToNoncontrollingInterest.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:OtherLiabilitiesNoncurrentMiscellaneous.  Please recheck your submission."
+        },
+        {
+          "@_type": "Error",
+          "#text": "[cp-0717-Element-Id]  You did not adhere to the declarations for concepts by containing an \"id\" attribute whose value begins with the recommended namespace prefix of the taxonomy, followed by an underscore, followed by an element name, for the concept solobrands.com:OtherOperatingExpensesPolicyPolicyTextBlock.  Please recheck your submission."
+        },
+        {
+          "@_type": "Info",
+          "#text": "There are more than 100 warnings or errors, only 100 will be displayed."
+        }
+      ]
+    },
+    "InputFiles": {
+      "File": [
+        {
+          "@_doctype": "10-Q",
+          "@_isDefinitelyFs": true,
+          "@_isOnlyDei": true,
+          "@_isUsgaap": true,
+          "#text": "DTC_instance_FY_2023_2025.xml"
+        },
+        "DTC-20251231.xsd",
+        "DTC-20251231_lab.xml"
+      ]
+    },
+    "SupplementalFiles": "",
+    "BaseTaxonomies": {
+      "BaseTaxonomy": {
+        "@_items": 33,
+        "#text": "http://xbrl.sec.gov/dei/2025"
+      }
+    },
+    "HasPresentationLinkbase": false,
+    "HasCalculationLinkbase": false
+  }
+}

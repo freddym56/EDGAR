@@ -20,4 +20,19 @@ describe(`Fact Data | Sidebar`, () => {
             .should('not.have.text', 'Unknown Location')
             .should('have.text', 'nmex20231031_10q.htm');
     });
+
+    it("should render 'D' badge labels for facts with dimensions", () => {
+        cy.loadByAccessionNum('000143774923027411').then(() => {
+            cy.get(selectors.searchHourglass).should('exist');
+            cy.get(selectors.searchHourglass).should('not.be.visible');
+
+            cy.get(selectors.factSidebarToggleBtn).click();
+            cy.get(selectors.sidebarPaginationSelect).select('Page 5')
+            cy.get(selectors.sidebarPaginationSelect).should('contain.text', 'Page 5')
+
+            cy.get(selectors.sidebarFactBadge(63)).should('contain.text', "D") // Nested Array Segment
+            cy.get(selectors.sidebarFactBadge(64)).should('contain.text', "D") // Nested Array Segment
+            cy.get(selectors.sidebarFactBadge(65)).should('contain.text', "D") // Array Segment
+        })
+    })
 });
